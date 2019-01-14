@@ -1,7 +1,7 @@
 # jiteyareta
 Agent Based Modelling
 
-##Bijen:
+## Bijen:
 - food coordinate when found
 - food quality (utility value)
 - accuracy of giving food direction
@@ -10,19 +10,19 @@ Agent Based Modelling
 - range vision
 - bee type
 
-##Food:
+## Food:
 - utility value
 - location
 - regeneration rate
 - type (optional)
 
-##Area:
+## Area:
 - height
 - width
 - txt map of all elements
 - number of hives
 
-##Obstacles:
+## Obstacles:
 - type -> can bees fly over (extra distance)
 - size
 - coordinates
