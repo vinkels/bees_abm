@@ -22,6 +22,9 @@ class Bee(Agent):
         super().__init__(unique_id, model)
         self.id = id
 
+    def step(self):
+        print("stepped")
+
 # if __name__ == '__main__':
 #     FoodModel = HiveModel(10, 10)
 #     FoodModel.step()

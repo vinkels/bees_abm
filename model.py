@@ -4,6 +4,7 @@ from mesa.space import MultiGrid
 import random as rd
 
 from food import Bee
+from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
     def __init__(self, width, height):
@@ -12,15 +13,21 @@ class BeeForagingModel(Model):
         self.width = height
 
         self.grid = MultiGrid(self.width, self.height, torus=True)
-        self.start_food = 5
-        self.n_food = 0
-        self.foods = []
 
+        self.schedule = RandomActivationBeeWorld(self)
+
+        # # Food Info
+        # self.start_food = 5
+        # self.n_food = 0
+        # self.foods = []
+
+        # Init bees
         bee = Bee(unique_id=self.next_id(), model=self)
-
         self.grid.place_agent(bee, (0, 0))
+        self.schedule.add(bee)
 
-
+    def step(self):
+        self.schedule.step()
 
         # self.init_food()
 
