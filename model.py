@@ -28,6 +28,10 @@ class BeeForagingModel(Model):
         self.grid.place_agent(bee, (0, 0))
         self.schedule.add(bee)
 
+        bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "foraging")
+        self.grid.place_agent(bee_for, (0, 0))
+        self.schedule.add(bee_for)
+
         food = Food(id = self.next_id(), model = self, pos = (3,3), util = 5)
         self.grid.place_agent(food, (3, 3))
 

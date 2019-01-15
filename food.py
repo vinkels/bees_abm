@@ -25,6 +25,11 @@ class Hive(Agent):
         super().__init__(unique_id, model)
         self.unique_id = unique_id
         self.pos = pos
+        self.food_locs = []
+
+    def receive_info(self, info):
+        self.food_locs.append(info)
+
 
     def step(self):
         print(f'The Hive is alive')
@@ -43,6 +48,7 @@ class Bee(Agent):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
         '''
+        print("random moved")
         
         # get neighborhood
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
@@ -74,6 +80,9 @@ class Bee(Agent):
         # move to neighbour cell
         self.model.grid.move_agent(self, go_to)
 
+    def give_hive_info(self):
+
+
 
     def step(self):
         '''
@@ -81,14 +90,16 @@ class Bee(Agent):
         '''
 
         # random search bee
+        print(self.__dict__)
+
         if self.type_bee == "scout":
 
             # bee is going to random search
-            if self.loaded == False:
+            if self.loaded is False:
                 self.random_move()
 
-            # check for food on current cell    
-            neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+                # check for food on current cell    
+                neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
                 for nb in neighbors:
                     if type(nb) == Food:
 
@@ -109,3 +120,6 @@ class Bee(Agent):
 
                 else:
                     self.move(self.hive_loc)
+
+        elif self.type_bee == "foraging":
+
