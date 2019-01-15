@@ -32,7 +32,8 @@ class Hive(Agent):
 
 
     def step(self):
-        print(f'The Hive is alive')
+        # print(f'The Hive is alive. Food is at', self.food_locs)
+        pass
 
 class Bee(Agent):
 
@@ -48,7 +49,6 @@ class Bee(Agent):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
         '''
-        print("random moved")
         
         # get neighborhood
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
@@ -80,7 +80,12 @@ class Bee(Agent):
         # move to neighbour cell
         self.model.grid.move_agent(self, go_to)
 
-    def give_hive_info(self):
+    def arrive_at_hive(self, hive):
+        ''' 
+        A scouting bee arrives back at the hive
+        '''
+        self.loaded = False
+        hive.receive_info(self.food_loc)
 
 
 
@@ -90,8 +95,6 @@ class Bee(Agent):
         '''
 
         # random search bee
-        print(self.__dict__)
-
         if self.type_bee == "scout":
 
             # bee is going to random search
@@ -109,17 +112,64 @@ class Bee(Agent):
 
                             # take food and remember location
                             self.loaded = True
-                            self.food_loc.append(self.pos)
+                            self.food_loc = self.pos
+
 
             # if he has found a food source, return to hive
             else:
 
                 # check if destination is reached
-                if self.pos == self.hive_loc:
-                    self.loaded = False
+                env = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+                for loc in env:
+                    if type(loc) == Hive:
+                        self.arrive_at_hive(loc)
 
-                else:
-                    self.move(self.hive_loc)
+                    else:
+                        self.move(self.hive_loc)
+
+        elif self.type_bee == "rester":
+            '''
+            This type of bees stays at the hive, until a location for food is known and then he becomes a foraging bee
+            '''
+
+            env = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+            for loc in env:
+                if type(loc) == Hive:
+                    if loc.food_locs:
+                        self.type_bee = "foraging"
+                        self.food_loc= loc.food_locs[0]
 
         elif self.type_bee == "foraging":
+            '''
+            This type of bee goes to a given food location, takes the food and return to the hive
+            '''
+            
+            # if not yet arrived at food location
+            if self.loaded is False:
+
+                # check if arrived, then take food
+                if self.food_loc == self.pos:
+                    neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+                    for nb in neighbors:
+                        if type(nb) == Food:
+
+                            # if the source is not yet empty
+                            if nb.util > 0:
+                                nb.get_eaten()
+
+                                # take food and remember location
+                                self.loaded = True
+
+                # else, move to location
+                else:
+                    self.move(self.food_loc)
+
+            # if loaded, return to hive
+            else:
+                self.move(self.hive_loc)
+
+                if self.hive_loc == self.pos:
+                    self.type_bee = "rester"
+
+
 

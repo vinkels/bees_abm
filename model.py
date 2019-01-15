@@ -28,7 +28,7 @@ class BeeForagingModel(Model):
         self.grid.place_agent(bee, (0, 0))
         self.schedule.add(bee)
 
-        bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "foraging")
+        bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "rester")
         self.grid.place_agent(bee_for, (0, 0))
         self.schedule.add(bee_for)
 
