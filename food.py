@@ -6,48 +6,59 @@ import math
 
 
 class Food(Agent):
-    def __init__(self, id, model, pos, util):
-        super().__init__(id, model)
-        self.id = id
-        self.model = model
+    def __init__(self, model, pos, util):
+        super().__init__(model.next_id(), model)
+
         self.pos = pos
         self.util = util
 
     def step(self):
-        print(f'current location: {self.pos}')
-        print(f'current utility: {self.util}')
+        print(f'current location: {self.pos}, current utility: {self.util}')
 
     def get_eaten(self):
         self.util -= 1
 
 class Hive(Agent):
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id, model)
-        self.unique_id = unique_id
+    def __init__(self, model, pos):
+        super().__init__(model.next_id(), model)
+
         self.pos = pos
         self.food_locs = []
+
+        self.food = 0
 
     def receive_info(self, info):
         self.food_locs.append(info)
 
-
     def step(self):
-        print(f'The Hive is alive')
+        # Make random new bees
+        # TODO make this actually depend on queen, drones and food resources.
+        if rd.random() > 0.99:
+            bee = Bee(self.model, self.pos, self, "scout")
+            self.model.add_agent(bee, self.pos)
+
+    def unload_food(self, food=1):
+        self.food += 1
+
+    def get_food_stat(self):
+        return self.food
 
 class Obstacle(Agent):
     def __init__(self, unique_id, model, pos):
         super().__init__(unique_id, model)
         self.unique_id = unique_id
         self.pos = pos
+        
+
 
 class Bee(Agent):
+    def __init__(self, model, pos, hive, type_bee):
+        super().__init__(model.next_id(), model)
 
-    def __init__(self, unique_id, model, type_bee):
-        super().__init__(unique_id, model)
-        self.id = id
         self.loaded = False
         self.food_loc = []
-        self.hive_loc = (0, 0)
+        self.hive_loc = hive.pos
+        self.pos = pos
         self.type_bee = type_bee
 
     def random_move(self):
@@ -82,7 +93,6 @@ class Bee(Agent):
         else:
             return neighbourhood
     
-
     def move(self, loc):
 
         neighborhood = self.avoid_obstacle(self.pos)
@@ -112,6 +122,11 @@ class Bee(Agent):
         Move the bee, look around for a food source and take food source
         '''
 
+        # Kill random bees, TODO make this depend on energy
+        if rd.random() > 0.99:
+            self.model.remove_agent(self)
+            return
+
         # random search bee
         # print(self.__dict__)
 
@@ -139,11 +154,13 @@ class Bee(Agent):
 
                 # check if destination is reached
                 if self.pos == self.hive_loc:
-                    self.loaded = False
-
+                    neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+                    for nb in neighbors:
+                        if type(nb) == Hive:
+                            self.loaded = False
+                            nb.unload_food()
                 else:
                     self.move(self.hive_loc)
 
         elif self.type_bee == "foraging":
             pass
-
