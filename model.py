@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
-from food import Bee, Food, Hive
+from food import Bee, Food, Hive, Obstacle
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
@@ -27,6 +27,11 @@ class BeeForagingModel(Model):
         bee = Bee(unique_id=self.next_id(), model=self, type_bee = "scout")
         self.grid.place_agent(bee, (0, 0))
         self.schedule.add(bee)
+
+        #Init obstacle
+        obs_position = (rd.randrange(self.width),rd.randrange(self.height))
+        obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
+        self.grid.place_agent(obstacle, obs_position)
 
         bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "foraging")
         self.grid.place_agent(bee_for, (0, 0))

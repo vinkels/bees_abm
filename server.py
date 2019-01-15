@@ -1,7 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-from food import Bee, Food, Hive
+from food import Bee, Food, Hive,Obstacle
 from model import BeeForagingModel
 
 color_dic = {
@@ -40,6 +40,14 @@ def hive_portrayal(agent):
         portrayal["Layer"] = 0
         portrayal["Filled"] = "true"
         portrayal["Color"] = "RED"
+        portrayal["w"] = 1
+        portrayal["h"] = 1
+    elif type(agent) is Obstacle:
+        portrayal["Shape"] = "rect"
+        portrayal["scale"] = 0.9
+        portrayal["Layer"] = 0
+        portrayal["Filled"] = "true"
+        portrayal["Color"] = "GREEN"
         portrayal["w"] = 1
         portrayal["h"] = 1
 
