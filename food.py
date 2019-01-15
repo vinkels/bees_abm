@@ -40,6 +40,9 @@ class Hive(Agent):
     def unload_food(self, food=1):
         self.food += 1
 
+    def get_food_stat(self):
+        return self.food
+
 class Bee(Agent):
     def __init__(self, model, pos, hive, type_bee):
         super().__init__(model.next_id(), model)

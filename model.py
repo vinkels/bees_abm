@@ -19,21 +19,24 @@ class BeeForagingModel(Model):
         self.schedule = RandomActivationBeeWorld(self)
 
         # Init Hive
-        hive = Hive(self, (0,0))
-        self.add_agent(hive, (0, 0))
+        self.hive = Hive(self, (0,0))
+        self.add_agent(self.hive, (0, 0))
 
         # Init Bees
-        bee = Bee(self, hive.pos, hive, "scout")
-        self.add_agent(bee, hive.pos)
+        bee = Bee(self, self.hive.pos, self.hive, "scout")
+        self.add_agent(bee, self.hive.pos)
 
-        bee_for = Bee(self, hive.pos, hive, "foraging")
-        self.add_agent(bee_for, hive.pos)
+        bee_for = Bee(self, self.hive.pos, self.hive, "foraging")
+        self.add_agent(bee_for, self.hive.pos)
 
         # Init Food
         food = Food(self, (3,3), 5)
         self.add_agent(food, (3, 3))
 
-        self.datacollector = DataCollector({"Bees": lambda m: m.schedule.get_breed_count(Bee)})
+        self.datacollector = DataCollector({
+            "Bees": lambda m: m.schedule.get_breed_count(Bee), 
+            "HiveFood": lambda m: m.hive.get_food_stat()
+        })
         self.datacollector.collect(self)
 
     def step(self):
