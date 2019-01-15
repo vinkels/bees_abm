@@ -16,12 +16,16 @@ class Food(Agent):
         print(f'current location: {self.pos}')
         print(f'current utility: {self.util}')
 
+    def get_eaten(self):
+        self.util -= 1
+
 class Bee(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.id = id
         self.loaded = False
+        self.food_loc = []
 
     def random_move(self):
         '''
@@ -43,11 +47,22 @@ class Bee(Agent):
         '''
         Move the bee, look around for a food source and take food source
         '''
-        self.random_move()
+
+        if self.loaded == False:
+            self.random_move()
+
+            neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+            print(neighbors)
+            for nb in neighbors:
+                if type(nb) == Food:
+                    print(nb.util)
+                    self.loaded = True
+                    self.food_loc.append(self.pos)
+
+        # else:
 
 
-    def step(self):
-        print("stepped")
+
 
 # if __name__ == '__main__':
 #     FoodModel = HiveModel(10, 10)

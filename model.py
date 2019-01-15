@@ -3,7 +3,7 @@ from mesa import Agent
 from mesa.space import MultiGrid
 import random as rd
 
-from food import Bee
+from food import Bee, Food
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
@@ -12,7 +12,7 @@ class BeeForagingModel(Model):
         self.height = width
         self.width = height
 
-        self.grid = MultiGrid(self.width, self.height, torus=True)
+        self.grid = MultiGrid(self.width, self.height, torus=False)
 
         self.schedule = RandomActivationBeeWorld(self)
 
@@ -25,6 +25,9 @@ class BeeForagingModel(Model):
         bee = Bee(unique_id=self.next_id(), model=self)
         self.grid.place_agent(bee, (0, 0))
         self.schedule.add(bee)
+
+        food = Food(id = self.next_id(), model = self, pos = (3,3), util = 5)
+        self.grid.place_agent(food, (3, 3))
 
     def step(self):
         self.schedule.step()
