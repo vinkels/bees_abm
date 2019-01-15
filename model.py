@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
-from food import Bee, Food
+from food import Bee, Food, Hive
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
@@ -17,6 +17,11 @@ class BeeForagingModel(Model):
         self.grid = MultiGrid(self.width, self.height, torus=False)
 
         self.schedule = RandomActivationBeeWorld(self)
+
+        # Init Hive
+        hive = Hive(unique_id=self.next_id(), model=self, pos=(0,0))
+        self.grid.place_agent(hive, (0, 0))
+        self.schedule.add(hive)
 
         # Init bees
         bee = Bee(unique_id=self.next_id(), model=self, type_bee = "scout")

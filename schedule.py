@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from mesa.time import RandomActivation
 
-from food import Bee, Food
+from food import Bee, Food, Hive
 
 
 class RandomActivationBeeWorld(RandomActivation):
@@ -16,11 +16,12 @@ class RandomActivationBeeWorld(RandomActivation):
         super().__init__(model)
 
         self.agents_by_breed = {
+            Hive: {},
             Bee: {},
             Food: {}
         }
 
-        self.agent_order = [Food, Bee]
+        self.agent_order = [Food, Hive, Bee]
 
     def add(self, agent):
         '''

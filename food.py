@@ -20,6 +20,15 @@ class Food(Agent):
     def get_eaten(self):
         self.util -= 1
 
+class Hive(Agent):
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id, model)
+        self.unique_id = unique_id
+        self.pos = pos
+
+    def step(self):
+        print(f'The Hive is alive')
+
 class Bee(Agent):
 
     def __init__(self, unique_id, model, type_bee):
