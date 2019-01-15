@@ -9,8 +9,8 @@ from schedule import RandomActivationBeeWorld
 class BeeForagingModel(Model):
     def __init__(self, width, height):
         super().__init__()
-        self.height = width
-        self.width = height
+        self.height = height
+        self.width = width
 
         self.grid = MultiGrid(self.width, self.height, torus=True)
 
