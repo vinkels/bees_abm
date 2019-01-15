@@ -34,29 +34,17 @@ def hive_portrayal(agent):
         portrayal["Color"] = "#f4df42"
         portrayal["r"] = 0.5
 
-    # elif type(agent) is Sugar:
-    #     if agent.amount != 0:
-    #         portrayal["Color"] = color_dic[agent.amount]
-    #     else:
-    #         portrayal["Color"] = "#D6F5D6"
-
-    #     portrayal["Shape"] = "rect"
-    #     portrayal["Filled"] = "true"
-    #     portrayal["Layer"] = 0
-    #     portrayal["w"] = 1
-    #     portrayal["h"] = 1
-
     return portrayal
 
 width = 5
 height = 5
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
-# chart_element = ChartModule([{"Label": "SsAgent", "Color": "#AA0000"}])
+chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}])
 
 server = ModularServer(
     BeeForagingModel, 
-    [canvas_element], 
+    [canvas_element, chart_element], 
     "Hive", 
     {
         "width": width, 
