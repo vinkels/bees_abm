@@ -19,7 +19,7 @@ class BeeForagingModel(Model):
         self.schedule = RandomActivationBeeWorld(self)
 
         # Init bees
-        bee = Bee(unique_id=self.next_id(), model=self)
+        bee = Bee(unique_id=self.next_id(), model=self, type_bee = "scout")
         self.grid.place_agent(bee, (0, 0))
         self.schedule.add(bee)
 
