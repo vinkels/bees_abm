@@ -1,7 +1,8 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-from food import Bee, HiveModel
+from food import Bee
+from model import HiveModel
 
 color_dic = {
     4: "#005C00",
@@ -18,9 +19,12 @@ def hive_portrayal(agent):
     portrayal = {}
 
     if type(agent) is Bee:
-        portrayal["Shape"] = "circle"
+        portrayal["Shape"] = "rect"
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
+        portrayal["Color"] = "#000000"
+        portrayal["w"] = 1
+        portrayal["h"] = 1
 
     # elif type(agent) is Sugar:
     #     if agent.amount != 0:
