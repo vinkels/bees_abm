@@ -19,12 +19,12 @@ def hive_portrayal(agent):
     portrayal = {}
 
     if type(agent) is Bee:
-        portrayal["Shape"] = "rect"
+        portrayal["Shape"] = "circle"
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
+        portrayal["Filled"] = "true"
         portrayal["Color"] = "#000000"
-        portrayal["w"] = 1
-        portrayal["h"] = 1
+        portrayal["r"] = 0.5
 
     # elif type(agent) is Sugar:
     #     if agent.amount != 0:
