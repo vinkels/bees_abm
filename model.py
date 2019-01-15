@@ -5,11 +5,12 @@ import random as rd
 
 from food import Bee
 
-class HiveModel(Model):
+class BeeForagingModel(Model):
     def __init__(self, width, height):
         super().__init__()
         self.height = width
         self.width = height
+
         self.grid = MultiGrid(self.width, self.height, torus=True)
         self.start_food = 5
         self.n_food = 0
@@ -22,6 +23,12 @@ class HiveModel(Model):
 
 
         # self.init_food()
+
+    # def new_food(self, pos):
+    #     self.n_food += 1
+    #     new_food = agent_type(Food, self.model, pos)
+    #     self.grid.place_agent(new_food, pos)
+    #     self.foods.append(new_food)
 
     # def remove_food(self, food):
     #     '''

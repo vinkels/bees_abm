@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
 from food import Bee
-from model import HiveModel
+from model import BeeForagingModel
 
 color_dic = {
     4: "#005C00",
@@ -47,7 +47,7 @@ canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
 # chart_element = ChartModule([{"Label": "SsAgent", "Color": "#AA0000"}])
 
 server = ModularServer(
-    HiveModel, 
+    BeeForagingModel, 
     [canvas_element], 
     "Hive", 
     {

@@ -16,13 +16,6 @@ class Food(Agent):
         print(f'current location: {self.pos}')
         print(f'current utility: {self.util}')
 
-
-    def new_food(self, pos):
-        self.n_food += 1
-        new_food = agent_type(Food, self.model, pos)
-        self.grid.place_agent(new_food, pos)
-        self.foods.append(new_food)
-
 class Bee(Agent):
 
     def __init__(self, unique_id, model):
