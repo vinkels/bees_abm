@@ -6,6 +6,7 @@ import random as rd
 
 class HiveModel(Model):
     def __init__(self, width, height):
+        super().__init__()
         self.height = width
         self.width = height
         self.grid = MultiGrid(self.width, self.height, torus=True)
@@ -27,7 +28,6 @@ class HiveModel(Model):
         self.agents.remove(food)
 
     def step(self):
-
         for food in list(self.foods):
             food.step()
 
@@ -53,7 +53,6 @@ class Food(Agent):
 
 
     def new_food(self, pos):
-
         self.n_food += 1
         new_food = agent_type(Food, self.model, pos)
         self.grid.place_agent(new_food, pos)
