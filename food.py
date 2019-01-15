@@ -28,6 +28,30 @@ class Bee(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.id = id
+        self.loaded = False
+
+    def random_move(self):
+        '''
+        This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
+        '''
+        
+        # get neighborhood
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
+        print(neighborhood)
+        
+        # select random cell in neighbourhood
+        select_coor = rd.randint(0, len(neighborhood) - 1)
+        
+        # move to cell
+        self.model.grid.move_agent(self, neighborhood[select_coor])
+
+
+    def step(self):
+        '''
+        Move the bee, look around for a food source and take food source
+        '''
+        self.random_move()
+
 
 # if __name__ == '__main__':
 #     FoodModel = HiveModel(10, 10)

@@ -19,6 +19,10 @@ class HiveModel(Model):
 
         self.grid.place_agent(bee, (0, 0))
 
+    def run_model(self):
+        print("Hallo")
+        bee.step()
+
 
 
         # self.init_food()
