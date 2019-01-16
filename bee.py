@@ -22,9 +22,20 @@ class BeeStrategy:
 
 
 class Rester(BeeStrategy):
+    '''
+    This type of bees stays at the hive, until a location for food is known and then he becomes a foraging bee
+    '''
 
     def step(self):
-        print("rester")
+        bee = self.bee
+        env = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
+        for loc in env:
+            if type(loc) == Hive:
+                if loc.food_locs:
+                    bee.type_bee = "foraging"
+                    print("Aantal food locs: ", len(loc.food_locs))
+                    chosen_loc = rd.randint(0, len(loc.food_locs) - 1)
+                    bee.food_loc = loc.food_locs[chosen_loc]
 
 
 class Scout(BeeStrategy):
@@ -63,9 +74,43 @@ class Scout(BeeStrategy):
 
 
 class Foraging(BeeStrategy):
+    '''
+    This type of bee goes to a given food location, takes the food and return to the hive
+    '''
 
-    def step(self):
-        print("foraging")
+    def step(self):   
+        bee = self.bee
+
+        # if not yet arrived at food location
+        if bee.loaded is False:
+
+            # check if arrived, then take food
+            if bee.food_loc == bee.pos:
+                neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
+                for nb in neighbors:
+                    if type(nb) == Food:
+
+                        # if the source is not yet empty
+                        if nb.util > 0:
+                            nb.get_eaten()
+
+                            # take food and remember location
+                            self.loaded = True
+
+                        else:
+                            self.type_bee = "scout"
+
+            # else, move to location
+
+            else:
+                bee.move(bee.food_loc)
+
+        # if loaded, return to hive
+        else:
+            bee.move(bee.hive_loc)
+
+            if bee.hive_loc == bee.pos:
+                bee.type_bee = "rester"
 
 
 bee_strategies = {
@@ -109,12 +154,11 @@ class Bee(Agent):
         
         neighbourhood = self.model.grid.get_neighborhood(self.pos, moore=True)
 
-        accessible_neighbourhood = [
+        return [
             loc
             for loc in neighbourhood
             if loc not in obstacles
         ]
-        return accessible_neighbourhood
     
     def move(self, loc):
 
@@ -163,61 +207,5 @@ class Bee(Agent):
         if self.age > 40:
             self.type_bee = "scout"
 
-        # random search bee
-        if self.type_bee == "scout":
-
-            strategy = bee_strategies[self.type_bee]
-            strategy(self).step()
-
-        elif self.type_bee == "rester":
-            '''
-            This type of bees stays at the hive, until a location for food is known and then he becomes a foraging bee
-            '''
-
-            env = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
-            for loc in env:
-                if type(loc) == Hive:
-                    if loc.food_locs:
-                        self.type_bee = "foraging"
-                        print("Aantal food locs: ", len(loc.food_locs))
-                        chosen_loc = rd.randint(0, len(loc.food_locs) - 1)
-                        self.food_loc= loc.food_locs[chosen_loc]
-
-        elif self.type_bee == "foraging":
-            '''
-            This type of bee goes to a given food location, takes the food and return to the hive
-            '''
-            
-            # if not yet arrived at food location
-            if self.loaded is False:
-
-                # check if arrived, then take food
-                if self.food_loc == self.pos:
-                    neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
-                    for nb in neighbors:
-                        if type(nb) == Food:
-
-                            # if the source is not yet empty
-                            if nb.util > 0:
-                                nb.get_eaten()
-
-                                # take food and remember location
-                                self.loaded = True
-
-                            else:
-                                self.type_bee = "scout"
-
-                # else, move to location
-
-                else:
-                    self.move(self.food_loc)
-
-            # if loaded, return to hive
-            else:
-                self.move(self.hive_loc)
-
-                if self.hive_loc == self.pos:
-                    self.type_bee = "rester"
-
-        else:
-            raise Exception("Dat is geen bij!")
+        strategy = bee_strategies[self.type_bee]
+        strategy(self).step()
