@@ -23,17 +23,21 @@ class BeeForagingModel(Model):
         self.add_agent(self.hive, (0, 0))
 
         # Init Bees
-        for i in range(0, 4):
-            bee = Bee(self, hive.pos, hive, "scout")
-            self.add_agent(bee, hive.pos)
 
-            # bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "rester")
-            bee_for = Bee(self, hive.pos, hive, "rester")
-            self.grid.place_agent(bee_for, (0, 0))
-            self.schedule.add(bee_for)
-            self.add_agent(bee_for, hive.pos)
+        bee = Bee(self, self.hive.pos, self.hive, "scout")
+        self.add_agent(bee, self.hive.pos)
 
-            # Init Food
+        #Init obstacle
+        obs_position = (rd.randrange(self.width),rd.randrange(self.height))
+        obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
+        
+        self.grid.place_agent(obstacle, obs_position)
+        
+        bee_for = Bee(self, self.hive.pos, self.hive, "rester")
+        self.add_agent(bee_for, self.hive.pos)
+        
+
+        # Init Food
         for i in range(0, 10):
             loc1 = rd.randint(0, width - 1)
             loc2 = rd.randint(0, height - 1)
