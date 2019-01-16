@@ -71,3 +71,21 @@ class RandomActivationBeeWorld(RandomActivation):
         Returns the current number of agents of certain breed in the queue.
         '''
         return len(self.agents_by_breed[breed_class].values())
+
+    def get_scout_count(self):
+
+        scout_count = 0
+        for_count = 0
+        rest_count = 0
+        agents = self.agents
+        for agent in agents:
+            if type(agent) == Bee:
+                if agent.type_bee == "scout":
+                    scout_count += 1
+                elif agent.type_bee == "foraging":
+                    for_count += 1
+                elif agent.type_bee == "rester":
+                    rest_count += 1
+
+
+        return scout_count, for_count, rest_count

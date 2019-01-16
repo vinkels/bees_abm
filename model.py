@@ -24,18 +24,18 @@ class BeeForagingModel(Model):
         self.add_agent(self.hive, (0, 0))
 
         # Init Bees
+        for i in range(0, 20):
+            bee = Bee(self, self.hive.pos, self.hive, "scout")
+            self.add_agent(bee, self.hive.pos)
 
-        bee = Bee(self, self.hive.pos, self.hive, "scout")
-        self.add_agent(bee, self.hive.pos)
+            bee_for = Bee(self, self.hive.pos, self.hive, "rester")
+            self.add_agent(bee_for, self.hive.pos)
 
         #Init obstacle
         obs_position = (rd.randrange(self.width),rd.randrange(self.height))
         obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
         
         self.grid.place_agent(obstacle, obs_position)
-        
-        bee_for = Bee(self, self.hive.pos, self.hive, "rester")
-        self.add_agent(bee_for, self.hive.pos)
         
 
         # Init Food
@@ -45,9 +45,14 @@ class BeeForagingModel(Model):
             food = Food(self, (loc1,loc2), rd.randint(1, 4))
             self.add_agent(food, (loc1, loc2))
 
+        
+
         self.datacollector = DataCollector({
-            "Bees": lambda m: m.schedule.get_breed_count(Bee), 
-            "HiveFood": lambda m: m.hive.get_food_stat()
+            "Bees": lambda m: m.schedule.get_breed_count(Bee),
+            "HiveFood": lambda m: m.hive.get_food_stat(),
+            "Scout bees": lambda m: m.schedule.get_scout_count()[0],
+            "Foraging bees": lambda m: m.schedule.get_scout_count()[1],
+            "Rester bees": lambda m: m.schedule.get_scout_count()[2]
         })
         self.datacollector.collect(self)
 
