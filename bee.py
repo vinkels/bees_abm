@@ -28,14 +28,20 @@ class Rester(BeeStrategy):
 
     def step(self):
         bee = self.bee
-        env = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-        for loc in env:
-            if type(loc) == Hive:
-                if loc.food_locs:
-                    bee.type_bee = "foraging"
-                    print("Aantal food locs: ", len(loc.food_locs))
-                    chosen_loc = rd.randint(0, len(loc.food_locs) - 1)
-                    bee.food_loc = loc.food_locs[chosen_loc]
+
+        # Resting bees can only be at the hive.
+        assert bee.pos == bee.hive_loc
+
+        hive = [
+            nb 
+            for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0) 
+            if type(nb) == Hive
+        ][0]
+
+        if hive.food_locs:
+            bee.type_bee = "foraging"
+            chosen_loc = rd.randint(0, len(hive.food_locs) - 1)
+            bee.food_loc = hive.food_locs[chosen_loc]
 
 
 class Scout(BeeStrategy):
