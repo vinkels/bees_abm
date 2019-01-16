@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
-from food import Bee, Food, Hive
+from food import Bee, Food, Hive, Obstacle
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
@@ -19,8 +19,8 @@ class BeeForagingModel(Model):
         self.schedule = RandomActivationBeeWorld(self)
 
         # Init Hive
-        hive = Hive(self, (0,0))
-        self.add_agent(hive, (0, 0))
+        self.hive = Hive(self, (0,0))
+        self.add_agent(self.hive, (0, 0))
 
         # Init Bees
         for i in range(0, 4):
@@ -40,7 +40,10 @@ class BeeForagingModel(Model):
             food = Food(self, (loc1,loc2), rd.randint(1, 4))
             self.add_agent(food, (loc1, loc2))
 
-        self.datacollector = DataCollector({"Bees": lambda m: m.schedule.get_breed_count(Bee)})
+        self.datacollector = DataCollector({
+            "Bees": lambda m: m.schedule.get_breed_count(Bee), 
+            "HiveFood": lambda m: m.hive.get_food_stat()
+        })
         self.datacollector.collect(self)
 
     def step(self):

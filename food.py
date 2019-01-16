@@ -43,6 +43,17 @@ class Hive(Agent):
     def unload_food(self, food=1):
         self.food += 1
 
+    def get_food_stat(self):
+        return self.food
+
+class Obstacle(Agent):
+    def __init__(self, unique_id, model, pos):
+        super().__init__(unique_id, model)
+        self.unique_id = unique_id
+        self.pos = pos
+        
+
+
 class Bee(Agent):
     def __init__(self, model, pos, hive, type_bee):
         super().__init__(model.next_id(), model)
@@ -59,18 +70,36 @@ class Bee(Agent):
         This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
         '''
         
-        # get neighborhood
-        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
-        
-        # select random cell in neighbourhood
-        select_coor = rd.randint(0, len(neighborhood) - 1)
-        
-        # move to cell
-        self.model.grid.move_agent(self, neighborhood[select_coor])
+        #get neighboorhood
+        neighbourhood = self.avoid_obstacle(self.pos)
 
+        # select random cell in neighbourhood        
+        select_coords = rd.randint(0, len(neighbourhood) - 1)
+        # move to cell
+        self.model.grid.move_agent(self, neighbourhood[select_coords])
+
+    def avoid_obstacle(self, position):
+        
+        # get neighborhood
+        neighbours = self.model.grid.get_neighbors(position, moore=True)
+        obstacle_location = None
+    
+        for nb in neighbours:
+            if type(nb) == Obstacle:
+                obstacle_location = nb.pos
+        
+        neighbourhood = self.model.grid.get_neighborhood(position, moore=True)
+        if obstacle_location is not None:
+            for nb in neighbourhood:
+                if nb == obstacle_location:
+                    neighbourhood.remove(nb)
+            return neighbourhood
+        else:
+            return neighbourhood
+    
     def move(self, loc):
 
-        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=True)
+        neighborhood = self.avoid_obstacle(self.pos)
 
         # determine distance of current position to goal
         min_dist = math.sqrt( ((self.pos[0]-loc[0])**2)+((self.pos[1]-loc[1])**2))

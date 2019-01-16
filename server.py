@@ -1,7 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-from food import Bee, Food, Hive
+from food import Bee, Food, Hive,Obstacle
 from model import BeeForagingModel
 
 color_dic = {
@@ -46,6 +46,14 @@ def hive_portrayal(agent):
         portrayal["Color"] = "RED"
         portrayal["w"] = 1
         portrayal["h"] = 1
+    elif type(agent) is Obstacle:
+        portrayal["Shape"] = "rect"
+        portrayal["scale"] = 0.9
+        portrayal["Layer"] = 0
+        portrayal["Filled"] = "true"
+        portrayal["Color"] = "GREEN"
+        portrayal["w"] = 1
+        portrayal["h"] = 1
 
     return portrayal
 
@@ -53,7 +61,7 @@ width = 20
 height = 20
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
-chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}])
+chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}], 500, 500)
 
 server = ModularServer(
     BeeForagingModel, 
