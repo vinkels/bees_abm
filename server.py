@@ -1,7 +1,11 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-from food import Bee, Food, Hive,Obstacle
+from food import Food
+from bee import Bee
+from hive import Hive
+from obstacle import Obstacle
+
 from model import BeeForagingModel
 
 color_dic = {
