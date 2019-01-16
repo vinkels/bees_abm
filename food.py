@@ -13,7 +13,8 @@ class Food(Agent):
         self.util = util
 
     def step(self):
-        self.util += 1
+        if self.util < 5:
+            self.util += 1
 
     def get_eaten(self):
         self.util -= 1
@@ -24,8 +25,9 @@ class Hive(Agent):
 
         self.pos = pos
         self.food_locs = []
-
         self.food = 0
+        self.n_bees = 0
+        self.hungry = False
 
     def receive_info(self, info):
         if info not in self.food_locs:
@@ -35,12 +37,37 @@ class Hive(Agent):
 
         # Make random new bees
         # TODO make this actually depend on queen, drones and food resources.
-        print(self.food_locs)
 
-        if rd.random() > 0.90:
-            bee = Bee(self.model, self.pos, self, "rester")
-            self.model.add_agent(bee, self.pos)
+        # determine number of bees in hive
+        bees_hive = self.model.grid.get_neighbors(self.pos, moore=True, include_center = True, radius = 0)
+        self.n_bees = len(bees_hive)
 
+        # give every bee a chance of reproduction
+        for bee in range(0, self.n_bees):
+            
+            if self.food > 0:
+                self.food -= 0.1
+                self.hungry = False
+
+            else:
+                self.hungry = True
+
+            if not self.hungry:
+                if self.n_bees > self.food:
+                    if rd.random() > 0.98:
+                        bee = Bee(self.model, self.pos, self, "rester")
+                        self.model.add_agent(bee, self.pos)
+                        self.n_bees += 1
+
+                else:
+                    if rd.random() > 0.90:
+                        bee = Bee(self.model, self.pos, self, "rester")
+                        self.model.add_agent(bee, self.pos)
+                        self.n_bees += 1
+
+
+
+        
     def unload_food(self, food=1):
         self.food += 1
 
@@ -135,7 +162,7 @@ class Bee(Agent):
 
         self.age += 1
 
-        if self.age > 40:
+        if self.age > 40 and self.type_bee == "rester":
             self.type_bee = "scout"
 
         # Kill random bees, TODO make this depend on energy
@@ -151,7 +178,7 @@ class Bee(Agent):
                 self.random_move()
 
                 # check for food on current cell    
-                neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
+                neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=1)
                 for nb in neighbors:
                     if type(nb) == Food:
 
@@ -161,7 +188,7 @@ class Bee(Agent):
 
                             # take food and remember location
                             self.loaded = True
-                            self.food_loc = self.pos
+                            self.food_loc = nb.pos
 
 
             # if he has found a food source, return to hive
@@ -172,6 +199,7 @@ class Bee(Agent):
                 for loc in env:
                     if type(loc) == Hive:
                         self.arrive_at_hive(loc)
+                        self.type_bee = "foraging"
 
                     else:
                         self.move(self.hive_loc)
@@ -186,7 +214,6 @@ class Bee(Agent):
                 if type(loc) == Hive:
                     if loc.food_locs:
                         self.type_bee = "foraging"
-                        print("Aantal food locs: ", len(loc.food_locs))
                         chosen_loc = rd.randint(0, len(loc.food_locs) - 1)
                         self.food_loc= loc.food_locs[chosen_loc]
 
