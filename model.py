@@ -19,7 +19,8 @@ class BeeForagingModel(Model):
         self.schedule = RandomActivationBeeWorld(self)
 
         # Init Hive
-        self.hive = Hive(self, (0,0))
+        hive = Hive(self, (0,0))
+        self.hive = hive
         self.add_agent(self.hive, (0, 0))
 
         # Init Bees
