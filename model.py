@@ -40,6 +40,11 @@ class BeeForagingModel(Model):
         obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
         
         self.grid.place_agent(obstacle, obs_position)
+
+
+        for obs_position in [(3, 1), (3, 2), (3, 3), (2, 3), (1, 3)]:
+            obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
+            self.grid.place_agent(obstacle, obs_position)
         
 
         # Init Food
