@@ -55,7 +55,7 @@ def hive_portrayal(agent):
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 0
         portrayal["Filled"] = "true"
-        portrayal["Color"] = "GREEN"
+        portrayal["Color"] = "GREY"
         portrayal["w"] = 1
         portrayal["h"] = 1
 

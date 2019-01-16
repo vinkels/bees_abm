@@ -26,35 +26,33 @@ class Bee(Agent):
         '''
         
         #get neighboorhood
-        neighbourhood = self.avoid_obstacle(self.pos)
+        neighbourhood = self.get_accessible_neighbourhood()
 
         # select random cell in neighbourhood        
         select_coords = rd.randint(0, len(neighbourhood) - 1)
         # move to cell
         self.model.grid.move_agent(self, neighbourhood[select_coords])
 
-    def avoid_obstacle(self, position):
+    def get_accessible_neighbourhood(self):
         
-        # get neighborhood
-        neighbours = self.model.grid.get_neighbors(position, moore=True)
-        obstacle_location = None
-    
-        for nb in neighbours:
-            if type(nb) == Obstacle:
-                obstacle_location = nb.pos
+        obstacles = [
+            nb.pos 
+            for nb in self.model.grid.get_neighbors(self.pos, moore=True)
+            if type(nb) == Obstacle
+        ]
         
-        neighbourhood = self.model.grid.get_neighborhood(position, moore=True)
-        if obstacle_location is not None:
-            for nb in neighbourhood:
-                if nb == obstacle_location:
-                    neighbourhood.remove(nb)
-            return neighbourhood
-        else:
-            return neighbourhood
+        neighbourhood = self.model.grid.get_neighborhood(self.pos, moore=True)
+
+        accessible_neighbourhood = [
+            loc
+            for loc in neighbourhood
+            if loc not in obstacles
+        ]
+        return accessible_neighbourhood
     
     def move(self, loc):
 
-        neighborhood = self.avoid_obstacle(self.pos)
+        neighborhood = self.get_accessible_neighbourhood()
 
         # determine distance of current position to goal
         min_dist = math.sqrt( ((self.pos[0]-loc[0])**2)+((self.pos[1]-loc[1])**2))
