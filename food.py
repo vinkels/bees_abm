@@ -28,7 +28,8 @@ class Hive(Agent):
         self.food = 0
 
     def receive_info(self, info):
-        self.food_locs.append(info)
+        if info not in self.food_locs:
+            self.food_locs.append(info)
 
     def step(self):
 
