@@ -8,7 +8,8 @@ color_dic = {
     4: "#005C00",
     3: "#008300",
     2: "#00AA00",
-    1: "#00F800"
+    1: "#00F800",
+    0: "#FFFFFF"
 }
 
 
@@ -27,11 +28,14 @@ def hive_portrayal(agent):
         portrayal["r"] = 0.5
 
     elif type(agent) is Food:
+        col_intensity = agent.util
+        if col_intensity > 4:
+            col_intensity = 4
         portrayal["Shape"] = "circle"
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
-        portrayal["Color"] = "#f4df42"
+        portrayal["Color"] = color_dic[col_intensity]
         portrayal["r"] = 0.7
 
     elif type(agent) is Hive:
@@ -45,8 +49,8 @@ def hive_portrayal(agent):
 
     return portrayal
 
-width = 5
-height = 5
+width = 20
+height = 20
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
 chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}])

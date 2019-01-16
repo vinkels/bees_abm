@@ -19,21 +19,26 @@ class BeeForagingModel(Model):
         self.schedule = RandomActivationBeeWorld(self)
 
         # Init Hive
-        hive = Hive(unique_id=self.next_id(), model=self, pos=(0,0))
-        self.grid.place_agent(hive, (0, 0))
-        self.schedule.add(hive)
+        hive = Hive(self, (0,0))
+        self.add_agent(hive, (0, 0))
 
-        # Init bees
-        bee = Bee(unique_id=self.next_id(), model=self, type_bee = "scout")
-        self.grid.place_agent(bee, (0, 0))
-        self.schedule.add(bee)
+        # Init Bees
+        for i in range(0, 4):
+            bee = Bee(self, hive.pos, hive, "scout")
+            self.add_agent(bee, hive.pos)
 
-        bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "rester")
-        self.grid.place_agent(bee_for, (0, 0))
-        self.schedule.add(bee_for)
+            # bee_for = Bee(unique_id=self.next_id(), model=self, type_bee = "rester")
+            bee_for = Bee(self, hive.pos, hive, "rester")
+            self.grid.place_agent(bee_for, (0, 0))
+            self.schedule.add(bee_for)
+            self.add_agent(bee_for, hive.pos)
 
-        food = Food(id = self.next_id(), model = self, pos = (3,3), util = 5)
-        self.grid.place_agent(food, (3, 3))
+            # Init Food
+        for i in range(0, 10):
+            loc1 = rd.randint(0, width - 1)
+            loc2 = rd.randint(0, height - 1)
+            food = Food(self, (loc1,loc2), rd.randint(1, 4))
+            self.add_agent(food, (loc1, loc2))
 
         self.datacollector = DataCollector({"Bees": lambda m: m.schedule.get_breed_count(Bee)})
         self.datacollector.collect(self)
@@ -41,3 +46,11 @@ class BeeForagingModel(Model):
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
+
+    def add_agent(self, agent, pos):
+        self.grid.place_agent(agent, pos)
+        self.schedule.add(agent)
+
+    def remove_agent(self, agent):
+        self.grid.remove_agent(agent)
+        self.schedule.remove(agent)
