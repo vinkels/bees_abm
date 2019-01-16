@@ -9,6 +9,72 @@ from obstacle import Obstacle
 from hive import Hive
 
 
+class BeeStrategy:
+    """
+    Base Class to create a bee strategy
+    """
+
+    def __init__(self, Bee):
+        self.bee = Bee
+
+    def step(self):
+        raise NotImplementedError
+
+
+class Rester(BeeStrategy):
+
+    def step(self):
+        print("rester")
+
+
+class Scout(BeeStrategy):
+
+    def step(self):
+        bee = self.bee
+        # bee is going to random search
+        if bee.loaded is False:
+            bee.random_move()
+
+            # check for food on current cell    
+            neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
+            for nb in neighbors:
+                if type(nb) == Food:
+
+                    # if the source is not yet empty
+                    if nb.util > 0:
+                        nb.get_eaten()
+
+                        # take food and remember location
+                        bee.loaded = True
+                        bee.food_loc = bee.pos
+
+
+        # if he has found a food source, return to hive
+        else:
+
+            # check if destination is reached
+            env = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
+            for loc in env:
+                if type(loc) == Hive:
+                    bee.arrive_at_hive(loc)
+
+                else:
+                    bee.move(bee.hive_loc)
+
+
+class Foraging(BeeStrategy):
+
+    def step(self):
+        print("foraging")
+
+
+bee_strategies = {
+    'rester': Rester,
+    'foraging': Foraging,
+    'scout': Scout
+}
+
+
 class Bee(Agent):
     def __init__(self, model, pos, hive, type_bee):
         super().__init__(model.next_id(), model)
@@ -87,46 +153,21 @@ class Bee(Agent):
 
         self.age += 1
 
-        if self.age > 40:
-            self.type_bee = "scout"
-
         # Kill random bees, TODO make this depend on energy
         if rd.random() > 0.99:
             self.model.remove_agent(self)
             return
+        
+        # strategy(self).step()
+
+        if self.age > 40:
+            self.type_bee = "scout"
 
         # random search bee
         if self.type_bee == "scout":
 
-            # bee is going to random search
-            if self.loaded is False:
-                self.random_move()
-
-                # check for food on current cell    
-                neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
-                for nb in neighbors:
-                    if type(nb) == Food:
-
-                        # if the source is not yet empty
-                        if nb.util > 0:
-                            nb.get_eaten()
-
-                            # take food and remember location
-                            self.loaded = True
-                            self.food_loc = self.pos
-
-
-            # if he has found a food source, return to hive
-            else:
-
-                # check if destination is reached
-                env = self.model.grid.get_neighbors(self.pos, moore=True, include_center=True, radius=0)
-                for loc in env:
-                    if type(loc) == Hive:
-                        self.arrive_at_hive(loc)
-
-                    else:
-                        self.move(self.hive_loc)
+            strategy = bee_strategies[self.type_bee]
+            strategy(self).step()
 
         elif self.type_bee == "rester":
             '''
