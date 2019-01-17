@@ -50,21 +50,29 @@ class Scout(BeeStrategy):
         bee = self.bee
         # bee is going to random search
         if bee.loaded is False:
-            bee.random_move()
 
-            # check for food on current cell    
-            neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-            for nb in neighbors:
-                if type(nb) == Food:
+            neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1)
+            food_neighbours = [nb.pos for nb in neighbors if type(nb) == Food and nb.util]
 
+            # If you see food that is uneaten, move there.
+            if food_neighbours:
+                go_to = food_neighbours[rd.randrange(0, len(food_neighbours))]
+                bee.model.grid.move_agent(bee, go_to)
+            else:
+                bee.random_move()
+
+            # check for food on current cell
+            for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0):
+                if type(nb) == Food and nb.util > 0:
                     # if the source is not yet empty
-                    if nb.util > 0:
-                        nb.get_eaten()
+                    nb.get_eaten()
 
-                        # take food and remember location
-                        bee.loaded = True
-                        bee.food_loc = bee.pos
+                    # take food and remember location
+                    bee.loaded = True
+                    bee.food_loc = bee.pos
 
+                    # Become a forager if you found food.
+                    bee.type_bee = 'foraging'
 
         # if he has found a food source, return to hive
         else:
@@ -89,25 +97,19 @@ class Foraging(BeeStrategy):
 
         # if not yet arrived at food location
         if bee.loaded is False:
-
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-                for nb in neighbors:
-                    if type(nb) == Food:
-
-                        # if the source is not yet empty
-                        if nb.util > 0:
-                            nb.get_eaten()
-
-                            # take food and remember location
-                            self.loaded = True
-
-                        else:
-                            self.type_bee = "scout"
+                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util]
+                if food_neighbors:
+                    food = food_neighbors[0]
+                    food.get_eaten()
+                    bee.loaded = True
+                else:
+                    # If there was no food at the promised location become a scout.
+                    bee.type_bee = "scout"
 
             # else, move to location
-
             else:
                 bee.move(bee.food_loc)
 
@@ -116,7 +118,9 @@ class Foraging(BeeStrategy):
             bee.move(bee.hive_loc)
 
             if bee.hive_loc == bee.pos:
-                bee.type_bee = "rester"
+                for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0):
+                    if type(nb) == Hive:
+                        bee.arrive_at_hive(nb)
 
 
 bee_strategies = {
