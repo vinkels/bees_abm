@@ -2,7 +2,9 @@ from collections import defaultdict
 
 from mesa.time import RandomActivation
 
-from food import Bee, Food, Hive
+from bee import Bee 
+from food import Food
+from hive import Hive
 
 
 class RandomActivationBeeWorld(RandomActivation):

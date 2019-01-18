@@ -5,7 +5,11 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
-from food import Bee, Food, Hive, Obstacle
+from food import Food
+from bee import Bee
+from hive import Hive
+from obstacle import Obstacle
+
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
@@ -18,10 +22,21 @@ class BeeForagingModel(Model):
 
         self.schedule = RandomActivationBeeWorld(self)
 
+        # # Wall
+        # for obs_position in [(3, 1), (3, 2), (3, 3), (2, 3), (1, 3)]:
+        #     obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
+        #     self.grid.place_agent(obstacle, obs_position)
+
+        hive_location, food_locations, obstacle_locations = self.init_grid(height, width)
+
+        print("hive location: ", hive_location)
+        print("food locations: ", food_locations)
+        print("obstacle locations: ", obstacle_locations)
+
         # Init Hive
-        hive = Hive(self, (0,0))
+        hive = Hive(self, hive_location)
         self.hive = hive
-        self.add_agent(self.hive, (0, 0))
+        self.add_agent(self.hive, hive_location)
 
         # Init Bees
         for i in range(0, 20):
@@ -31,25 +46,17 @@ class BeeForagingModel(Model):
             bee_for = Bee(self, self.hive.pos, self.hive, "rester")
             self.add_agent(bee_for, self.hive.pos)
 
-        #Init obstacle
-        obs_position = (rd.randrange(self.width),rd.randrange(self.height))
-        obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
-        
-        self.grid.place_agent(obstacle, obs_position)
-        
+        for f_loc in food_locations:
+            food = Food(self, f_loc, rd.randint(1, 4))
+            self.add_agent(food, f_loc)
 
-        # Init Food
-        for i in range(0, 10):
-            loc1 = rd.randint(0, width - 1)
-            loc2 = rd.randint(0, height - 1)
-            food = Food(self, (loc1,loc2), rd.randint(1, 4))
-            self.add_agent(food, (loc1, loc2))
-
-        
+        for o_loc in obstacle_locations:
+            obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=o_loc)
+            self.grid.place_agent(obstacle, o_loc)
 
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
-            "HiveFood": lambda m: m.hive.get_food_stat(),
+            "HiveFood": lambda m: m.hive.get_food_stat()/10,
             "Scout bees": lambda m: m.schedule.get_scout_count()[0],
             "Foraging bees": lambda m: m.schedule.get_scout_count()[1],
             "Rester bees": lambda m: m.schedule.get_scout_count()[2]
@@ -67,3 +74,25 @@ class BeeForagingModel(Model):
     def remove_agent(self, agent):
         self.grid.remove_agent(agent)
         self.schedule.remove(agent)
+
+    def add_bee(self, pos, hive, type_bee):
+            bee = Bee(self, pos, hive, type_bee)
+            self.add_agent(bee, pos)
+
+    def init_grid(self, height, width):
+        possible_locations = [
+            (x, y)
+            for y in range(height)
+            for x in range(width)
+        ]
+        amount_of_possible_locations = len(possible_locations)
+
+        ten_percent = int(amount_of_possible_locations / 10)
+
+        rd.shuffle(possible_locations)
+
+        hive_location = possible_locations[0]
+        food_locations = possible_locations[1:(ten_percent+1)]
+        obstacle_locations = possible_locations[(ten_percent+1):((ten_percent*2)+1)]
+        
+        return hive_location, food_locations, obstacle_locations
