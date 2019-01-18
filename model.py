@@ -29,9 +29,9 @@ class BeeForagingModel(Model):
 
         hive_location, food_locations, obstacle_locations = self.init_grid(height, width)
 
-        print("hive location: ", hive_location)
-        print("food locations: ", food_locations)
-        print("obstacle locations: ", obstacle_locations)
+        # print("hive location: ", hive_location)
+        # print("food locations: ", food_locations)
+        # print("obstacle locations: ", obstacle_locations)
 
         # Init Hive
         hive = Hive(self, hive_location)

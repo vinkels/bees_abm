@@ -11,6 +11,9 @@ class Hive(Agent):
         self.food = 0
         self.n_bees = 0
         self.hungry = False
+        # self.energy_level_critical = 10
+        # self.energy_level_optimal = 100
+        # self.energy_level_minimum = 25
 
     def receive_info(self, info):
         if info not in self.food_locs:
@@ -63,7 +66,10 @@ class Hive(Agent):
         #         print(bees_hive[0])
         #         self.model.remove_agent(bees_hive[0])
 
+        if rd.random() > 0.90: #self.energy_level_critical/100.0:
+            self.model.add_bee(self.pos, self, "scout")
 
+        self.balance_hive()
 
         
     def unload_food(self, food=1):
@@ -71,3 +77,12 @@ class Hive(Agent):
 
     def get_food_stat(self):
         return self.food
+    
+    def balance_hive(self):
+        pass
+        # if self.food > 0:
+        #     if self.food == self.energy_level_optimal:
+        #         self.model.add_bee(self.pos, self, "rester")
+        #         self.food = 0.5*self.energy_level_minimum
+        #     if self.food > self.energy_level_optimal:
+        #         self.food = 0.1*self.energy_level_critical
