@@ -7,6 +7,7 @@ import math
 from food import Food
 from obstacle import Obstacle
 from hive import Hive
+import util
 
 
 class BeeStrategy:
@@ -54,8 +55,8 @@ class Rester(BeeStrategy):
         assert bee.pos == bee.hive_loc
 
         hive = [
-            nb 
-            for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0) 
+            nb
+            for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
             if type(nb) == Hive
         ][0]
 
@@ -128,16 +129,18 @@ class Foraging(BeeStrategy):
     This type of bee goes to a given food location, takes the food and return to the hive
     '''
 
-    def step(self):   
+    def step(self):
         bee = self.bee
 
         # if not yet arrived at food location
         if bee.loaded is False:
-
+            # always moving if it has no food
+            bee.move(bee.food_loc)
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
                 food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util]
+                bee.plan_course = []
                 if food_neighbors:
                     food = food_neighbors[0]
                     food.get_eaten()
@@ -146,10 +149,6 @@ class Foraging(BeeStrategy):
                 # if there was no food at the promised location become a scout
                 else:
                     bee.type_bee = "scout"
-
-            # else, move to location
-            else:
-                bee.move(bee.food_loc)
 
         # if loaded, return to hive
         else:
@@ -185,15 +184,18 @@ class Bee(Agent):
         self.max_energy = rd.randint(10, 30)
         self.energy = self.max_energy
 
+        self.known_obstacles = set()
+        self.plan_course = []
+
     def random_move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
         '''
-        
+
         #get neighboorhood
         neighbourhood = self.get_accessible_neighbourhood()
 
-        # select random cell in neighbourhood        
+        # select random cell in neighbourhood
         select_coords = rd.randint(0, len(neighbourhood) - 1)
 
         # move to cell
@@ -203,13 +205,14 @@ class Bee(Agent):
         '''
         Determine with cells in neighbourhood are not with obstacles
         '''
-        
-        obstacles = [
-            nb.pos 
+
+        obstacles = set{[
+            nb.pos
             for nb in self.model.grid.get_neighbors(self.pos, moore=True)
             if type(nb) == Obstacle
-        ]
-        
+        ]}
+        self.known_obstacles += obstacles
+
         neighbourhood = self.model.grid.get_neighborhood(self.pos, moore=True)
 
         return [
@@ -222,28 +225,21 @@ class Bee(Agent):
         '''
         Move to specified location.
         '''
-
         neighborhood = self.get_accessible_neighbourhood()
 
-        # determine distance of current position to goal
-        min_dist = math.sqrt( ((self.pos[0]-loc[0])**2)+((self.pos[1]-loc[1])**2))
-        go_to = self.pos
-        
-        # select neighbouring cell with smallest distance to goal
-        for cell in neighborhood:
-            
-            # determine for each cell the distance to the goal
-            dist = math.sqrt( ((cell[0]-loc[0])**2)+((cell[1]-loc[1])**2))
-            
-            if dist < min_dist:
-                min_dist = dist
-                go_to = cell
+        if not bee.plan_course or not bee.plan_course[0] in neighborhood:
+            bee.plan_course = util.path_finder(cur_loc=bee.pos,
+                                               target_loc=bee.food_loc,
+                                               obstacles=bee.known_obstacles,
+                                               grid_width=self.model.width,
+                                               grid_height=self.model.height)
 
-        # move to neighbour cell
-        self.model.grid.move_agent(self, go_to)
+        nxt_loc = bee.plan_course[0]
+        self.model.grid.move_agent(self, nxt_loc)
+        bee.plan_course.pop(0)
 
     def arrive_at_hive(self, hive):
-        ''' 
+        '''
         A scouting bee arrives back at the hive
         '''
         
@@ -267,8 +263,7 @@ class Bee(Agent):
         # if no food is available, go search
         else:
             self.energy -= 1
-            self.type_bee = "scout" 
-
+            self.type_bee = "scout"
 
     def step(self):
         '''

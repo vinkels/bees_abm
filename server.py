@@ -69,11 +69,11 @@ chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "H
     {"Label": "Foraging bees", "Color": "#f4b042"}, {"Label": "Rester bees", "Color": "#17ef71"}, {"Label": "Baby bees", "Color": "#ff93d0"}], 500, 500)
 
 server = ModularServer(
-    BeeForagingModel, 
-    [canvas_element, chart_element], 
-    "Hive", 
+    BeeForagingModel,
+    [canvas_element, chart_element],
+    "Hive",
     {
-        "width": width, 
+        "width": width,
         "height": height
     }
 )
