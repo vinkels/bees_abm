@@ -3,10 +3,11 @@ import random as rd
 
 
 class Hive(Agent):
-    def __init__(self, model, pos):
+    def __init__(self, model, pos, hive_num):
         super().__init__(model.next_id(), model)
 
         self.pos = pos
+        self.hive_num = hive_num
         self.food_locs = []
         self.food = 0
         self.n_bees = 0
@@ -33,7 +34,7 @@ class Hive(Agent):
             
         # chance of babies
         if rd.random() < self.reproduction_rate:
-            self.model.add_bee(self.pos, self, "babee")
+            self.model.add_bee(self.pos, self, "babee", hive_num = self.hive_num)
             self.n_bees += 1
 
         # forget (maybe) 10% of food locations when too many to remember

@@ -171,15 +171,17 @@ bee_strategies = {
 
 
 class Bee(Agent):
-    def __init__(self, model, pos, hive, type_bee):
+    def __init__(self, model, pos, hive, type_bee, hive_num):
         super().__init__(model.next_id(), model)
 
         self.loaded = False
         self.food_loc = []
         self.hive_loc = hive.pos
+        self.hive_num = hive_num
         self.pos = pos
         self.type_bee = type_bee
         self.age = 0
+
         
         # random threshold of energy required per bee to go foraging
         self.max_energy = rd.randint(10, 30)

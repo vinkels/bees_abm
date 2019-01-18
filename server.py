@@ -28,8 +28,11 @@ def hive_portrayal(agent):
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 2
         portrayal["Filled"] = "true"
-        portrayal["Color"] = "#000000"
         portrayal["r"] = 0.5
+        if agent.hive_num == 0:
+            portrayal["Color"] = "PURPLE"
+        elif agent.hive_num == 1:
+            portrayal["Color"] = "ORANGE"
 
     elif type(agent) is Food:
         col_intensity = agent.util
@@ -47,9 +50,14 @@ def hive_portrayal(agent):
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 0
         portrayal["Filled"] = "true"
-        portrayal["Color"] = "RED"
+        
         portrayal["w"] = 1
         portrayal["h"] = 1
+        if agent.hive_num == 0:
+            portrayal["Color"] = "RED"
+        elif agent.hive_num == 1:
+            portrayal["Color"] = "GREEN"
+
     elif type(agent) is Obstacle:
         portrayal["Shape"] = "rect"
         portrayal["scale"] = 0.9
