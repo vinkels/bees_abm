@@ -27,24 +27,29 @@ class BeeForagingModel(Model):
         #     obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
         #     self.grid.place_agent(obstacle, obs_position)
 
-        hive_location, food_locations, obstacle_locations = self.init_grid(height, width)
+        hive_locations, food_locations, obstacle_locations = self.init_grid(height, width)
 
-        # print("hive location: ", hive_location)
-        # print("food locations: ", food_locations)
-        # print("obstacle locations: ", obstacle_locations)
+        for hive_number in range(0, len(hive_locations)):
 
-        # Init Hive
-        hive = Hive(self, hive_location)
-        self.hive = hive
-        self.add_agent(self.hive, hive_location)
+            hive_location = hive_locations[hive_number]
 
-        # Init Bees
-        for i in range(0, 20):
-            bee = Bee(self, self.hive.pos, self.hive, "scout")
-            self.add_agent(bee, self.hive.pos)
+            # Init Hive
+            hive = Hive(self, hive_location, hive_number)
+            self.hive = hive
+            self.add_agent(self.hive, hive_location)
 
-            bee_for = Bee(self, self.hive.pos, self.hive, "rester")
-            self.add_agent(bee_for, self.hive.pos)
+            # Init Bees
+            for i in range(0, 20):
+                bee = Bee(self, self.hive.pos, self.hive, "scout", hive_num = hive_number)
+                self.add_agent(bee, self.hive.pos)
+
+                bee_for = Bee(self, self.hive.pos, self.hive, "rester", hive_num = hive_number)
+                self.add_agent(bee_for, self.hive.pos)
+
+            # init babies
+            for i in range(0, 3):
+                bee_baby = Bee(self, self.hive.pos, self.hive, "babee", hive_num = hive_number)
+                self.add_agent(bee_baby, self.hive.pos)
 
         for f_loc in food_locations:
             food = Food(self, f_loc, rd.randint(1, 4))
@@ -59,7 +64,8 @@ class BeeForagingModel(Model):
             "HiveFood": lambda m: m.hive.get_food_stat()/10,
             "Scout bees": lambda m: m.schedule.get_scout_count()[0],
             "Foraging bees": lambda m: m.schedule.get_scout_count()[1],
-            "Rester bees": lambda m: m.schedule.get_scout_count()[2]
+            "Rester bees": lambda m: m.schedule.get_scout_count()[2],
+            "Baby bees": lambda m: m.schedule.get_scout_count()[3]
         })
         self.datacollector.collect(self)
 
@@ -75,8 +81,8 @@ class BeeForagingModel(Model):
         self.grid.remove_agent(agent)
         self.schedule.remove(agent)
 
-    def add_bee(self, pos, hive, type_bee):
-            bee = Bee(self, pos, hive, type_bee)
+    def add_bee(self, pos, hive, type_bee, hive_num):
+            bee = Bee(self, pos, hive, type_bee, hive_num)
             self.add_agent(bee, pos)
 
     def init_grid(self, height, width):
@@ -87,12 +93,12 @@ class BeeForagingModel(Model):
         ]
         amount_of_possible_locations = len(possible_locations)
 
-        ten_percent = int(amount_of_possible_locations / 10)
+        ten_percent = int(amount_of_possible_locations / 20)
 
         rd.shuffle(possible_locations)
 
-        hive_location = possible_locations[0]
-        food_locations = possible_locations[1:(ten_percent+1)]
-        obstacle_locations = possible_locations[(ten_percent+1):((ten_percent*2)+1)]
+        hive_location = possible_locations[0:2]
+        food_locations = possible_locations[2:(ten_percent+1)]
+        obstacle_locations = possible_locations[(ten_percent+1):((ten_percent*4)+1)]
         
         return hive_location, food_locations, obstacle_locations

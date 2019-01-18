@@ -3,86 +3,67 @@ import random as rd
 
 
 class Hive(Agent):
-    def __init__(self, model, pos):
+    def __init__(self, model, pos, hive_num):
         super().__init__(model.next_id(), model)
 
         self.pos = pos
+        self.hive_num = hive_num
         self.food_locs = []
         self.food = 0
         self.n_bees = 0
         self.hungry = False
-        # self.energy_level_critical = 10
-        # self.energy_level_optimal = 100
-        # self.energy_level_minimum = 25
+        self.energy_level_critical = 10
+        self.energy_level_optimal = 0
+        self.energy_level_minimum = 25
+        self.bees_hive = []
+        self.bite = 1
+        self.reproduction_rate = 0.1
 
     def receive_info(self, info):
-        if info not in self.food_locs:
-            self.food_locs.append(info)
+        self.food_locs.append(info)
 
     def step(self):
 
-        # Make random new bees
-        # TODO make this actually depend on queen, drones and food resources.
-
         # determine number of bees in hive
-        bees_hive = self.model.grid.get_neighbors(self.pos, moore=True, include_center = True, radius = 0)
-        self.n_bees = len(bees_hive)
-        # hungry_count = 0
+        self.bees_hive = self.model.grid.get_neighbors(self.pos, moore=True, include_center = True, radius = 0)
+        self.n_bees = len(self.bees_hive)
 
-        # # give every bee a chance of reproduction
-        for bee in range(0, self.n_bees):
+        # determine optimal and critical amount of food
+        self.energy_level_optimal = self.n_bees * 20
+        self.energy_level_critical = self.n_bees 
             
-        #     if self.food > 0:
-        #         self.food -= 1
-        #         self.hungry = False
-        #         hungry_count = 0
+        # chance of babies
+        if rd.random() < self.reproduction_rate:
+            self.model.add_bee(self.pos, self, "babee", hive_num = self.hive_num)
+            self.n_bees += 1
 
-        #     else:
-        #         self.hungry = True
-        #         hungry_count += 1
+        # forget (maybe) 10% of food locations when too many to remember
+        if len(self.food_locs) > 10:
+            if rd.random() < 0.5:
+                self.food_locs = self.food_locs[int(len(self.food_locs)/10):len(self.food_locs)]
 
-        #     if not self.hungry:
-                # if self.n_bees > self.food:
-            if rd.random() > 0.99:
-                self.model.add_bee(self.pos, self, "rester")
-                self.n_bees += 1
-
-                # else:
-                #     if rd.random() > 0.90:
-                #         self.model.add_bee(self.pos, self, "rester")
-                #         self.n_bees += 1
-
-        # print("bees hungry: ", hungry_count)
-        # print("percentage hungry: ", hungry_count/self.n_bees)
-
-        # # determine percentage hungry bees, and let bees die when more hunger in hive
-        # if rd.random() < hungry_count/self.n_bees:
-        #     bee_die = rd.randint(0, self.n_bees - 1)
-        #     self.model.remove_agent(bees_hive[bee_die])
-
-        # if self.hungry is True:
-        #     hungry_count += 1
-        #     if hungry_count > 5:
-        #         print(bees_hive[0])
-        #         self.model.remove_agent(bees_hive[0])
-
-        if rd.random() > 0.90: #self.energy_level_critical/100.0:
-            self.model.add_bee(self.pos, self, "scout")
-
+        # adjust parameters of hive based on food in hive
         self.balance_hive()
 
         
     def unload_food(self, food=1):
-        self.food += 10
+        self.food += 5
 
     def get_food_stat(self):
         return self.food
     
     def balance_hive(self):
-        pass
-        # if self.food > 0:
-        #     if self.food == self.energy_level_optimal:
-        #         self.model.add_bee(self.pos, self, "rester")
-        #         self.food = 0.5*self.energy_level_minimum
-        #     if self.food > self.energy_level_optimal:
-        #         self.food = 0.1*self.energy_level_critical
+
+        # if food is available 
+        if self.food > 0:
+
+            # if more than necessary amount of food, increase consumption and reproduction
+            if self.food >= self.energy_level_optimal:
+                self.bite += 1
+                self.reproduction_rate += 0.1
+
+            else:
+                self.bite = 1
+                self.reproduction_rate = 0.1
+                    
+
