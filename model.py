@@ -56,7 +56,7 @@ class BeeForagingModel(Model):
 
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
-            "HiveFood": lambda m: m.hive.get_food_stat(),
+            "HiveFood": lambda m: m.hive.get_food_stat()/10,
             "Scout bees": lambda m: m.schedule.get_scout_count()[0],
             "Foraging bees": lambda m: m.schedule.get_scout_count()[1],
             "Rester bees": lambda m: m.schedule.get_scout_count()[2]

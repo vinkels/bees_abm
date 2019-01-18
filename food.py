@@ -9,7 +9,8 @@ class Food(Agent):
         self.util = util
 
     def step(self):
-        self.util += 1
+        if self.util < 5:
+            self.util += 1
 
     def get_eaten(self):
         self.util -= 1

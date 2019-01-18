@@ -140,6 +140,7 @@ class Bee(Agent):
         self.pos = pos
         self.type_bee = type_bee
         self.age = 0
+        self.energy = 20
 
     def random_move(self):
         '''
@@ -199,6 +200,12 @@ class Bee(Agent):
         hive.receive_info(self.food_loc)
         hive.unload_food()
 
+    def relax_at_hive(self, hive):
+
+        if hive.food > 1:
+            self.energy += 5
+            hive.food -= 1 
+
 
     def step(self):
         '''
@@ -208,11 +215,20 @@ class Bee(Agent):
         self.age += 1
 
         # Kill random bees, TODO make this depend on energy
-        if rd.random() > 0.99:
+        # if rd.random() > 0.99:
+        #     self.model.remove_agent(self)
+        #     return
+
+        if self.pos != self.hive_loc:
+            self.energy -= 1
+
+        if self.energy < 0:
+            print("bee died from starvation")
             self.model.remove_agent(self)
             return
         
         # strategy(self).step()
+
 
         if self.age > 40:
             self.type_bee = "scout"
