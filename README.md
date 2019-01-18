@@ -33,14 +33,17 @@ Agent Based Modelling
  - Wanneer er meer food is dan gaat de reproductie rate omhoog en eten bijen meer
  - Als er weinig food is dan gaat het omlaag
  - Als de hoeveelheid food in de hive heel erg laag is, geen reproductie
- - Afhankelijk van de reproduction rate worden meer resters geboren
+ - Afhankelijk van de reproduction rate worden meer baby's geboren met een incubation time dat daarna resters worden.
  - Er is een grote kans om naar een food location te gaan als meer bijen naar die food sources zijn gegaan. 
- - Food sources worden met een 50 procent kans tien procent van de food location vergeten. 
+ - Food sources worden met een 50 procent kans tien procent van de food location vergeten.
+  
  - In Resters Class:
     > Als bijen in de hive aankomen worden het resters
     > Als bepaalde energy level hebben random nu tussen (5, 40) en er zijn food location bekend in de hive , dan worden de resters foragers
     >Als er geen locatie bekend is of ze hebben niet genoeg energie dan blijven ze resters en eten in de hive en sparen ze energie
     > Als er niet genoeg eten in de hive dan kost het de resters bij energie
- 
+ ## Observations
+ - Leeftijd voor incubation baby heeft invloed hoeveelheid totale bijen
+ -
 
 
