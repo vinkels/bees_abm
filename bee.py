@@ -278,7 +278,7 @@ class Bee(Agent):
 
         # if outside of hive, lose energy proportional to age
         if self.pos != self.hive_loc:
-            self.energy -= (self.age / 100) * 1
+            self.energy -= (self.age / 100)
 
         # if no more energy, die
         if self.energy <= 0:

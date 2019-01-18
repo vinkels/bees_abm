@@ -38,6 +38,7 @@ class Hive(Agent):
             self.n_bees += 1
 
         # forget (maybe) 10% of food locations when too many to remember
+        #TODO the amount of number to forget and the randomness should be tuned
         if len(self.food_locs) > 10:
             if rd.random() < 0.5:
                 self.food_locs = self.food_locs[int(len(self.food_locs)/10):len(self.food_locs)]
