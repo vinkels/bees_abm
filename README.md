@@ -34,6 +34,8 @@ Agent Based Modelling
  - Als er weinig food is dan gaat het omlaag
  - Als de hoeveelheid food in de hive heel erg laag is, geen reproductie
  - Afhankelijk van de reproduction rate worden meer resters geboren
+ - Er is een grote kans om naar een food location te gaan als meer bijen naar die food sources zijn gegaan. 
+ - Food sources worden met een 50 procent kans tien procent van de food location vergeten. 
  - In Resters Class:
     > Als bijen in de hive aankomen worden het resters
     > Als bepaalde energy level hebben random nu tussen (5, 40) en er zijn food location bekend in de hive , dan worden de resters foragers
