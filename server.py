@@ -61,8 +61,8 @@ def hive_portrayal(agent):
 
     return portrayal
 
-width = 20
-height = 20
+width = 100
+height = 100
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
 chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"}, 

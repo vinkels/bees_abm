@@ -10,6 +10,7 @@ def path_finder(cur_loc, target_loc, obstacles, grid_width, grid_height):
     start = grid.node(cur_loc[0], cur_loc[1])
     end = grid.node(target_loc[0], target_loc[1])
     finder = IDAStarFinder(diagonal_movement=DiagonalMovement.always)
+    # print(f"finding path from ({start.x}, {start.y}) to ({end.x}, {end.y})")
     path, runs = finder.find_path(start, end, grid)
     # print(path)
     # print('operations:', runs, 'path length:', len(path))

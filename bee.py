@@ -134,8 +134,8 @@ class Foraging(BeeStrategy):
 
         # if not yet arrived at food location
         if bee.loaded is False:
-            # always moving if it has no food
             bee.move(bee.food_loc)
+            
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
@@ -154,11 +154,11 @@ class Foraging(BeeStrategy):
         else:
             bee.move(bee.hive_loc)
 
-            # if arrived at hive, unload
-            if bee.hive_loc == bee.pos:
-                for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0):
-                    if type(nb) == Hive:
-                        bee.arrive_at_hive(nb)
+            # check if destination is reached
+            if bee.pos == bee.hive_loc:
+                hive = [nb for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0) if type(nb) == Hive][0]
+                assert hive
+                bee.arrive_at_hive(hive)
 
 
 bee_strategies = {
@@ -167,6 +167,8 @@ bee_strategies = {
     'foraging': Foraging,
     'scout': Scout
 }
+
+MAX_ENERGY = 25
 
 
 class Bee(Agent):
@@ -206,12 +208,12 @@ class Bee(Agent):
         Determine with cells in neighbourhood are not with obstacles
         '''
 
-        obstacles = set{[
+        obstacles = set([
             nb.pos
             for nb in self.model.grid.get_neighbors(self.pos, moore=True)
             if type(nb) == Obstacle
-        ]}
-        self.known_obstacles += obstacles
+        ])
+        self.known_obstacles.update(obstacles)
 
         neighbourhood = self.model.grid.get_neighborhood(self.pos, moore=True)
 
@@ -227,16 +229,16 @@ class Bee(Agent):
         '''
         neighborhood = self.get_accessible_neighbourhood()
 
-        if not bee.plan_course or not bee.plan_course[0] in neighborhood:
-            bee.plan_course = util.path_finder(cur_loc=bee.pos,
-                                               target_loc=bee.food_loc,
-                                               obstacles=bee.known_obstacles,
+        if not self.plan_course or not self.plan_course[0] in neighborhood:
+            self.plan_course = util.path_finder(cur_loc=self.pos,
+                                               target_loc=loc,
+                                               obstacles=self.known_obstacles,
                                                grid_width=self.model.width,
                                                grid_height=self.model.height)
 
-        nxt_loc = bee.plan_course[0]
+        nxt_loc = self.plan_course[0]
         self.model.grid.move_agent(self, nxt_loc)
-        bee.plan_course.pop(0)
+        self.plan_course.pop(0)
 
     def arrive_at_hive(self, hive):
         '''
