@@ -121,7 +121,7 @@ class Scout(BeeStrategy):
                     bee.type_bee = 'foraging'
 
         else:
-            assert self.loaded == False
+            assert bee.loaded == False
 
 
 class Foraging(BeeStrategy):

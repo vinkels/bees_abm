@@ -1,5 +1,6 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
+from mesa.visualization.UserParam import UserSettableParameter
 
 from food import Food
 from bee import Bee
@@ -82,6 +83,8 @@ server = ModularServer(
     "Hive",
     {
         "width": width,
-        "height": height
+        "height": height,
+        "obstacle_density": UserSettableParameter('slider', 'obstacle density', value=0, min_value=0, max_value=100),
+        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100)
     }
 )

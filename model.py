@@ -13,7 +13,7 @@ from obstacle import Obstacle
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
-    def __init__(self, width, height):
+    def __init__(self, width, height, obstacle_density, food_density):
         super().__init__()
         self.height = height
         self.width = width
@@ -27,7 +27,10 @@ class BeeForagingModel(Model):
         #     obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
         #     self.grid.place_agent(obstacle, obs_position)
 
-        hive_locations, food_locations, obstacle_locations = self.init_grid(height, width)
+        if obstacle_density + food_density > 99:
+            raise Exception("Food and obstacles do not fit in the grid.")
+
+        hive_location, food_locations, obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
 
         for hive_number in range(0, len(hive_locations)):
 
@@ -85,7 +88,7 @@ class BeeForagingModel(Model):
             bee = Bee(self, pos, hive, type_bee, hive_num)
             self.add_agent(bee, pos)
 
-    def init_grid(self, height, width):
+    def init_grid(self, height, width, obstacle_density, food_density):
         possible_locations = [
             (x, y)
             for y in range(height)
@@ -93,12 +96,13 @@ class BeeForagingModel(Model):
         ]
         amount_of_possible_locations = len(possible_locations)
 
-        ten_percent = int(amount_of_possible_locations / 20)
+        amount_food = int((amount_of_possible_locations / 100) * food_density)
+        amount_obstacle = int((amount_of_possible_locations / 100) * obstacle_density)
 
         rd.shuffle(possible_locations)
 
-        hive_location = possible_locations[0:2]
-        food_locations = possible_locations[2:(ten_percent+1)]
-        obstacle_locations = possible_locations[(ten_percent+1):((ten_percent*4)+1)]
+        hive_location = possible_locations[0]
+        food_locations = possible_locations[1:(amount_food+1)]
+        obstacle_locations = possible_locations[(amount_food+1):((amount_obstacle)+1)]
         
         return hive_location, food_locations, obstacle_locations
