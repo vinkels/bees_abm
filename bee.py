@@ -5,7 +5,6 @@ import random as rd
 import math
 
 from food import Food
-from obstacle import Obstacle
 from hive import Hive
 import util
 
@@ -202,20 +201,10 @@ class Bee(Agent):
         Determine with cells in neighbourhood are not with obstacles
         '''
 
-        obstacles = set([
-            nb.pos
-            for nb in self.model.grid.get_neighbors(self.pos, moore=True)
-            if type(nb) == Obstacle
-        ])
+        neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
         self.known_obstacles.update(obstacles)
 
-        neighbourhood = self.model.grid.get_neighborhood(self.pos, moore=True)
-
-        return [
-            loc
-            for loc in neighbourhood
-            if loc not in obstacles
-        ]
+        return list(neighbourhood)
 
     def move(self, loc):
         '''

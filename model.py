@@ -7,7 +7,6 @@ import random as rd
 from food import Food
 from bee import Bee
 from hive import Hive
-from obstacle import Obstacle
 from obstacle_grid import MultiGridWithObstacles
 
 from schedule import RandomActivationBeeWorld
@@ -18,18 +17,15 @@ class BeeForagingModel(Model):
         self.height = height
         self.width = width
 
-        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False)
-
-        self.schedule = RandomActivationBeeWorld(self)
-
         self.user_error = None
-        
-
         if obstacle_density + food_density > 99:
             raise Exception("Food and obstacles do not fit in the grid.")
 
-
         hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
+
+        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations))
+
+        self.schedule = RandomActivationBeeWorld(self)
 
         for hive_location in hive_locations:
 
@@ -55,7 +51,6 @@ class BeeForagingModel(Model):
         for f_loc in food_locations:
             food = Food(self, f_loc, rd.randint(1, 4))
             self.add_agent(food, f_loc)
-
 
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
