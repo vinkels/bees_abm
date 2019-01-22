@@ -30,8 +30,8 @@ class Hive(Agent):
 
         # determine optimal and critical amount of food
         self.energy_level_optimal = self.n_bees * 20
-        self.energy_level_critical = self.n_bees 
-            
+        self.energy_level_critical = self.n_bees
+
         # chance of babies
         if rd.random() < self.reproduction_rate:
             self.model.add_bee(self.pos, self, "babee", hive_num = self.hive_num)
@@ -46,16 +46,21 @@ class Hive(Agent):
         # adjust parameters of hive based on food in hive
         self.balance_hive()
 
-        
     def unload_food(self, food=1):
         self.food += 5
 
     def get_food_stat(self):
         return self.food
-    
+
+    def get_hive_id(self):
+        return self.hive_num
+
+    def get_food_memory(self):
+        return self.food_locs
+
     def balance_hive(self):
 
-        # if food is available 
+        # if food is available
         if self.food > 0:
 
             # if more than necessary amount of food, increase consumption and reproduction
@@ -66,5 +71,3 @@ class Hive(Agent):
             else:
                 self.bite = 1
                 self.reproduction_rate = 0.1
-                    
-

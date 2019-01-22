@@ -70,11 +70,25 @@ class BeeForagingModel(Model):
             "Rester bees": lambda m: m.schedule.get_scout_count()[2],
             "Baby bees": lambda m: m.schedule.get_scout_count()[3]
         })
-        self.datacollector.collect(self)
-
+        self.datacollector2 = DataCollector({
+            "HiveID": lambda m: m.hive.get_hive_id(),
+            "FoodLocs": lambda m: m.hive.get_food_memory(),
+        })
+        self.running = True
+        # self.datacollector.collect(self)
+        # self.datacollector2.collect(self)
+    def get_hive(self, hive_id):
+        return self.schedule.agent_by_breed[Hive][hive_id]
+        
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
+
+    def run_model(self, n_steps):
+        for i in range(n_steps):
+            self.datacollector.collect(self)
+            self.datacollector2.collect(self)
+            self.step()
 
     def add_agent(self, agent, pos):
         self.grid.place_agent(agent, pos)
@@ -104,5 +118,5 @@ class BeeForagingModel(Model):
         hive_locations = [possible_locations[0]]
         food_locations = possible_locations[1:(amount_food+1)]
         obstacle_locations = possible_locations[(amount_food+1):((amount_obstacle)+1)]
-        
+
         return hive_locations, food_locations, obstacle_locations
