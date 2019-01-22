@@ -4,6 +4,8 @@ from mesa.space import MultiGrid
 import random as rd
 import math
 
+from config import *
+
 from food import Food
 from obstacle import Obstacle
 from hive import Hive
@@ -35,7 +37,7 @@ class Babee(BeeStrategy):
         bee.relax_at_hive(hive)
 
         # age is arbitrary
-        if bee.age > 3:
+        if bee.age > BABYTIME:
             bee.type_bee = "rester"
 
 
@@ -100,7 +102,8 @@ class Scout(BeeStrategy):
             for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0):
 
                 # if the source is not yet empty
-                if type(nb) == Food and nb.util > 0:
+                #TODO add carrying capacity
+                if type(nb) == Food and nb.util % 5 > 0:
 
                     # decrease utility of food
                     nb.get_eaten()
@@ -131,7 +134,9 @@ class Foraging(BeeStrategy):
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util]
+                #TODO CHECK DEPENDENCY CARRYING CAPACITY
+                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util % 5 > 0]
+                #TODO DEFINE PLAN COURSE
                 bee.plan_course = []
                 if food_neighbors:
                     food = food_neighbors[0]
@@ -160,7 +165,6 @@ bee_strategies = {
     'scout': Scout
 }
 
-MAX_ENERGY = 25
 
 
 class Bee(Agent):
@@ -177,6 +181,7 @@ class Bee(Agent):
 
 
         # random threshold of energy required per bee to go foraging
+        #TODO SHOULD DEPEND ON ENERGY LEVEL OF HIVE
         self.max_energy = rd.randint(10, 30)
         self.energy = self.max_energy
 
@@ -240,6 +245,7 @@ class Bee(Agent):
         '''
 
         # unload food
+        
         self.loaded = False
         hive.receive_info(self.food_loc)
         hive.unload_food()
@@ -257,6 +263,7 @@ class Bee(Agent):
             hive.food -= hive.bite
 
         # if no food is available, go search
+        #TODO ENERGY DECAY OVER TIME
         else:
             self.energy -= 1
             self.type_bee = "scout"
@@ -265,7 +272,7 @@ class Bee(Agent):
         '''
         Move the bee, look around for a food source and take food source
         '''
-
+        #TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
         self.age += 1
 
         # if outside of hive, lose energy proportional to age
@@ -278,6 +285,7 @@ class Bee(Agent):
             return
 
         # if bee is a rester at 40, become scout
+        #TODO AGE TO BECOME SCOUTER DECISION
         if self.age > 40 and self.type_bee == "rester":
             self.type_bee = "scout"
 
