@@ -54,9 +54,9 @@ def hive_portrayal(agent):
 
         portrayal["w"] = 1
         portrayal["h"] = 1
-        if agent.hive_id == 0:
+        if agent.unique_id == 0:
             portrayal["Color"] = "RED"
-        elif agent.hive_id == 1:
+        else:
             portrayal["Color"] = "GREEN"
 
     elif type(agent) is Obstacle:

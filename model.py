@@ -1,6 +1,5 @@
 from mesa import Model
 from mesa import Agent
-from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 
 import random as rd
@@ -9,6 +8,7 @@ from food import Food
 from bee import Bee
 from hive import Hive
 from obstacle import Obstacle
+from obstacle_grid import MultiGridWithObstacles
 
 from schedule import RandomActivationBeeWorld
 
@@ -18,7 +18,7 @@ class BeeForagingModel(Model):
         self.height = height
         self.width = width
 
-        self.grid = MultiGrid(self.width, self.height, torus=False)
+        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False)
 
         self.schedule = RandomActivationBeeWorld(self)
 
