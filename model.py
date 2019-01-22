@@ -30,7 +30,7 @@ class BeeForagingModel(Model):
         if obstacle_density + food_density > 99:
             raise Exception("Food and obstacles do not fit in the grid.")
 
-        hive_location, food_locations, obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
+        hive_locations, food_locations, obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
 
         for hive_number in range(0, len(hive_locations)):
 
@@ -101,8 +101,8 @@ class BeeForagingModel(Model):
 
         rd.shuffle(possible_locations)
 
-        hive_location = possible_locations[0]
+        hive_locations = [possible_locations[0]]
         food_locations = possible_locations[1:(amount_food+1)]
         obstacle_locations = possible_locations[(amount_food+1):((amount_obstacle)+1)]
         
-        return hive_location, food_locations, obstacle_locations
+        return hive_locations, food_locations, obstacle_locations
