@@ -30,7 +30,7 @@ class BeeForagingModel(Model):
         if obstacle_density + food_density > 99:
             raise Exception("Food and obstacles do not fit in the grid.")
 
-        hive_locations, food_locations, obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
+        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
 
         for hive_location in hive_locations:
 
@@ -57,9 +57,9 @@ class BeeForagingModel(Model):
             food = Food(self, f_loc, rd.randint(1, 4))
             self.add_agent(food, f_loc)
 
-        for o_loc in obstacle_locations:
-            obstacle = Obstacle(model=self, pos=o_loc)
-            self.grid.place_agent(obstacle, o_loc)
+        # for o_loc in obstacle_locations:
+        #     obstacle = Obstacle(model=self, pos=o_loc)
+        #     self.grid.place_agent(obstacle, o_loc)
 
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
@@ -81,11 +81,10 @@ class BeeForagingModel(Model):
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
+        self.datacollector2.collect(self)
 
     def run_model(self, n_steps):
         for i in range(n_steps):
-            self.datacollector.collect(self)
-            self.datacollector2.collect(self)
             self.step()
 
     def add_agent(self, agent, pos):
@@ -115,6 +114,6 @@ class BeeForagingModel(Model):
 
         hive_locations = [possible_locations[0]]
         food_locations = possible_locations[1:(amount_food+1)]
-        obstacle_locations = possible_locations[(amount_food+1):((amount_obstacle)+1)]
+        obstacle_locations = set(possible_locations[(amount_food+1):((amount_obstacle)+1)])
 
         return hive_locations, food_locations, obstacle_locations
