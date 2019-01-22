@@ -22,13 +22,12 @@ class BeeForagingModel(Model):
 
         self.schedule = RandomActivationBeeWorld(self)
 
-        # # Wall
-        # for obs_position in [(3, 1), (3, 2), (3, 3), (2, 3), (1, 3)]:
-        #     obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=obs_position)
-        #     self.grid.place_agent(obstacle, obs_position)
+        self.user_error = None
+        
 
         if obstacle_density + food_density > 99:
             raise Exception("Food and obstacles do not fit in the grid.")
+
 
         hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
 
@@ -57,9 +56,6 @@ class BeeForagingModel(Model):
             food = Food(self, f_loc, rd.randint(1, 4))
             self.add_agent(food, f_loc)
 
-        # for o_loc in obstacle_locations:
-        #     obstacle = Obstacle(model=self, pos=o_loc)
-        #     self.grid.place_agent(obstacle, o_loc)
 
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
