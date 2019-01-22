@@ -6,7 +6,7 @@ from mesa.visualization import TextVisualization
 from food import Food
 from bee import Bee
 from hive import Hive
-from obstacle import Obstacle
+from obstacle_grid import OBSTACLE
 
 from model import BeeForagingModel
 
@@ -60,7 +60,7 @@ def hive_portrayal(agent):
         else:
             portrayal["Color"] = "GREEN"
 
-    elif type(agent) is Obstacle:
+    elif agent is OBSTACLE:
         portrayal["Shape"] = "rect"
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 0
