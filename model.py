@@ -32,34 +32,33 @@ class BeeForagingModel(Model):
 
         hive_locations, food_locations, obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
 
-        for hive_number in range(0, len(hive_locations)):
-
-            hive_location = hive_locations[hive_number]
+        for hive_location in hive_locations:
 
             # Init Hive
-            hive = Hive(self, hive_location, hive_number)
+            hive = Hive(self, hive_location)
             self.hive = hive
             self.add_agent(self.hive, hive_location)
 
             # Init Bees
+            hive_id = hive.unique_id
             for i in range(0, 20):
-                bee = Bee(self, self.hive.pos, self.hive, "scout", hive_num = hive_number)
-                self.add_agent(bee, self.hive.pos)
+                bee = Bee(self, self.hive.pos, self.hive, "scout", hive_id=hive_id)
+                self.add_agent(bee, hive_location)
 
-                bee_for = Bee(self, self.hive.pos, self.hive, "rester", hive_num = hive_number)
-                self.add_agent(bee_for, self.hive.pos)
+                bee_for = Bee(self, hive_location, self.hive, "rester", hive_id=hive_id)
+                self.add_agent(bee_for, hive_location)
 
             # init babies
             for i in range(0, 3):
-                bee_baby = Bee(self, self.hive.pos, self.hive, "babee", hive_num = hive_number)
-                self.add_agent(bee_baby, self.hive.pos)
+                bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
+                self.add_agent(bee_baby, hive_location)
 
         for f_loc in food_locations:
             food = Food(self, f_loc, rd.randint(1, 4))
             self.add_agent(food, f_loc)
 
         for o_loc in obstacle_locations:
-            obstacle = Obstacle(unique_id=self.next_id(), model=self, pos=o_loc)
+            obstacle = Obstacle(model=self, pos=o_loc)
             self.grid.place_agent(obstacle, o_loc)
 
         self.datacollector = DataCollector({
@@ -75,11 +74,10 @@ class BeeForagingModel(Model):
             "FoodLocs": lambda m: m.hive.get_food_memory(),
         })
         self.running = True
-        # self.datacollector.collect(self)
-        # self.datacollector2.collect(self)
+
     def get_hive(self, hive_id):
-        return self.schedule.agent_by_breed[Hive][hive_id]
-        
+        return self.schedule.agents_by_breed[Hive][hive_id]
+
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
@@ -98,8 +96,8 @@ class BeeForagingModel(Model):
         self.grid.remove_agent(agent)
         self.schedule.remove(agent)
 
-    def add_bee(self, pos, hive, type_bee, hive_num):
-            bee = Bee(self, pos, hive, type_bee, hive_num)
+    def add_bee(self, pos, hive, type_bee, hive_id):
+            bee = Bee(self, pos, hive, type_bee, hive_id)
             self.add_agent(bee, pos)
 
     def init_grid(self, height, width, obstacle_density, food_density):
