@@ -103,8 +103,11 @@ class BeeForagingModel(Model):
 
         rd.shuffle(possible_locations)
 
+        food_end_index = amount_food + 1
+        obstacle_end_index = food_end_index + amount_obstacle
+
         hive_locations = [possible_locations[0]]
-        food_locations = possible_locations[1:(amount_food+1)]
-        obstacle_locations = set(possible_locations[(amount_food+1):((amount_obstacle)+1)])
+        food_locations = possible_locations[1:food_end_index]
+        obstacle_locations = set(possible_locations[food_end_index:obstacle_end_index])
 
         return hive_locations, food_locations, obstacle_locations
