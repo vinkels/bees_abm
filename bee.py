@@ -148,7 +148,7 @@ class Foraging(BeeStrategy):
 
             # check if destination is reached
             if bee.pos == bee.hive_loc:
-                hive = [nb for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0) if type(nb) == Hive][0]
+                hive = bee.model.get_hive(bee.hive_id)
                 assert hive
                 bee.arrive_at_hive(hive)
 
