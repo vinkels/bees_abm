@@ -13,7 +13,7 @@ def main():
     df = bee_model.datacollector.get_model_vars_dataframe()
     df2 = bee_model.datacollector2.get_model_vars_dataframe()
     print(tm.time() - start_time)
-    df.to_pickle('huppelfluppel.p')
+    df.to_pickle('pickles/huppelfluppel.p')
     df.to_csv('pickles/df.csv')
     df2.to_csv('pickles/df2.csv')
 
