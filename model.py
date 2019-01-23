@@ -27,12 +27,15 @@ class BeeForagingModel(Model):
 
         self.schedule = RandomActivationBeeWorld(self)
 
+        self.hives = {}
+
         for hive_location in hive_locations:
 
             # Init Hive
             hive = Hive(self, hive_location)
             self.hive = hive
             self.add_agent(self.hive, hive_location)
+            self.hives[hive.unique_id] = hive
 
             # Init Bees
             hive_id = hive.unique_id
@@ -55,10 +58,10 @@ class BeeForagingModel(Model):
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
             "HiveFood": lambda m: m.hive.get_food_stat()/10,
-            "Scout bees": lambda m: m.schedule.get_scout_count()[0],
-            "Foraging bees": lambda m: m.schedule.get_scout_count()[1],
-            "Rester bees": lambda m: m.schedule.get_scout_count()[2],
-            "Baby bees": lambda m: m.schedule.get_scout_count()[3]
+            "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
+            "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
+            "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
+            "Baby bees": lambda m: m.schedule.get_bee_count("babee")
         })
         self.datacollector2 = DataCollector({
             "HiveID": lambda m: m.hive.get_hive_id(),
@@ -67,7 +70,7 @@ class BeeForagingModel(Model):
         self.running = True
 
     def get_hive(self, hive_id):
-        return self.schedule.agents_by_breed[Hive][hive_id]
+        return self.hives[hive_id]
 
     def step(self):
         self.schedule.step()

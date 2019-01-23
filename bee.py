@@ -10,6 +10,8 @@ from food import Food
 from hive import Hive
 import util
 
+# TODO remove
+import time as tm
 
 class BeeStrategy:
     """
@@ -261,7 +263,7 @@ class Bee(Agent):
         '''
         Move the bee, look around for a food source and take food source
         '''
-        #TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
+        # TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
         self.age += 1
 
         # if outside of hive, lose energy proportional to age

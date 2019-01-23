@@ -10,7 +10,7 @@ def main():
     bee_model = md.BeeForagingModel(100, 100, 1, 10)
 
     start_time = tm.time()
-    bee_model.run_model(1000)
+    bee_model.run_model(100)
     print(tm.time() - start_time)
 
     df = bee_model.datacollector.get_model_vars_dataframe()
