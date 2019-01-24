@@ -67,8 +67,8 @@ class Hive(Agent):
             # if more than necessary amount of food, increase consumption and reproduction
             #TODO dependency energy in hive
             if self.food >= self.energy_level_optimal:
-                self.bite += 1
-                self.reproduction_rate += 0.1
+                self.bite +=  self.bite/1000
+                self.reproduction_rate += self.reproduction_rate/1000
 
             else:
                 self.bite = 1

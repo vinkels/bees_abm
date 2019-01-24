@@ -3,14 +3,14 @@ import random as rd
 
 
 class Food(Agent):
-    def __init__(self, model, pos, util):
+    def __init__(self, model, pos):
         super().__init__(model.next_id(), model)
 
         self.pos = pos
         #TODO SET HIGHER PARAMETER FOR RANDOMNESS 
         self.max_util = rd.randint(1, 10)
         #TODO GENERATE RANDOMNESS BETWEEN 1 AND MAX_UTIL CHANGE THIS IN MODEL.PY 
-        self.util = util
+        self.util = rd.randint(1, self.max_util)
         self.steps = 0
 
     def step(self):

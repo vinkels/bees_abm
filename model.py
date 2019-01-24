@@ -58,7 +58,7 @@ class BeeForagingModel(Model):
 
         #TODO ADD MORE ROBUST RANDOMNESS TO FOOD UTILITY
         for f_loc in food_locations:
-            food = Food(self, f_loc, rd.randint(1, 4))
+            food = Food(self, f_loc)
             self.add_agent(food, f_loc)
 
         self.datacollector = DataCollector({
