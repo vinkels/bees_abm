@@ -4,6 +4,7 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
+from config import *
 from food import Food
 from bee import Bee
 from hive import Hive
@@ -12,13 +13,14 @@ from obstacle_grid import MultiGridWithObstacles
 from schedule import RandomActivationBeeWorld
 
 class BeeForagingModel(Model):
+    #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
     def __init__(self, width, height, obstacle_density, food_density):
         super().__init__()
         self.height = height
         self.width = width
 
         self.user_error = None
-        if obstacle_density + food_density > 99:
+        if obstacle_density + food_density > FOOD_OBSTACLE_RATIO:
             raise Exception("Food and obstacles do not fit in the grid.")
 
         hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
@@ -32,12 +34,15 @@ class BeeForagingModel(Model):
         for hive_location in hive_locations:
 
             # Init Hive
+            #TODO INITIALISE AMOUNT OF HIVES 
             hive = Hive(self, hive_location)
             self.hive = hive
             self.add_agent(self.hive, hive_location)
             self.hives[hive.unique_id] = hive
 
             # Init Bees
+            #TODO TAG BEES FOR WARM-UP PERIOD
+            #TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
             hive_id = hive.unique_id
             for i in range(0, 20):
                 bee = Bee(self, self.hive.pos, self.hive, "scout", hive_id=hive_id)
@@ -51,6 +56,7 @@ class BeeForagingModel(Model):
                 bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
                 self.add_agent(bee_baby, hive_location)
 
+        #TODO ADD MORE ROBUST RANDOMNESS TO FOOD UTILITY
         for f_loc in food_locations:
             food = Food(self, f_loc, rd.randint(1, 4))
             self.add_agent(food, f_loc)
@@ -108,7 +114,7 @@ class BeeForagingModel(Model):
 
         food_end_index = amount_food + 1
         obstacle_end_index = food_end_index + amount_obstacle
-
+        
         hive_locations = [possible_locations[0]]
         food_locations = possible_locations[1:food_end_index]
         obstacle_locations = set(possible_locations[food_end_index:obstacle_end_index])

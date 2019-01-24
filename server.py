@@ -7,7 +7,7 @@ from food import Food
 from bee import Bee
 from hive import Hive
 from obstacle_grid import OBSTACLE
-
+from config import GRID_HEIGHT, GRID_WIDTH
 from model import BeeForagingModel
 
 color_dic = {
@@ -55,6 +55,7 @@ def hive_portrayal(agent):
 
         portrayal["w"] = 1
         portrayal["h"] = 1
+        #TODO DYNAMICALLY GIVE DIFFERENT COLOURS TO DIFFERENT NUMBERS OF HIVES
         if agent.unique_id == 0:
             portrayal["Color"] = "RED"
         else:
@@ -71,13 +72,13 @@ def hive_portrayal(agent):
 
     return portrayal
 
-width = 100
-height = 100
+width = GRID_WIDTH
+height = GRID_HEIGHT
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
 chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"},
     {"Label": "Foraging bees", "Color": "#f4b042"}, {"Label": "Rester bees", "Color": "#17ef71"}, {"Label": "Baby bees", "Color": "#ff93d0"}], 500, 500)
-# error_text = TextVisualization.TextData(BeeForagingModel, var_name="user_error")
+
 server = ModularServer(
     BeeForagingModel,
     [canvas_element, chart_element],
