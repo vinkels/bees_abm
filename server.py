@@ -30,7 +30,12 @@ def hive_portrayal(agent):
         portrayal["Filled"] = "true"
         portrayal["r"] = 0.5
         if agent.hive_num == 0:
-            portrayal["Color"] = "PURPLE"
+            if agent.type_bee == "scout":
+                portrayal["Color"] = "#70a5f9"
+            elif agent.type_bee == "foraging":
+                portrayal["Color"] = "#f4b042"
+            else:
+                portrayal["Color"] = "BLACK"
         elif agent.hive_num == 1:
             portrayal["Color"] = "ORANGE"
 
@@ -69,8 +74,8 @@ def hive_portrayal(agent):
 
     return portrayal
 
-width = 100
-height = 100
+width = 40
+height = 40
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
 chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"}, 

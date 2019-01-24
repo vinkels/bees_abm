@@ -97,8 +97,8 @@ class BeeForagingModel(Model):
 
         rd.shuffle(possible_locations)
 
-        hive_location = possible_locations[0:2]
-        food_locations = possible_locations[2:(ten_percent+1)]
+        hive_location = possible_locations[0:1]
+        food_locations = possible_locations[1:(ten_percent+1)]
         obstacle_locations = possible_locations[(ten_percent+1):((ten_percent*4)+1)]
         
         return hive_location, food_locations, obstacle_locations
