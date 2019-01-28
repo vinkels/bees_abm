@@ -13,6 +13,8 @@ import util
 # TODO remove
 import time as tm
 
+import numpy as np
+
 class BeeStrategy:
     """
     Base Class to create a bee strategy
@@ -178,8 +180,9 @@ class Bee(Agent):
         self.max_energy = rd.randint(10, 30)
         self.energy = self.max_energy
 
-        self.known_obstacles = set()
         self.plan_course = []
+
+        self.mental_map = np.ones((self.model.height, self.model.width)).tolist()
 
     def random_move(self):
         '''
@@ -201,7 +204,9 @@ class Bee(Agent):
         '''
 
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
-        self.known_obstacles.update(obstacles)
+
+        for obstacle in obstacles:
+            self.mental_map[obstacle[0]][obstacle[1]] = 0
 
         return list(neighbourhood)
 
@@ -215,7 +220,7 @@ class Bee(Agent):
             plan_start = tm.time()
             self.plan_course = util.path_finder(cur_loc=self.pos,
                                                target_loc=loc,
-                                               obstacles=self.known_obstacles,
+                                               mental_map=self.mental_map,
                                                grid_width=self.model.width,
                                                grid_height=self.model.height)
             plan_end = tm.time()
