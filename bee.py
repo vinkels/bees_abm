@@ -13,7 +13,7 @@ import util
 # TODO remove
 import time as tm
 
-import numpy as np
+from pathfinding.core.grid import Grid
 
 class BeeStrategy:
     """
@@ -182,7 +182,7 @@ class Bee(Agent):
 
         self.plan_course = []
 
-        self.mental_map = np.ones((self.model.height, self.model.width)).tolist()
+        self.mental_map = Grid(height=self.model.height, width=self.model.width)
 
     def random_move(self):
         '''
@@ -206,7 +206,8 @@ class Bee(Agent):
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
 
         for obstacle in obstacles:
-            self.mental_map[obstacle[0]][obstacle[1]] = 0
+            self.mental_map.nodes[obstacle[0]][obstacle[1]].walkable = False
+            self.mental_map.nodes[obstacle[0]][obstacle[1]].weight = 0
 
         return list(neighbourhood)
 
@@ -220,7 +221,7 @@ class Bee(Agent):
             plan_start = tm.time()
             self.plan_course = util.path_finder(cur_loc=self.pos,
                                                target_loc=loc,
-                                               mental_map=self.mental_map,
+                                               grid=self.mental_map,
                                                grid_width=self.model.width,
                                                grid_height=self.model.height)
             plan_end = tm.time()

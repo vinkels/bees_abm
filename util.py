@@ -5,14 +5,15 @@ from pathfinding.finder.a_star import AStarFinder
 
 import time
 
-def path_finder(cur_loc, target_loc, mental_map, grid_width, grid_height):
-    grid = Grid(matrix=mental_map)
+def path_finder(cur_loc, target_loc, grid, grid_width, grid_height):
     start = grid.node(cur_loc[0], cur_loc[1])
     end = grid.node(target_loc[0], target_loc[1])
 
     finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-
     path, _ = finder.find_path(start, end, grid)
+
+    # Pathfinding edits grid, so we need to clean it up afterwards.
+    grid.cleanup()
 
     return path[1:]
 
