@@ -12,6 +12,10 @@ from obstacle_grid import MultiGridWithObstacles
 
 from schedule import RandomActivationBeeWorld
 
+from util import path_finder
+
+import time
+
 class BeeForagingModel(Model):
     #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
     def __init__(self, width, height, obstacle_density, food_density):
@@ -75,13 +79,33 @@ class BeeForagingModel(Model):
         })
         self.running = True
 
+        self.total_data_time = 0
+        self.total_schedule_time = 0
+
+        self.time_by_strategy = {
+            "scout": 0,
+            "foraging": 0,
+            "rester": 0,
+            "babee": 0
+        }
+
+        self.planning_time = 0
+
     def get_hive(self, hive_id):
         return self.hives[hive_id]
 
     def step(self):
+        schedule_start = time.time()
         self.schedule.step()
+        schedule_end = time.time()
+
+        start = time.time()
         self.datacollector.collect(self)
         self.datacollector2.collect(self)
+        end = time.time()
+    
+        self.total_data_time += end - start
+        self.total_schedule_time += schedule_end - schedule_start
 
     def run_model(self, n_steps):
         for i in range(n_steps):

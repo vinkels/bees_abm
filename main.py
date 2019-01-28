@@ -10,8 +10,13 @@ def main():
     bee_model = md.BeeForagingModel(100, 100, 1, 10)
 
     start_time = tm.time()
-    bee_model.run_model(100)
+    bee_model.run_model(1000)
     print(tm.time() - start_time)
+
+    print(bee_model.total_data_time, bee_model.total_schedule_time)
+    print(bee_model.schedule.timing_by_breed)
+    print(bee_model.time_by_strategy)
+    print(bee_model.planning_time)
 
     df = bee_model.datacollector.get_model_vars_dataframe()
     df2 = bee_model.datacollector2.get_model_vars_dataframe()

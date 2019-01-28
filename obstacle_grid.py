@@ -57,5 +57,5 @@ class MultiGridWithObstacles(MultiGrid):
         """
         Returns only the accessible spots in the neighbourhood.
         """
-        neighborhood = set(self.get_neighborhood(pos, moore, include_center, radius))
+        neighborhood = set(self.iter_neighborhood(pos, moore, include_center, radius))
         return neighborhood - self.obstacle_positions, neighborhood & self.obstacle_positions

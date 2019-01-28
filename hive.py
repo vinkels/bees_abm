@@ -1,5 +1,4 @@
 from mesa import Agent
-from config import *
 import random as rd
 
 
