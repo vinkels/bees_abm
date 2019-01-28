@@ -1,7 +1,6 @@
 from pathfinding.core.diagonal_movement import DiagonalMovement
 from pathfinding.core.grid import Grid
-# from pathfinding.finder.ida_star import IDAStarFinder
-from pathfinding.finder.dijkstra import DijkstraFinder
+from pathfinding.finder.a_star import AStarFinder
 
 
 import time
@@ -11,15 +10,10 @@ def path_finder(cur_loc, target_loc, mental_map, grid_width, grid_height):
     start = grid.node(cur_loc[0], cur_loc[1])
     end = grid.node(target_loc[0], target_loc[1])
 
-    finder = DijkstraFinder(diagonal_movement=DiagonalMovement.always)
+    finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
 
-    path, runs = finder.find_path(start, end, grid)
-    # print(runs)
-    # print(path)
-    # print('operations:', runs, 'path length:', len(path))
-    # print(grid.grid_str(path=path, start=start, end=end))
-    
-    # print(f"time: {step_2} {step_3}")
+    path, _ = finder.find_path(start, end, grid)
+
     return path[1:]
 
 if __name__ == "__main__":
