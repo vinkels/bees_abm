@@ -65,6 +65,7 @@ class RandomActivationBeeWorld(RandomActivation):
         '''
         agent_keys = list(self.agents_by_breed[breed].keys())
         self.model.random.shuffle(agent_keys)
+
         for agent_key in agent_keys:
             self.agents_by_breed[breed][agent_key].step()
 
@@ -74,23 +75,9 @@ class RandomActivationBeeWorld(RandomActivation):
         '''
         return len(self.agents_by_breed[breed_class].values())
 
-    def get_scout_count(self):
-
-        scout_count = 0
-        for_count = 0
-        rest_count = 0
-        baby_count = 0
-        agents = self.agents
-        for agent in agents:
-            if type(agent) == Bee:
-                if agent.type_bee == "scout":
-                    scout_count += 1
-                elif agent.type_bee == "foraging":
-                    for_count += 1
-                elif agent.type_bee == "rester":
-                    rest_count += 1
-                elif agent.type_bee == "babee":
-                    baby_count += 1
-
-
-        return scout_count, for_count, rest_count, baby_count
+    def get_bee_count(self, bee_type):
+        return sum([
+            1 
+            for agent in self.agents_by_breed[Bee].values() 
+            if agent.type_bee == bee_type
+        ])

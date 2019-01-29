@@ -1,10 +1,12 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
+from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization import TextVisualization
 
 from food import Food
 from bee import Bee
 from hive import Hive
-from obstacle import Obstacle
+from obstacle_grid import OBSTACLE
 
 from model import BeeForagingModel
 
@@ -29,14 +31,9 @@ def hive_portrayal(agent):
         portrayal["Layer"] = 2
         portrayal["Filled"] = "true"
         portrayal["r"] = 0.5
-        if agent.hive_num == 0:
-            if agent.type_bee == "scout":
-                portrayal["Color"] = "#70a5f9"
-            elif agent.type_bee == "foraging":
-                portrayal["Color"] = "#f4b042"
-            else:
-                portrayal["Color"] = "BLACK"
-        elif agent.hive_num == 1:
+        if agent.hive_id == 0:
+            portrayal["Color"] = "PURPLE"
+        elif agent.hive_id == 1:
             portrayal["Color"] = "ORANGE"
 
     elif type(agent) is Food:
@@ -55,15 +52,15 @@ def hive_portrayal(agent):
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 0
         portrayal["Filled"] = "true"
-        
+
         portrayal["w"] = 1
         portrayal["h"] = 1
-        if agent.hive_num == 0:
+        if agent.unique_id == 0:
             portrayal["Color"] = "RED"
-        elif agent.hive_num == 1:
+        else:
             portrayal["Color"] = "GREEN"
 
-    elif type(agent) is Obstacle:
+    elif agent is OBSTACLE:
         portrayal["Shape"] = "rect"
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 0
@@ -78,15 +75,17 @@ width = 40
 height = 40
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
-chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"}, 
+chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"},
     {"Label": "Foraging bees", "Color": "#f4b042"}, {"Label": "Rester bees", "Color": "#17ef71"}, {"Label": "Baby bees", "Color": "#ff93d0"}], 500, 500)
-
+# error_text = TextVisualization.TextData(BeeForagingModel, var_name="user_error")
 server = ModularServer(
     BeeForagingModel,
     [canvas_element, chart_element],
     "Hive",
     {
         "width": width,
-        "height": height
+        "height": height,
+        "obstacle_density": UserSettableParameter('slider', 'obstacle density', value=0, min_value=0, max_value=100),
+        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100)
     }
 )

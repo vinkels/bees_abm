@@ -1,13 +1,13 @@
 from mesa import Agent
+from config import *
 import random as rd
 
 
 class Hive(Agent):
-    def __init__(self, model, pos, hive_num):
+    def __init__(self, model, pos):
         super().__init__(model.next_id(), model)
 
         self.pos = pos
-        self.hive_num = hive_num
         self.food_locs = []
         self.food = 0
         self.n_bees = 0
@@ -30,35 +30,42 @@ class Hive(Agent):
 
         # determine optimal and critical amount of food
         self.energy_level_optimal = self.n_bees * 20
-        self.energy_level_critical = self.n_bees 
-            
+        self.energy_level_critical = self.n_bees
+
         # chance of babies
         if rd.random() < self.reproduction_rate:
-            self.model.add_bee(self.pos, self, "babee", hive_num = self.hive_num)
+            self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id)
             self.n_bees += 1
 
-        # forget (maybe) 10% of food locations when too many to remember
-        #TODO the amount of number to forget and the randomness should be tuned
+        # forget randomnly amount of food locations when too many to remember
+        
+        to_discard  = rd.randint(1, 10)
         if len(self.food_locs) > 10:
-            if rd.random() < 0.5:
-                self.food_locs = self.food_locs[int(len(self.food_locs)/10):len(self.food_locs)]
+                self.food_locs = self.food_locs[0:to_discard]
 
         # adjust parameters of hive based on food in hive
         self.balance_hive()
 
-        
     def unload_food(self, food=1):
+        #TODO depends on bee carrying capacity
         self.food += 5
 
     def get_food_stat(self):
         return self.food
-    
+
+    def get_hive_id(self):
+        return self.unique_id
+
+    def get_food_memory(self):
+        return self.food_locs
+
     def balance_hive(self):
 
-        # if food is available 
+        # if food is available
         if self.food > 0:
 
             # if more than necessary amount of food, increase consumption and reproduction
+            #TODO dependency energy in hive
             if self.food >= self.energy_level_optimal:
                 self.bite += 1
                 self.reproduction_rate += 0.1
@@ -66,5 +73,3 @@ class Hive(Agent):
             else:
                 self.bite = 1
                 self.reproduction_rate = 0.1
-                    
-
