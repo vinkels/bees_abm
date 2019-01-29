@@ -13,6 +13,8 @@ import util
 # TODO remove
 import time as tm
 
+import numpy as np
+
 from pathfinding.core.grid import Grid
 
 class BeeStrategy:
@@ -70,7 +72,8 @@ class Rester(BeeStrategy):
                 
             # otherwise, stay at hive and gain energy
             else:
-                bee.relax_at_hive(hive)
+                # become scout if no food has been found
+                bee.type_bee = "scout"
 
         else:
             bee.relax_at_hive(hive)
@@ -129,7 +132,11 @@ class Foraging(BeeStrategy):
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util % self.car_cap > 0]
+                food_neighbors = [
+                    nb 
+                    for nb in neighbors 
+                    if type(nb) == Food and nb.util % bee.car_cap > 0
+                ]
 
                 bee.plan_course = []
                 if food_neighbors:

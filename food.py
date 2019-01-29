@@ -2,6 +2,8 @@ from mesa import Agent
 import random as rd
 
 
+import numpy as np
+
 class Food(Agent):
     def __init__(self, model, pos, util_pars=(5, 2.5), max_step=3):
         super().__init__(model.next_id(), model)
@@ -10,9 +12,8 @@ class Food(Agent):
         self.pos = pos
 
         #TODO GENERATE RANDOMNESS BETWEEN 1 AND MAX_UTIL CHANGE THIS IN MODEL.PY
- 
+        self.max_util = abs(int(round(np.random.normal(util_pars[0], util_pars[1])))) + 1
         
-        self.max_util = int(round(np.random.normal(util_pars[0], util_pars[1])))
         self.util = rd.randint(1, self.max_util)
         self.steps = 0
 
