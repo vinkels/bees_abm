@@ -42,22 +42,32 @@ Agent Based Modelling
     > Als bepaalde energy level hebben random nu tussen (5, 40) en er zijn food location bekend in de hive , dan worden de resters foragers
     >Als er geen locatie bekend is of ze hebben niet genoeg energie dan blijven ze resters en eten in de hive en sparen ze energie
     > Als er niet genoeg eten in de hive dan kost het de resters bij energie
+ 
  ## Observations
+
  - Leeftijd voor incubation baby heeft invloed hoeveelheid totale bijen
- -
 
+## Final Parameters and output
 
-Final Parameters and output
-Fixed:
-- gridsize: 50x50
-- Number of bees at start 
+#### Fixed
 
-Input:
+- gridsize 50x50
+- Number of bees at start
+- Reproduction rate
+- Deathrate
+- max utility foodsource
+- energy decay bees (- 1/100*age)
+- max age
+- bite size
+
+#### Input
+
 - number of obstacles
-- Food density
+- Food density (5 - 30)
 - Aantal Hives (1,3,5,7)
 
-Output:
+#### Output
+
 - Food in de hive/hive size ratio
 - Verhouding foraging/scouting/rester/babees
 - Death/birth rate

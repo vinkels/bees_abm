@@ -9,8 +9,10 @@ class Food(Agent):
         self.pos = pos
         #TODO SET HIGHER PARAMETER FOR RANDOMNESS 
         self.max_util = rd.randint(1, 10)
-        #TODO GENERATE RANDOMNESS BETWEEN 1 AND MAX_UTIL CHANGE THIS IN MODEL.PY 
-        self.util = rd.randint(1, self.max_util)
+        #TODO GENERATE RANDOMNESS BETWEEN 1 AND MAX_UTIL CHANGE THIS IN MODEL.PY
+ 
+        # self.util = rd.randint(1, self.max_util)
+        self.util = np.random.normal(self.max_util/2, 2.5)
         self.steps = 0
 
     def step(self):
