@@ -129,8 +129,7 @@ class Foraging(BeeStrategy):
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-                # TODO CHECK DEPENDENCY CARRYING CAPACITY
-                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util % 5 > 0]
+                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util % self.car_cap > 0]
 
                 bee.plan_course = []
                 if food_neighbors:
@@ -163,8 +162,8 @@ bee_strategies = {
 
 
 class Bee(Agent):
-    def __init__(self, model, pos, hive, type_bee, hive_id):
-        super().__init__(model.next_id(), model, energy_pars=(20, 5))
+    def __init__(self, model, pos, hive, type_bee, hive_id, energy_pars=(20, 5)):
+        super().__init__(model.next_id(), model)
 
         self.loaded = False
         self.food_loc = []
@@ -173,6 +172,7 @@ class Bee(Agent):
         self.pos = pos
         self.type_bee = type_bee
         self.age = 0
+        self.car_cap = self.model.car_cap
 
 
         # random threshold of energy required per bee to go foraging

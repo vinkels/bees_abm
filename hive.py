@@ -47,7 +47,7 @@ class Hive(Agent):
 
     def unload_food(self, food=1):
         #TODO depends on bee carrying capacity
-        self.food += 5
+        self.food += self.model.car_cap
 
     def get_food_stat(self):
         return self.food

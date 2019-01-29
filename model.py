@@ -18,23 +18,22 @@ import time
 
 class BeeForagingModel(Model):
     #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width, height, obstacle_density, food_density):
+    def __init__(self, width, height, obstacle_density, food_density, car_cap=5):
         super().__init__()
         self.height = height
         self.width = width
+        self.car_cap = car_cap
 
         self.user_error = None
         if obstacle_density + food_density > FOOD_OBSTACLE_RATIO:
             raise Exception("Food and obstacles do not fit in the grid.")
 
         hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density)
-
         self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations))
-
         self.schedule = RandomActivationBeeWorld(self)
 
         self.hives = {}
-
+        
         for hive_location in hive_locations:
 
             # Init Hive
@@ -43,13 +42,14 @@ class BeeForagingModel(Model):
             self.hive = hive
             self.add_agent(self.hive, hive_location)
             self.hives[hive.unique_id] = hive
+            
 
             # Init Bees
             #TODO TAG BEES FOR WARM-UP PERIOD
             #TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
             hive_id = hive.unique_id
             for i in range(0, 20):
-                bee = Bee(self, self.hive.pos, self.hive, "scout", hive_id=hive_id)
+                bee = Bee(self, self.hive.pos, self.hive, "scout", hive_id=hive_id,)
                 self.add_agent(bee, hive_location)
 
                 bee_for = Bee(self, hive_location, self.hive, "rester", hive_id=hive_id)
