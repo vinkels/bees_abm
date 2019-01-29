@@ -3,7 +3,7 @@ import random as rd
 
 
 class Food(Agent):
-    def __init__(self, model, pos):
+    def __init__(self, model, pos, util_pars=(5, 2.5)):
         super().__init__(model.next_id(), model)
 
         self.pos = pos
@@ -12,7 +12,7 @@ class Food(Agent):
         #TODO GENERATE RANDOMNESS BETWEEN 1 AND MAX_UTIL CHANGE THIS IN MODEL.PY
  
         # self.util = rd.randint(1, self.max_util)
-        self.util = np.random.normal(self.max_util/2, 2.5)
+        self.max_util = np.random.normal(util_pars[0], util_pars[1])
         self.steps = 0
 
     def step(self):
