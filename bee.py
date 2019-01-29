@@ -176,7 +176,7 @@ class Bee(Agent):
 
 
         # random threshold of energy required per bee to go foraging
-        # TODO SHOULD DEPEND ON ENERGY LEVEL OF HIVE 
+         
         self.max_energy = np.random.normal(energy_pars[0], energy_pars[1])
         self.energy = self.max_energy
 
