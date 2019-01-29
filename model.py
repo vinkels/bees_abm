@@ -49,11 +49,11 @@ class BeeForagingModel(Model):
             #TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
             hive_id = hive.unique_id
             for i in range(0, 20):
-                bee = Bee(self, self.hive.pos, self.hive, "scout", hive_id=hive_id,)
+                bee = Bee(self, hive.pos, hive, "scout", hive_id=hive_id)
                 self.add_agent(bee, hive_location)
                 bee.age = BABYTIME
 
-                bee_for = Bee(self, hive_location, self.hive, "rester", hive_id=hive_id)
+                bee_for = Bee(self, hive_location, hive, "rester", hive_id=hive_id)
                 self.add_agent(bee_for, hive_location)
                 bee_for.age = BABYTIME
 

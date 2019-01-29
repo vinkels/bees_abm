@@ -28,7 +28,7 @@ class Hive(Agent):
         self.n_bees = len(self.bees_hive)
 
         # determine optimal and critical amount of food
-        self.energy_level_optimal = self.n_bees * 50
+        self.energy_level_optimal = self.n_bees * 20
         self.energy_level_critical = self.n_bees
 
         # chance of babies
