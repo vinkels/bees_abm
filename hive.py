@@ -32,7 +32,7 @@ class Hive(Agent):
         self.energy_level_critical = self.n_bees
 
         # chance of babies
-        if rd.random() < self.reproduction_rate:
+        if self.food > self.bite and rd.random() < self.reproduction_rate:
             self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id)
             self.n_bees += 1
 
@@ -59,7 +59,6 @@ class Hive(Agent):
         return self.food_locs
 
     def balance_hive(self):
-
         # if food is available
         if self.food > 0:
 

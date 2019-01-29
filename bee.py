@@ -206,8 +206,8 @@ class Bee(Agent):
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
 
         for obstacle in obstacles:
-            self.mental_map.nodes[obstacle[0]][obstacle[1]].walkable = False
-            self.mental_map.nodes[obstacle[0]][obstacle[1]].weight = 0
+            self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
+            self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
 
         return list(neighbourhood)
 
@@ -256,8 +256,8 @@ class Bee(Agent):
 
         # if no food is available, go search
         # TODO ENERGY DECAY OVER TIME
-        else:
-            self.energy -= 1
+        # BABEES are not allowed to change to scouters, only by age
+        elif self.type_bee != "babee":
             self.type_bee = "scout"
 
     def step(self):
@@ -267,9 +267,9 @@ class Bee(Agent):
         # TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
         self.age += 1
 
-        # if outside of hive, lose energy proportional to age
-        if self.pos != self.hive_loc:
-            self.energy -= (self.age / 100)
+        # lose energy proportional to age
+        age_penalty = self.age / 1000
+        self.energy -= min(age_penalty, 1)
 
         # if no more energy, die
         if self.energy <= 0:
