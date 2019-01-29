@@ -27,7 +27,7 @@ Agent Based Modelling
 - size
 - coordinates
 
-<div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+
 
 ## Food strategy and Hive balance:
  - Wanneer er meer food is dan gaat de reproductie rate omhoog en eten bijen meer
@@ -47,3 +47,21 @@ Agent Based Modelling
  -
 
 
+Final Parameters and output
+Fixed:
+- gridsize: 50x50
+- Number of bees at start 
+
+Input:
+- number of obstacles
+- Food density
+- Aantal Hives (1,3,5,7)
+
+Output:
+- Food in de hive/hive size ratio
+- Verhouding foraging/scouting/rester/babees
+- Death/birth rate
+- mean death age
+
+
+<div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
