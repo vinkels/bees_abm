@@ -33,16 +33,16 @@ class BeeForagingModel(Model):
         self.schedule = RandomActivationBeeWorld(self)
 
         self.hives = {}
-        
+
         for hive_location in hive_locations:
 
             # Init Hive
-            #TODO INITIALISE AMOUNT OF HIVES 
+            #TODO INITIALISE AMOUNT OF HIVES
             hive = Hive(self, hive_location)
             self.hive = hive
             self.add_agent(self.hive, hive_location)
             self.hives[hive.unique_id] = hive
-            
+
 
             # Init Bees
             #TODO TAG BEES FOR WARM-UP PERIOD
@@ -51,14 +51,16 @@ class BeeForagingModel(Model):
             for i in range(0, 20):
                 bee = Bee(self, self.hive.pos, self.hive, "scout", hive_id=hive_id,)
                 self.add_agent(bee, hive_location)
+                bee.age = BABYTIME
 
                 bee_for = Bee(self, hive_location, self.hive, "rester", hive_id=hive_id)
                 self.add_agent(bee_for, hive_location)
+                bee_for.age = BABYTIME
 
-            # init babies
-            for i in range(0, 3):
-                bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
-                self.add_agent(bee_baby, hive_location)
+            # # init babies
+            # for i in range(0, 3):
+            #     bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
+            #     self.add_agent(bee_baby, hive_location)
 
         #TODO ADD MORE ROBUST RANDOMNESS TO FOOD UTILITY
         for f_loc in food_locations:
@@ -67,7 +69,7 @@ class BeeForagingModel(Model):
 
         self.datacollector = DataCollector({
             "Bees": lambda m: m.schedule.get_breed_count(Bee),
-            "HiveFood": lambda m: m.hive.get_food_stat()/10,
+            "HiveFood": lambda m: m.hive.get_food_stat(),
             "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
             "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
             "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
@@ -103,7 +105,7 @@ class BeeForagingModel(Model):
         self.datacollector.collect(self)
         self.datacollector2.collect(self)
         end = time.time()
-    
+
         self.total_data_time += end - start
         self.total_schedule_time += schedule_end - schedule_start
 
@@ -138,7 +140,7 @@ class BeeForagingModel(Model):
 
         food_end_index = amount_food + 1
         obstacle_end_index = food_end_index + amount_obstacle
-        
+
         hive_locations = [possible_locations[0]]
         food_locations = possible_locations[1:food_end_index]
         obstacle_locations = set(possible_locations[food_end_index:obstacle_end_index])

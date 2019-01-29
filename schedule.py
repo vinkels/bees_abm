@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from mesa.time import RandomActivation
 
-from bee import Bee 
+from bee import Bee
 from food import Food
 from hive import Hive
 
@@ -88,7 +88,7 @@ class RandomActivationBeeWorld(RandomActivation):
 
     def get_bee_count(self, bee_type):
         return sum([
-            1 
-            for agent in self.agents_by_breed[Bee].values() 
+            1
+            for agent in self.agents_by_breed[Bee].values()
             if agent.type_bee == bee_type
         ])

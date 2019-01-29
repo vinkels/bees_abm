@@ -15,7 +15,7 @@ color_dic = {
     3: "#008300",
     2: "#00AA00",
     1: "#00F800",
-    0: "#FFFFFF"
+    0: "red"
 }
 
 
@@ -28,16 +28,22 @@ def hive_portrayal(agent):
     if type(agent) is Bee:
         portrayal["Shape"] = "circle"
         portrayal["scale"] = 0.9
+        portrayal["r"] = 0.5
         portrayal["Layer"] = 2
         portrayal["Filled"] = "true"
-        portrayal["r"] = 0.5
+
         if agent.hive_id == 0:
             portrayal["Color"] = "PURPLE"
         elif agent.hive_id == 1:
             portrayal["Color"] = "ORANGE"
+        elif agent.hive_id == 2:
+            portrayal["Color"] = "PINK"
 
     elif type(agent) is Food:
         col_intensity = agent.util
+
+        assert col_intensity >= 0, agent.__dict__
+
         if col_intensity > 4:
             col_intensity = 4
         portrayal["Shape"] = "circle"
