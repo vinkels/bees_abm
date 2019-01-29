@@ -92,3 +92,5 @@ class RandomActivationBeeWorld(RandomActivation):
             for agent in self.agents_by_breed[Bee].values()
             if agent.type_bee == bee_type
         ])
+    def get_mortality(self):
+        pass

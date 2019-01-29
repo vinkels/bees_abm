@@ -17,11 +17,7 @@ import time as tm
 
 #TODO: number of hives, food availability, 
 # We define our variables and bounds
-problem = {
-    'num_vars': 2,
-    'names': ['obstacle_density', 'food_density'],
-    'bounds': [[10, 20, 30], [5, 10, 20]]
-}
+
 
 var_params = {'obstacle_density': [10, 20, 30],
               'food_density': [5, 10, 20]}
@@ -37,7 +33,7 @@ distinct_samples = 10
 
 # Set the outputs
 model_reporters = {"n_bees": lambda m: m.schedule.get_breed_count(Bee),
-                   "food": lambda m: m.hive.get_food_stat()/10,
+                   "food": lambda m: m.hives[m.hive.unique_id].get_food_stat(),
                    "scout_bee": lambda m: m.schedule.get_bee_count("scout"),
                    "forage_bee": lambda m: m.schedule.get_bee_count("foraging"),
                    "rest_bee": lambda m: m.schedule.get_bee_count("rester"),

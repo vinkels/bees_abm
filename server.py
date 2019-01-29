@@ -62,10 +62,14 @@ def hive_portrayal(agent):
         portrayal["w"] = 1
         portrayal["h"] = 1
         #TODO DYNAMICALLY GIVE DIFFERENT COLOURS TO DIFFERENT NUMBERS OF HIVES
-        if agent.unique_id == 0:
-            portrayal["Color"] = "RED"
-        else:
-            portrayal["Color"] = "GREEN"
+        col_intensity = agent.unique_id
+        assert col_intensity >= 0, agent.__dict__
+        if col_intensity > 4:
+            col_intensity = 4
+        # if agent.unique_id == 0:
+        portrayal["Color"] = color_dic[col_intensity]
+        # else:
+            # portrayal["Color"] = "GREEN"
 
     elif agent is OBSTACLE:
         portrayal["Shape"] = "rect"

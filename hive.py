@@ -16,6 +16,8 @@ class Hive(Agent):
         self.energy_level_minimum = 25
         self.bees_hive = []
         self.bite = 1
+        # TODO Add birth ratio
+        # self.birth_rate = 0.0
         self.reproduction_rate = 0.1
 
     def receive_info(self, info):
@@ -35,6 +37,7 @@ class Hive(Agent):
         if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
             self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id)
             self.n_bees += 1
+            # self.birth_rate += 1.0
 
         # forget randomnly amount of food locations when too many to remember
 

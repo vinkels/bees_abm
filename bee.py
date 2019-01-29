@@ -188,6 +188,7 @@ class Bee(Agent):
         self.pos = pos
         self.type_bee = type_bee
         self.age = 0
+        self.alive = True
         self.car_cap = self.model.car_cap
 
 
@@ -290,6 +291,7 @@ class Bee(Agent):
 
         # if no more energy, die
         if self.energy <= 0:
+            self.alive = False
             self.model.remove_agent(self)
             return
 
