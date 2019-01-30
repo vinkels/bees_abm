@@ -19,5 +19,6 @@ def main():
     print(bee_model.schedule.timing_by_breed)
     print(bee_model.time_by_strategy)
     print(bee_model.planning_time)
+    print(bee_model.grid.timings)
 
 main()
