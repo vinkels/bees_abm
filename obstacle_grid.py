@@ -17,19 +17,64 @@ class MultiGridWithObstacles(MultiGrid):
         super().__init__(width, height, torus)
         self.obstacle_positions = obstacle_positions
         # print(self.obstacle_positions)
+        self.agents = {}
+
+    def move_agent(self, agent, pos):
+        """
+        Move an agent from its current position to a new position.
+
+        Args:
+            agent: Agent object to move. Assumed to have its current location
+                   stored in a 'pos' tuple.
+            pos: Tuple of new position to move the agent to.
+
+        Overwritten to be less safe, but faster by not checking torus
+        """
+        self._remove_agent(agent.pos, agent)
+        self._place_agent(pos, agent)
+        agent.pos = pos
+
+    def place_agent(self, agent, pos):
+        """ Position an agent on the grid, and set its pos variable. """
+        self._place_agent(pos, agent)
+
+        self.agents[agent.unique_id] = agent
+
+        agent.pos = pos
+
+    def remove_agent(self, agent):
+        """ Remove the agent from the grid and set its pos variable to None. """
+        pos = agent.pos
+
+        del self.agents[agent.unique_id]
+
+        self._remove_agent(pos, agent)
+        agent.pos = None
+
+    def _place_agent(self, pos, agent):
+        """ 
+        Place the agent at the correct location.
+        No empties, because they cost performance.
+        """
+        x, y = pos
+        self.grid[x][y].add(agent.unique_id)
+
+    def _remove_agent(self, pos, agent):
+        """ 
+        Remove the agent from the given location. 
+        No empties, because they cost performance.
+        """
+        x, y = pos
+        self.grid[x][y].remove(agent.unique_id)
 
     def get_contents_with_obstacles_helper(self, x, y):
         """
         A helper function that add an OBSTACLE to the contents if there is one at that location.
         """
-        position_set = self[x][y]
-
         if (x, y) in self.obstacle_positions:
-            obstacle_set = {OBSTACLE}
-            obstacle_set.update(position_set)
-            return obstacle_set
+            return [OBSTACLE]
         else:
-            return position_set
+            return [self.agents[z] for z in self[x][y]]
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):

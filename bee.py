@@ -191,7 +191,6 @@ class Bee(Agent):
         self.car_cap = self.model.car_cap
         self.color = color
 
-
         # random threshold of energy required per bee to go foraging
 
         self.max_energy = np.random.normal(energy_pars[0], energy_pars[1])
@@ -211,9 +210,10 @@ class Bee(Agent):
 
         # select random cell in neighbourhood
         select_coords = rd.randint(0, len(neighbourhood) - 1)
+        target = neighbourhood[select_coords]
 
         # move to cell
-        self.model.grid.move_agent(self, neighbourhood[select_coords])
+        self.model.grid.move_agent(self, target)
 
     def get_accessible_neighbourhood(self):
         '''
