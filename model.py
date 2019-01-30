@@ -100,9 +100,9 @@ class BeeForagingModel(Model):
 
     def step(self):
         # schedule_start = time.time()
-        self.death_count = 0
-        self.birth_count = 0
-        self.death_age = []
+        # self.death_count = 0
+        # self.birth_count = 0
+        # self.death_age = []
         self.schedule.step()
 
         # schedule_end = time.time()
@@ -139,7 +139,7 @@ class BeeForagingModel(Model):
     def remove_agent(self, agent):
         if type(agent) == Bee:
             self.death_count+=1
-            self.death_age.append((agent.age, self.death_count))
+            self.death_age.append(agent.age)
 
         self.grid.remove_agent(agent)
         self.schedule.remove(agent)
