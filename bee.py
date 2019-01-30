@@ -13,6 +13,8 @@ import util
 # TODO remove
 import time as tm
 
+from pathfinding.core.grid import Grid
+
 class BeeStrategy:
     """
     Base Class to create a bee strategy
@@ -65,8 +67,7 @@ class Rester(BeeStrategy):
                 bee.type_bee = "foraging"
                 chosen_loc = rd.randint(0, len(hive.food_locs) - 1)
                 bee.food_loc = hive.food_locs[chosen_loc]
-
-
+                
             # otherwise, stay at hive and gain energy
             else:
                 bee.relax_at_hive(hive)
@@ -81,43 +82,36 @@ class Scout(BeeStrategy):
     '''
 
     def step(self):
+        """
+        No food found yet, do random walk
+        """
         bee = self.bee
 
-        # no food found yet, do random walk
         if bee.loaded is False:
-
-            # search for food (vision is 1)
-            neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1)
-            food_neighbours = [nb.pos for nb in neighbors if type(nb) == Food and nb.util]
+            food_neighbours = [
+                nb 
+                for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1) 
+                if type(nb) == Food and nb.util
+            ]
 
             # If you see food that is uneaten, move there.
             if food_neighbours:
-                go_to = food_neighbours[rd.randrange(0, len(food_neighbours))]
-                bee.model.grid.move_agent(bee, go_to)
+                food = food_neighbours[rd.randrange(0, len(food_neighbours))]
+                
+                bee.model.grid.move_agent(bee, food.pos)
+                food.get_eaten()
+
+                # Become a forager take food and remember location
+                bee.type_bee = 'foraging'
+                bee.loaded = True
+                bee.food_loc = bee.pos
 
             # otherwise, move randomly
             else:
                 bee.random_move()
 
-            # take the food on current cell
-            for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0):
-
-                # if the source is not yet empty
-                #TODO add carrying capacity
-                if type(nb) == Food and nb.util % 5 > 0:
-
-                    # decrease utility of food
-                    nb.get_eaten()
-
-                    # take food and remember location
-                    bee.loaded = True
-                    bee.food_loc = bee.pos
-
-                    # Become a forager if you found food.
-                    bee.type_bee = 'foraging'
-
         else:
-            assert bee.loaded == False
+            raise Exception("Scouts should be unloaded.")
 
 
 class Foraging(BeeStrategy):
@@ -135,9 +129,9 @@ class Foraging(BeeStrategy):
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-                #TODO CHECK DEPENDENCY CARRYING CAPACITY
+                # TODO CHECK DEPENDENCY CARRYING CAPACITY
                 food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util % 5 > 0]
-                #TODO DEFINE PLAN COURSE
+
                 bee.plan_course = []
                 if food_neighbors:
                     food = food_neighbors[0]
@@ -170,7 +164,7 @@ bee_strategies = {
 
 class Bee(Agent):
     def __init__(self, model, pos, hive, type_bee, hive_id):
-        super().__init__(model.next_id(), model)
+        super().__init__(model.next_id(), model, energy_pars=(20, 5))
 
         self.loaded = False
         self.food_loc = []
@@ -179,22 +173,24 @@ class Bee(Agent):
         self.pos = pos
         self.type_bee = type_bee
         self.age = 0
+        self.energy_pars = energy_pars
 
 
         # random threshold of energy required per bee to go foraging
-        #TODO SHOULD DEPEND ON ENERGY LEVEL OF HIVE
-        self.max_energy = rd.randint(10, 30)
+        # TODO SHOULD DEPEND ON ENERGY LEVEL OF HIVE 
+        self.max_energy = np.random.normal(self.energy_pars[0], self.energy_pars[1])
         self.energy = self.max_energy
 
-        self.known_obstacles = set()
         self.plan_course = []
+
+        self.mental_map = Grid(height=self.model.height, width=self.model.width)
 
     def random_move(self):
         '''
         This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
         '''
 
-        #get neighboorhood
+        # get neighboorhood
         neighbourhood = self.get_accessible_neighbourhood()
 
         # select random cell in neighbourhood
@@ -209,7 +205,10 @@ class Bee(Agent):
         '''
 
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
-        self.known_obstacles.update(obstacles)
+
+        for obstacle in obstacles:
+            self.mental_map.nodes[obstacle[0]][obstacle[1]].walkable = False
+            self.mental_map.nodes[obstacle[0]][obstacle[1]].weight = 0
 
         return list(neighbourhood)
 
@@ -220,11 +219,14 @@ class Bee(Agent):
         neighborhood = self.get_accessible_neighbourhood()
 
         if not self.plan_course or not self.plan_course[0] in neighborhood:
+            plan_start = tm.time()
             self.plan_course = util.path_finder(cur_loc=self.pos,
                                                target_loc=loc,
-                                               obstacles=self.known_obstacles,
+                                               grid=self.mental_map,
                                                grid_width=self.model.width,
                                                grid_height=self.model.height)
+            plan_end = tm.time()
+            self.model.planning_time += plan_end - plan_start
 
         nxt_loc = self.plan_course[0]
         self.model.grid.move_agent(self, nxt_loc)
@@ -254,7 +256,7 @@ class Bee(Agent):
             hive.food -= hive.bite
 
         # if no food is available, go search
-        #TODO ENERGY DECAY OVER TIME
+        # TODO ENERGY DECAY OVER TIME
         else:
             self.energy -= 1
             if not self.type_bee == "babee":
@@ -277,9 +279,13 @@ class Bee(Agent):
             return
 
         # if bee is a rester at 40, become scout
-        #TODO AGE TO BECOME SCOUTER DECISION
+        # TODO AGE TO BECOME SCOUTER DECISION
         if self.age > 40 and self.type_bee == "rester":
             self.type_bee = "scout"
 
+        bee_type = self.type_bee
+        strat_start = tm.time()
         strategy = bee_strategies[self.type_bee]
         strategy(self).step()
+        strat_end = tm.time()
+        self.model.time_by_strategy[bee_type] += strat_end - strat_start

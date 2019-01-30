@@ -6,6 +6,8 @@ from bee import Bee
 from food import Food
 from hive import Hive
 
+import time
+
 
 class RandomActivationBeeWorld(RandomActivation):
     '''
@@ -24,6 +26,12 @@ class RandomActivationBeeWorld(RandomActivation):
         }
 
         self.agent_order = [Food, Hive, Bee]
+
+        self.timing_by_breed = {
+            Hive: 0,
+            Bee: 0,
+            Food: 0
+        }
 
     def add(self, agent):
         '''
@@ -51,7 +59,10 @@ class RandomActivationBeeWorld(RandomActivation):
         Executes the step of each agent breed, one at a time, in random order.
         '''
         for agent_class in self.agent_order:
+            breed_start = time.time()
             self.step_breed(agent_class)
+            breed_end = time.time()
+            self.timing_by_breed[agent_class] += breed_end - breed_start
 
         self.steps += 1
         self.time += 1

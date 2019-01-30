@@ -3,7 +3,7 @@ from mesa.space import MultiGrid, accept_tuple_argument
 import itertools
 
 
-OBSTACLE = "OBSTACLE"
+from config import OBSTACLE
 
 class MultiGridWithObstacles(MultiGrid):
     def __init__(self, width, height, torus, obstacle_positions):
@@ -16,7 +16,7 @@ class MultiGridWithObstacles(MultiGrid):
         """
         super().__init__(width, height, torus)
         self.obstacle_positions = obstacle_positions
-        print(self.obstacle_positions)
+        # print(self.obstacle_positions)
 
     def get_contents_with_obstacles_helper(self, x, y):
         """
@@ -57,5 +57,5 @@ class MultiGridWithObstacles(MultiGrid):
         """
         Returns only the accessible spots in the neighbourhood.
         """
-        neighborhood = set(self.get_neighborhood(pos, moore, include_center, radius))
+        neighborhood = set(self.iter_neighborhood(pos, moore, include_center, radius))
         return neighborhood - self.obstacle_positions, neighborhood & self.obstacle_positions

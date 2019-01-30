@@ -1,20 +1,20 @@
 from pathfinding.core.diagonal_movement import DiagonalMovement
 from pathfinding.core.grid import Grid
-from pathfinding.finder.ida_star import IDAStarFinder
+from pathfinding.finder.a_star import AStarFinder
 
 
-def path_finder(cur_loc, target_loc, obstacles, grid_width, grid_height):
-    grid_map = [[1 if (x, y) not in obstacles else 0 for x in range(grid_width)]
-                for y in range(grid_height)]
-    grid = Grid(matrix=grid_map)
+import time
+
+def path_finder(cur_loc, target_loc, grid, grid_width, grid_height):
     start = grid.node(cur_loc[0], cur_loc[1])
     end = grid.node(target_loc[0], target_loc[1])
-    finder = IDAStarFinder(diagonal_movement=DiagonalMovement.always)
-    # print(f"finding path from ({start.x}, {start.y}) to ({end.x}, {end.y})")
-    path, runs = finder.find_path(start, end, grid)
-    # print(path)
-    # print('operations:', runs, 'path length:', len(path))
-    # print(grid.grid_str(path=path, start=start, end=end))
+
+    finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
+    path, _ = finder.find_path(start, end, grid)
+
+    # Pathfinding edits grid, so we need to clean it up afterwards.
+    grid.cleanup()
+
     return path[1:]
 
 if __name__ == "__main__":
