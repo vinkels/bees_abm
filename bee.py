@@ -11,7 +11,7 @@ from hive import Hive
 import util
 
 # TODO remove
-import time as tm
+# import time as tm
 
 import numpy as np
 
@@ -235,14 +235,14 @@ class Bee(Agent):
         neighborhood = self.get_accessible_neighbourhood()
 
         if not self.plan_course or not self.plan_course[0] in neighborhood:
-            plan_start = tm.time()
+            # plan_start = tm.time()
             self.plan_course = util.path_finder(cur_loc=self.pos,
                                                target_loc=loc,
                                                grid=self.mental_map,
                                                grid_width=self.model.width,
                                                grid_height=self.model.height)
-            plan_end = tm.time()
-            self.model.planning_time += plan_end - plan_start
+            # plan_end = tm.time()
+            # self.model.planning_time += plan_end - plan_start
 
         nxt_loc = self.plan_course[0]
         self.model.grid.move_agent(self, nxt_loc)
@@ -293,9 +293,9 @@ class Bee(Agent):
             self.model.remove_agent(self)
             return
 
-        bee_type = self.type_bee
-        strat_start = tm.time()
+        # bee_type = self.type_bee
+        # strat_start = tm.time()
         strategy = bee_strategies[self.type_bee]
         strategy(self).step()
-        strat_end = tm.time()
-        self.model.time_by_strategy[bee_type] += strat_end - strat_start
+        # strat_end = tm.time()
+        # self.model.time_by_strategy[bee_type] += strat_end - strat_start

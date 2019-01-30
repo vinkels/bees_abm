@@ -69,49 +69,64 @@ class BeeForagingModel(Model):
             food = Food(self, f_loc)
             self.add_agent(food, f_loc)
 
-        self.datacollector = DataCollector({
-            "Bees": lambda m: m.schedule.get_breed_count(Bee),
-            "HiveFood": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
-            "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
-            "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
-            "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
-            "Baby bees": lambda m: m.schedule.get_bee_count("babee")
-        })
-        self.datacollector2 = DataCollector({
-            "HiveID": lambda m: m.hives[self.hive.unique_id].get_hive_id(),
-            "FoodLocs": lambda m: m.hives[self.hive.unique_id].get_food_memory(),
-        })
-        self.running = True
+        # self.datacollector = DataCollector({
+        #     "Bees": lambda m: m.schedule.get_breed_count(Bee),
+        #     "HiveFood": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
+        #     "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
+        #     "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
+        #     "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
+        #     "Baby bees": lambda m: m.schedule.get_bee_count("babee")
+        # })
+        # self.datacollector2 = DataCollector({
+        #     "HiveID": lambda m: m.hives[self.hive.unique_id].get_hive_id(),
+        #     "FoodLocs": lambda m: m.hives[self.hive.unique_id].get_food_memory(),
+        # })
+        # self.running = False
 
-        self.total_data_time = 0
-        self.total_schedule_time = 0
+        # self.total_data_time = 0
+        # self.total_schedule_time = 0
 
-        self.time_by_strategy = {
-            "scout": 0,
-            "foraging": 0,
-            "rester": 0,
-            "babee": 0
-        }
+        # self.time_by_strategy = {
+        #     "scout": 0,
+        #     "foraging": 0,
+        #     "rester": 0,
+        #     "babee": 0
+        # }
 
-        self.planning_time = 0
+        # self.planning_time = 0
 
     def get_hive(self, hive_id):
         return self.hives[hive_id]
 
     def step(self):
-        schedule_start = time.time()
+        # schedule_start = time.time()
         self.death_count = 0
+        self.birth_count = 0
+        self.death_age = []
         self.schedule.step()
-        schedule_end = time.time()
 
-        start = time.time()
-        self.datacollector.collect(self)
-        self.datacollector2.collect(self)
-        end = time.time()
+        # schedule_end = time.time()
 
-        self.total_data_time += end - start
-        self.total_schedule_time += schedule_end - schedule_start
-        
+        # start = time.time()
+        # self.datacollector.collect(self)
+        # self.datacollector2.collect(self)
+        # end = time.time()
+
+        # self.total_data_time += end - start
+        # self.total_schedule_time += schedule_end - schedule_start
+
+
+    def get_birth_count(self):
+        return self.birth_count
+
+    def get_death_count(self):
+        return self.death_count
+
+    def get_death_age(self):
+        if len(self.death_age) > 0:
+            return sum(self.death_age)/len(self.death_age)
+        else:
+            return 0
 
     def run_model(self, n_steps):
         for i in range(n_steps):

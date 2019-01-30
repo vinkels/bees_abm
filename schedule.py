@@ -92,10 +92,10 @@ class RandomActivationBeeWorld(RandomActivation):
             for agent in self.agents_by_breed[Bee].values()
             if agent.type_bee == bee_type
         ])
-    def get_mortality_count(self, bee_type):
+    
+    def get_avg_bees(self):
         return sum([
-            val
+            1
             for agent in self.agents_by_breed[Bee].values()
-            if agent.type_bee == bee_type
-            for elem, val in agent.death_count_by_type
         ])
+    

@@ -20,7 +20,9 @@ import time as tm
 
 
 var_params = {'obstacle_density': [10, 20, 30],
-              'food_density': [5, 10, 20]}
+              'food_density': [5, 10, 20],
+              'nr_hives': [1,3, 5]
+              }
 
 fixed_params = {"width": 50,
                 "height": 50
@@ -32,12 +34,18 @@ max_steps = 50
 distinct_samples = 10
 
 # Set the outputs
+
 model_reporters = {"n_bees": lambda m: m.schedule.get_breed_count(Bee),
-                   "food": lambda m: m.hives[m.hive.unique_id].get_food_stat(),
+                   "food": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
                    "scout_bee": lambda m: m.schedule.get_bee_count("scout"),
                    "forage_bee": lambda m: m.schedule.get_bee_count("foraging"),
                    "rest_bee": lambda m: m.schedule.get_bee_count("rester"),
-                   "baby_bee": lambda m: m.schedule.get_bee_count("babee")}
+                   "baby_bee": lambda m: m.schedule.get_bee_count("babee"),
+                   "death_age": lambda m: m.get_death_age(),
+                   "n_births": lambda m: m.get_birth_count(),
+                   "n_deaths": lambda m: m.get_death_count()
+
+                   }
 
 data = {}
 
