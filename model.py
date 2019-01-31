@@ -157,10 +157,11 @@ class BeeForagingModel(Model):
 
     def add_bee(self, pos, hive, type_bee, hive_id, color, age=0):
             bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color,age=age)
+
             if type_bee == 'babee':
                 self.birth_count += 1
-            self.grid.place_agent(bee, pos)
-            self.schedule.add(bee)
+            
+            self.add_agent(bee, pos)
 
     def init_grid(self, height, width, obstacle_density, food_density,nr_hives):
         possible_locations = [
