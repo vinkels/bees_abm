@@ -137,7 +137,7 @@ class MultiGridWithObstacles(MultiGrid):
                     cand = (x+a, y+b)
 
                     # Don't go out of bounds here.
-                    if cand[0] < self.width and cand[1] < self.height:
+                    if 0 <= cand[0] < self.width and 0 <= cand[1] < self.height:
                         if cand not in self.obstacle_positions:
                             accessible.append(cand)
                         else:
