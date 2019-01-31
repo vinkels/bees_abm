@@ -93,4 +93,11 @@ class RandomActivationBeeWorld(RandomActivation):
             if agent.type_bee == bee_type
         ])
 
+    def count_hive_bees(self, pos):
+        return sum([
+            1
+            for agent in self.agents_by_breed[Bee].values()
+            if agent.hive_loc == pos
+        ])
+
     

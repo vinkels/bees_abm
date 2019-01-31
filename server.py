@@ -75,17 +75,18 @@ width = GRID_WIDTH
 height = GRID_HEIGHT
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
-chart_element = ChartModule([{"Label": "n_bees", "Color": "#AA0000"}, {"Label": "hive_food", "Color": "#000000"}, {"Label": "scout_bees", "Color": "#70a5f9"},
-    {"Label": "forage_bees", "Color": "#f4b042"}, {"Label": "rest_bees", "Color": "#17ef71"}, {"Label": "baby_bees", "Color": "#ff93d0"}], 500, 500)
+# chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"},
+    # {"Label": "Foraging bees", "Color": "#f4b042"}, {"Label": "Rester bees", "Color": "#17ef71"}, {"Label": "Baby bees", "Color": "#ff93d0"}], 500, 500)
 
 server = ModularServer(
     BeeForagingModel,
-    [canvas_element,chart_element],
+    [canvas_element],
     "Hive",
     {
         "width": width,
         "height": height,
         "obstacle_density": UserSettableParameter('slider', 'obstacle density', value=0, min_value=0, max_value=100),
-        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100)
+        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100),
+        "VIZUALISATION": True
     }
 )

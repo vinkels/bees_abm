@@ -18,7 +18,7 @@ import time
 
 class BeeForagingModel(Model):
     #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, car_cap=5):
+    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, car_cap=5, VIZUALISATION=False):
         super().__init__()
         self.height = height
         self.width = width
@@ -38,7 +38,7 @@ class BeeForagingModel(Model):
             raise Exception("Food and obstacles do not fit in the grid.")
 
         hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, self.obstacle_density, self.food_density, self.nr_hives)
-        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations))
+        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations), VIZUALISATION=VIZUALISATION)
         self.schedule = RandomActivationBeeWorld(self)
 
         self.hives = {}
@@ -99,7 +99,7 @@ class BeeForagingModel(Model):
         }
 
         self.planning_time = 0
-        self.datacollector.collect(self)
+        
         self.running = True
         
 
@@ -109,6 +109,7 @@ class BeeForagingModel(Model):
             'move to food neighbour': 0,
             'random move': 0
         }
+        self.datacollector.collect(self)
 
     def get_hive(self, hive_id):
         return self.hives[hive_id]
@@ -116,15 +117,14 @@ class BeeForagingModel(Model):
     def step(self):
 
         schedule_start = time.time()
-        self.datacollector.collect(self)
+        
         self.schedule.step()
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
 
+        self.datacollector.collect(self)
         
-
-
 
     def get_birth_count(self):
         count = self.birth_count
