@@ -98,7 +98,7 @@ class BeeForagingModel(Model):
         }
 
         self.planning_time = 0
-        self.datacollector.collect(self)
+        
         self.running = True
         
 
@@ -108,6 +108,7 @@ class BeeForagingModel(Model):
             'move to food neighbour': 0,
             'random move': 0
         }
+        self.datacollector.collect(self)
 
     def get_hive(self, hive_id):
         return self.hives[hive_id]
@@ -115,12 +116,12 @@ class BeeForagingModel(Model):
     def step(self):
 
         schedule_start = time.time()
-        self.datacollector.collect(self)
+        
         self.schedule.step()
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
-
+        self.datacollector.collect(self)
         
 
 
