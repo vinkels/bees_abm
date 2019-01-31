@@ -16,7 +16,6 @@ class Hive(Agent):
         self.energy_level_critical = 10
         self.energy_level_optimal = 0
         self.energy_level_minimum = 25
-        self.bees_hive = []
         self.bite = 1
         self.color = color
         self.bee_color = bee_color
@@ -29,8 +28,7 @@ class Hive(Agent):
     def step(self):
 
         # determine number of bees in hive
-        self.bees_hive = list(self.model.grid.get_neighbors_by_breed(Bee, self.pos, moore=True, include_center = True, radius = 0))
-        self.n_bees = len(self.bees_hive)
+        self.n_bees = self.model.schedule.count_hive_bees(self.pos)
 
         # determine optimal and critical amount of food
         self.energy_level_optimal = self.n_bees * 20

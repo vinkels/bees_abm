@@ -86,6 +86,7 @@ server = ModularServer(
         "width": width,
         "height": height,
         "obstacle_density": UserSettableParameter('slider', 'obstacle density', value=0, min_value=0, max_value=100),
-        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100)
+        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100),
+        "VIZUALISATION": True
     }
 )
