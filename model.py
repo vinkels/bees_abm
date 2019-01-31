@@ -27,13 +27,16 @@ class BeeForagingModel(Model):
         self.death_count  = 0
         self.birth_count = 0
         self.death_age = []
+        self.obstacle_density = obstacle_density
+        self.food_density = food_density
+        self.nr_hives = nr_hives
 
 
         self.user_error = None
-        if obstacle_density + food_density > FOOD_OBSTACLE_RATIO:
+        if self.obstacle_density + self.food_density > FOOD_OBSTACLE_RATIO:
             raise Exception("Food and obstacles do not fit in the grid.")
 
-        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density, self.nr_hives)
+        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, self.obstacle_density, self.food_density, self.nr_hives)
         self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations))
         self.schedule = RandomActivationBeeWorld(self)
 
