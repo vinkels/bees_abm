@@ -41,7 +41,8 @@ class Babee(BeeStrategy):
         bee.relax_at_hive(hive)
 
         # age is arbitrary
-        if bee.age > BABYTIME:
+        if bee.age > 100:
+            bee.age = BABYTIME
             bee.type_bee = "rester"
 
 
