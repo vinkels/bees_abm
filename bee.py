@@ -198,7 +198,8 @@ class Bee(Agent):
 
         self.plan_course = []
 
-        self.mental_map = Grid(height=self.model.height, width=self.model.width)
+        # self.mental_map = Grid(height=self.model.height, width=self.model.width)
+        self.mental_map = np.zeros((self.model.height, self.model.width))
 
     def random_move(self):
         '''
@@ -223,8 +224,9 @@ class Bee(Agent):
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
 
         for obstacle in obstacles:
-            self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
-            self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
+            # self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
+            # self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
+            self.mental_map[obstacle[0]][obstacle[1]] = 1
 
         return list(neighbourhood)
 
@@ -237,10 +239,10 @@ class Bee(Agent):
         if not self.plan_course or not self.plan_course[0] in neighborhood:
             plan_start = tm.time()
             self.plan_course = util.path_finder(cur_loc=self.pos,
-                                               target_loc=loc,
-                                               grid=self.mental_map,
-                                               grid_width=self.model.width,
-                                               grid_height=self.model.height)
+                                            target_loc=loc,
+                                            grid=self.mental_map,
+                                            grid_width=self.model.width,
+                                            grid_height=self.model.height)
             plan_end = tm.time()
             self.model.planning_time += plan_end - plan_start
 
