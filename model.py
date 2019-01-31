@@ -18,7 +18,7 @@ import time
 
 class BeeForagingModel(Model):
     #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15,nr_hives=3, car_cap=5):
+    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, car_cap=5):
         super().__init__()
         self.height = height
         self.width = width
@@ -97,6 +97,13 @@ class BeeForagingModel(Model):
 
         self.planning_time = 0
 
+        self.timings_scout = {
+            'move home': 0,
+            'look for food': 0,
+            'move to food neighbour': 0,
+            'random move': 0
+        }
+
     def get_hive(self, hive_id):
         return self.hives[hive_id]
 
@@ -150,10 +157,11 @@ class BeeForagingModel(Model):
 
     def add_bee(self, pos, hive, type_bee, hive_id, color, age=0):
             bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color,age=age)
+
             if type_bee == 'babee':
                 self.birth_count += 1
-            self.grid.place_agent(bee, pos)
-            self.schedule.add(bee)
+            
+            self.add_agent(bee, pos)
 
     def init_grid(self, height, width, obstacle_density, food_density,nr_hives):
         possible_locations = [

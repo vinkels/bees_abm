@@ -2,6 +2,8 @@ from mesa import Agent
 import random as rd
 from config import BABYTIME
 
+from bee import Bee
+
 class Hive(Agent):
     def __init__(self, model, pos, color,bee_color):
         super().__init__(model.next_id(), model)
@@ -27,7 +29,7 @@ class Hive(Agent):
     def step(self):
 
         # determine number of bees in hive
-        self.bees_hive = self.model.grid.get_neighbors(self.pos, moore=True, include_center = True, radius = 0)
+        self.bees_hive = list(self.model.grid.get_neighbors_by_breed(Bee, self.pos, moore=True, include_center = True, radius = 0))
         self.n_bees = len(self.bees_hive)
 
         # determine optimal and critical amount of food
