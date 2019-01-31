@@ -31,15 +31,9 @@ fixed_params = {"width": 50,
                 }
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-<<<<<<< HEAD
-replicates = 1
-max_steps = 500000
-distinct_samples = 1
-=======
 replicates = 10
 max_steps = 1000
 distinct_samples = 10
->>>>>>> e679f08b56c44cbde986402aa8632c6d5bf99439
 
 # Set the outputs
 
@@ -76,12 +70,7 @@ batch = BatchRunnerMP(BeeForagingModel,
 
 batch.run_all()
 jup = batch.get_model_vars_dataframe()
-<<<<<<< HEAD
-jup.to_csv(f'jeej_{tm.time()}.csv')
-jup.to_pickle(f'test_{tm.time()}.p')
-=======
 jup.to_csv('jeej2.csv')
->>>>>>> e679f08b56c44cbde986402aa8632c6d5bf99439
 
 # data[var] = batch.get_model_vars_dataframe()
 
