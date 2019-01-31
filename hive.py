@@ -16,6 +16,8 @@ class Hive(Agent):
         self.energy_level_minimum = 25
         self.bees_hive = []
         self.bite = 1
+        # TODO Add birth ratio
+        # self.birth_rate = 0.0
         self.reproduction_rate = 0.1
 
     def receive_info(self, info):
@@ -32,12 +34,13 @@ class Hive(Agent):
         self.energy_level_critical = self.n_bees
 
         # chance of babies
-        if rd.random() < self.reproduction_rate:
+        if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
             self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id)
             self.n_bees += 1
+            # self.birth_rate += 1.0
 
         # forget randomnly amount of food locations when too many to remember
-        
+
         to_discard  = rd.randint(1, 10)
         if len(self.food_locs) > 10:
                 self.food_locs = self.food_locs[0:to_discard]
@@ -47,7 +50,7 @@ class Hive(Agent):
 
     def unload_food(self, food=1):
         #TODO depends on bee carrying capacity
-        self.food += 5
+        self.food += self.model.car_cap
 
     def get_food_stat(self):
         return self.food
@@ -59,16 +62,15 @@ class Hive(Agent):
         return self.food_locs
 
     def balance_hive(self):
-
         # if food is available
         if self.food > 0:
 
             # if more than necessary amount of food, increase consumption and reproduction
             #TODO dependency energy in hive
             if self.food >= self.energy_level_optimal:
-                self.bite +=  self.bite/1000
-                self.reproduction_rate += self.reproduction_rate/1000
+                self.bite =  min(1, self.bite + self.bite/100)
+                self.reproduction_rate += self.reproduction_rate/100
 
             else:
-                self.bite = 1
+                self.bite = 0.2
                 self.reproduction_rate = 0.1

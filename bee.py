@@ -4,7 +4,7 @@ from mesa.space import MultiGrid
 import random as rd
 import math
 
-from config import *
+from config import BABYTIME, LIFESPAN
 
 from food import Food
 from hive import Hive
@@ -12,6 +12,8 @@ import util
 
 # TODO remove
 import time as tm
+
+import numpy as np
 
 from pathfinding.core.grid import Grid
 
@@ -67,10 +69,11 @@ class Rester(BeeStrategy):
                 bee.type_bee = "foraging"
                 chosen_loc = rd.randint(0, len(hive.food_locs) - 1)
                 bee.food_loc = hive.food_locs[chosen_loc]
-                
+
             # otherwise, stay at hive and gain energy
             else:
-                bee.relax_at_hive(hive)
+                # become scout if no food has been found
+                bee.type_bee = "scout"
 
         else:
             bee.relax_at_hive(hive)
@@ -88,27 +91,36 @@ class Scout(BeeStrategy):
         bee = self.bee
 
         if bee.loaded is False:
-            food_neighbours = [
-                nb 
-                for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1) 
-                if type(nb) == Food and nb.util
-            ]
+            if bee.energy < 0.5 * bee.max_energy and bee.pos != bee.hive_loc:
+                bee.move(bee.hive_loc)
 
-            # If you see food that is uneaten, move there.
-            if food_neighbours:
-                food = food_neighbours[rd.randrange(0, len(food_neighbours))]
-                
-                bee.model.grid.move_agent(bee, food.pos)
-                food.get_eaten()
-
-                # Become a forager take food and remember location
-                bee.type_bee = 'foraging'
-                bee.loaded = True
-                bee.food_loc = bee.pos
-
-            # otherwise, move randomly
+                # check if destination is reached
+                if bee.pos == bee.hive_loc:
+                    hive = bee.model.get_hive(bee.hive_id)
+                    assert hive
+                    bee.arrive_at_hive(hive)
             else:
-                bee.random_move()
+                food_neighbours = [
+                    nb
+                    for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1)
+                    if type(nb) == Food and nb.can_be_eaten()
+                ]
+
+                # If you see food that is uneaten, move there.
+                if food_neighbours:
+                    food = food_neighbours[rd.randrange(0, len(food_neighbours))]
+
+                    bee.model.grid.move_agent(bee, food.pos)
+                    food.get_eaten()
+
+                    # Become a forager take food and remember location
+                    bee.type_bee = 'foraging'
+                    bee.loaded = True
+                    bee.food_loc = bee.pos
+
+                # otherwise, move randomly
+                else:
+                    bee.random_move()
 
         else:
             raise Exception("Scouts should be unloaded.")
@@ -129,8 +141,11 @@ class Foraging(BeeStrategy):
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
                 neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
-                # TODO CHECK DEPENDENCY CARRYING CAPACITY
-                food_neighbors = [nb for nb in neighbors if type(nb) == Food and nb.util % 5 > 0]
+                food_neighbors = [
+                    nb
+                    for nb in neighbors
+                    if type(nb) == Food and nb.can_be_eaten()
+                ]
 
                 bee.plan_course = []
                 if food_neighbors:
@@ -163,8 +178,8 @@ bee_strategies = {
 
 
 class Bee(Agent):
-    def __init__(self, model, pos, hive, type_bee, hive_id):
-        super().__init__(model.next_id(), model, energy_pars=(20, 5))
+    def __init__(self, model, pos, hive, type_bee, hive_id, energy_pars=(20, 5)):
+        super().__init__(model.next_id(), model)
 
         self.loaded = False
         self.food_loc = []
@@ -173,12 +188,13 @@ class Bee(Agent):
         self.pos = pos
         self.type_bee = type_bee
         self.age = 0
-        self.energy_pars = energy_pars
+        self.alive = True
+        self.car_cap = self.model.car_cap
 
 
         # random threshold of energy required per bee to go foraging
-        # TODO SHOULD DEPEND ON ENERGY LEVEL OF HIVE 
-        self.max_energy = np.random.normal(self.energy_pars[0], self.energy_pars[1])
+
+        self.max_energy = np.random.normal(energy_pars[0], energy_pars[1])
         self.energy = self.max_energy
 
         self.plan_course = []
@@ -207,8 +223,8 @@ class Bee(Agent):
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
 
         for obstacle in obstacles:
-            self.mental_map.nodes[obstacle[0]][obstacle[1]].walkable = False
-            self.mental_map.nodes[obstacle[0]][obstacle[1]].weight = 0
+            self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
+            self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
 
         return list(neighbourhood)
 
@@ -238,10 +254,10 @@ class Bee(Agent):
         '''
 
         # unload food
-        
-        self.loaded = False
-        hive.receive_info(self.food_loc)
-        hive.unload_food()
+        if self.loaded:
+            self.loaded = False
+            hive.receive_info(self.food_loc)
+            hive.unload_food()
 
         # become rester to gain energy
         self.type_bee = "rester"
@@ -257,10 +273,11 @@ class Bee(Agent):
 
         # if no food is available, go search
         # TODO ENERGY DECAY OVER TIME
-        else:
-            self.energy -= 1
-            if not self.type_bee == "babee":
-                self.type_bee = "scout"
+
+        # BABEES are not allowed to change to scouters, only by age
+        elif self.type_bee != "babee":
+            self.type_bee = "scout"
+
 
     def step(self):
         '''
@@ -269,19 +286,16 @@ class Bee(Agent):
         # TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
         self.age += 1
 
-        # if outside of hive, lose energy proportional to age
-        if self.pos != self.hive_loc:
-            self.energy -= (self.age / 100)
+        # lose energy proportional to age
+        # TODO This should probably be a larger age_penalty
+        age_penalty = (self.age / LIFESPAN) / 10
+        self.energy -= min(age_penalty, 1)
 
         # if no more energy, die
         if self.energy <= 0:
+            self.alive = False
             self.model.remove_agent(self)
             return
-
-        # if bee is a rester at 40, become scout
-        # TODO AGE TO BECOME SCOUTER DECISION
-        if self.age > 40 and self.type_bee == "rester":
-            self.type_bee = "scout"
 
         bee_type = self.type_bee
         strat_start = tm.time()
