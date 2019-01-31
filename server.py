@@ -32,12 +32,8 @@ def hive_portrayal(agent):
         portrayal["Layer"] = 2
         portrayal["Filled"] = "true"
 
-        if agent.hive_id == 0:
-            portrayal["Color"] = "PURPLE"
-        elif agent.hive_id == 1:
-            portrayal["Color"] = "ORANGE"
-        elif agent.hive_id == 2:
-            portrayal["Color"] = "PINK"
+        portrayal["Color"] = agent.color
+    
 
     elif type(agent) is Food:
         col_intensity = agent.util
@@ -61,15 +57,8 @@ def hive_portrayal(agent):
 
         portrayal["w"] = 1
         portrayal["h"] = 1
-        #TODO DYNAMICALLY GIVE DIFFERENT COLOURS TO DIFFERENT NUMBERS OF HIVES
-        col_intensity = agent.unique_id
-        assert col_intensity >= 0, agent.__dict__
-        if col_intensity > 4:
-            col_intensity = 4
-        # if agent.unique_id == 0:
-        portrayal["Color"] = color_dic[col_intensity]
-        # else:
-            # portrayal["Color"] = "GREEN"
+      
+        portrayal["Color"] = agent.color
 
     elif agent is OBSTACLE:
         portrayal["Shape"] = "rect"
@@ -87,12 +76,12 @@ height = GRID_HEIGHT
 
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
-chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"},
-    {"Label": "Foraging bees", "Color": "#f4b042"}, {"Label": "Rester bees", "Color": "#17ef71"}, {"Label": "Baby bees", "Color": "#ff93d0"}], 500, 500)
+# chart_element = ChartModule([{"Label": "Bees", "Color": "#AA0000"}, {"Label": "HiveFood", "Color": "#000000"}, {"Label": "Scout bees", "Color": "#70a5f9"},
+    # {"Label": "Foraging bees", "Color": "#f4b042"}, {"Label": "Rester bees", "Color": "#17ef71"}, {"Label": "Baby bees", "Color": "#ff93d0"}], 500, 500)
 
 server = ModularServer(
     BeeForagingModel,
-    [canvas_element, chart_element],
+    [canvas_element],
     "Hive",
     {
         "width": width,

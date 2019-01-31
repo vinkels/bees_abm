@@ -178,7 +178,7 @@ bee_strategies = {
 
 
 class Bee(Agent):
-    def __init__(self, model, pos, hive, type_bee, hive_id, energy_pars=(20, 5)):
+    def __init__(self, model, pos, hive, type_bee, hive_id,color,age=0, energy_pars=(20, 5)):
         super().__init__(model.next_id(), model)
 
         self.loaded = False
@@ -187,10 +187,9 @@ class Bee(Agent):
         self.hive_id = hive_id
         self.pos = pos
         self.type_bee = type_bee
-        self.age = 0
-        self.alive = True
+        self.age = age
         self.car_cap = self.model.car_cap
-
+        self.color = color
 
         # random threshold of energy required per bee to go foraging
 
@@ -211,9 +210,10 @@ class Bee(Agent):
 
         # select random cell in neighbourhood
         select_coords = rd.randint(0, len(neighbourhood) - 1)
+        target = neighbourhood[select_coords]
 
         # move to cell
-        self.model.grid.move_agent(self, neighbourhood[select_coords])
+        self.model.grid.move_agent(self, target)
 
     def get_accessible_neighbourhood(self):
         '''
@@ -290,10 +290,8 @@ class Bee(Agent):
         # TODO This should probably be a larger age_penalty
         age_penalty = (self.age / LIFESPAN) / 10
         self.energy -= min(age_penalty, 1)
-
         # if no more energy, die
         if self.energy <= 0:
-            self.alive = False
             self.model.remove_agent(self)
             return
 

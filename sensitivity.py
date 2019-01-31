@@ -8,19 +8,23 @@ from hive import Hive
 from schedule import RandomActivationBeeWorld
 from model import BeeForagingModel
 from mesa.batchrunner import BatchRunner
+from mesa.batchrunner import BatchRunnerMP
 from SALib.analyze import sobol
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
 import time as tm
+import os
 
 #TODO: number of hives, food availability, 
 # We define our variables and bounds
 
 
 var_params = {'obstacle_density': [10, 20, 30],
-              'food_density': [5, 10, 20]}
+              'food_density': [5, 10, 20],
+              'nr_hives': [1,3, 5]
+              }
 
 fixed_params = {"width": 50,
                 "height": 50
@@ -28,16 +32,22 @@ fixed_params = {"width": 50,
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 replicates = 10
-max_steps = 50
+max_steps = 1000
 distinct_samples = 10
 
 # Set the outputs
+
 model_reporters = {"n_bees": lambda m: m.schedule.get_breed_count(Bee),
-                   "food": lambda m: m.hives[m.hive.unique_id].get_food_stat(),
+                   "food": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
                    "scout_bee": lambda m: m.schedule.get_bee_count("scout"),
                    "forage_bee": lambda m: m.schedule.get_bee_count("foraging"),
                    "rest_bee": lambda m: m.schedule.get_bee_count("rester"),
-                   "baby_bee": lambda m: m.schedule.get_bee_count("babee")}
+                   "baby_bee": lambda m: m.schedule.get_bee_count("babee"),
+                   "death_age": lambda m: m.get_death_age(),
+                   "n_births": lambda m: m.get_birth_count(),
+                   "n_deaths": lambda m: m.get_death_count()
+
+                   }
 
 data = {}
 
@@ -49,7 +59,8 @@ data = {}
 #     # your code to acommidate for this or sample in such a way that you only get integers.
 
 
-batch = BatchRunner(BeeForagingModel,
+batch = BatchRunnerMP(BeeForagingModel,
+                    nr_processes=os.cpu_count(),
                     max_steps=max_steps,
                     iterations=replicates,
                     fixed_parameters=fixed_params,
@@ -59,7 +70,7 @@ batch = BatchRunner(BeeForagingModel,
 
 batch.run_all()
 jup = batch.get_model_vars_dataframe()
-jup.to_csv('jeej.csv')
+jup.to_csv('jeej2.csv')
 
 # data[var] = batch.get_model_vars_dataframe()
 

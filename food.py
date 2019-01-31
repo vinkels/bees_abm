@@ -17,6 +17,8 @@ class Food(Agent):
         self.util = rd.randint(1, self.max_util)
         self.steps = 0
 
+        self.bite = self.model.car_cap
+
     def step(self):
         #TODO CHANGE STEPCOUNT  AND ADD THIS VARIABLE IN CONFIG
         if self.steps % self.max_step == 0:
@@ -27,7 +29,7 @@ class Food(Agent):
 
 
     def get_eaten(self):
-        self.util -= self.model.car_cap
+        self.util -= self.bite
 
     def can_be_eaten(self):
-        return self.util >= self.model.car_cap
+        return self.util >= self.bite
