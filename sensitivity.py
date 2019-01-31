@@ -29,9 +29,7 @@ var_params = {
     'food_density': [5, 15, 25],
     'nr_hives': [1,3, 5]
     }
-# fixed_params = {"width": 50,
-#                 "height": 50
-#                 }
+
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
