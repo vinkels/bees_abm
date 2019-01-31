@@ -51,6 +51,9 @@ class MultiGridWithObstacles(MultiGrid):
         }
 
         self.radius_1_food_cache = {}
+
+        self.accessible_cache = {}
+
         self.cache_hits = 0
 
         self.moore_neighbors = set([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)])
@@ -170,6 +173,9 @@ class MultiGridWithObstacles(MultiGrid):
         """
         Returns only the accessible spots in the neighbourhood.
         """
+        if pos in self.accessible_cache:
+            return self.accessible_cache[pos]
+
         x, y = pos
 
         accessible = []
@@ -185,6 +191,8 @@ class MultiGridWithObstacles(MultiGrid):
                     accessible.append(cand)
                 else:
                     obstacles.append(cand)
+
+        self.accessible_cache[pos] = accessible, obstacles
 
         return accessible, obstacles
 
