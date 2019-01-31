@@ -9,7 +9,7 @@ from config import GRID_WIDTH, GRID_HEIGHT
 
 
 def main():
-    bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 5)
+    bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
 
     start_time = tm.time()
     bee_model.run_model(1000)

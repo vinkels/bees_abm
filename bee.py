@@ -7,7 +7,6 @@ import math
 from config import BABYTIME, LIFESPAN
 
 from food import Food
-from hive import Hive
 import util
 
 # TODO remove
@@ -106,8 +105,8 @@ class Scout(BeeStrategy):
                 s = time.time()
                 food_neighbours = [
                     nb
-                    for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1)
-                    if type(nb) == Food and nb.can_be_eaten()
+                    for nb in bee.model.grid.get_neighbors_by_breed(Food, bee.pos, moore=True, include_center=False, radius=1)
+                    if nb.can_be_eaten()
                 ]
                 e = time.time()
                 bee.model.timings_scout['look for food'] += e - s
@@ -156,11 +155,10 @@ class Foraging(BeeStrategy):
 
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
-                neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
                 food_neighbors = [
                     nb
-                    for nb in neighbors
-                    if type(nb) == Food and nb.can_be_eaten()
+                    for nb in bee.model.grid.get_neighbors_by_breed(Food, bee.pos, moore=True, include_center=True, radius=0)
+                    if nb.can_be_eaten()
                 ]
 
                 bee.plan_course = []
@@ -262,9 +260,8 @@ class Bee(Agent):
             plan_end = time.time()
             self.model.planning_time += plan_end - plan_start
 
-        nxt_loc = self.plan_course[0]
+        nxt_loc = self.plan_course.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
-        self.plan_course.pop(0)
 
     def arrive_at_hive(self, hive):
         '''
