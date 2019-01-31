@@ -21,20 +21,25 @@ import os
 # We define our variables and bounds
 
 
-var_params = {'obstacle_density': [10, 20, 30],
-              'food_density': [5, 10, 20],
-              'nr_hives': [1,3, 5]
-              }
-
-fixed_params = {"width": 50,
-                "height": 50
-                }
+params = {
+        'nr_vars': 3,
+        'bounds':[[1, 3 ,5],[5,10,20],[10,20,30]],
+        'names':['obstacle_density','food_density','nr_hives']
+        }
+var_params = {
+    'obstacle_density': [0, 15, 30],
+    'food_density': [5, 15, 25],
+    'nr_hives': [1,3, 5]
+    }
+# fixed_params = {"width": 50,
+#                 "height": 50
+#                 }
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
 replicates = 1
 max_steps = 100
-distinct_samples = 1
+distinct_samples = 10
 
 
 # Set the outputs
@@ -45,29 +50,22 @@ model_reporters = {
 
 data = {}
 
-# for i, var in enumerate(problem['names']):
-#     # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
-#     samples = problem['bounds'][i]
+for i, var in enumerate(params['names']): 
+    # samples = np.linspace(*params['bounds'][i], num=distinct_samples, dtype=int)
+    samples = sorted(var_params[var]*distinct_samples)
+    batch = BatchRunner(BeeForagingModel,
+                        max_steps=max_steps,
+                        iterations=replicates,
+                        variable_parameters={var:samples},
+                        model_reporters=model_reporters,
+                        display_progress=True)
 
-#     # Keep in mind that wolf_gain_from_food should be integers. You will have to change
-#     # your code to acommidate for this or sample in such a way that you only get integers.
+    batch.run_all()
+    data = batch.get_model_vars_dataframe()
+        
+    data.to_csv(f'pickles/test_{var}.csv')
+    data.to_pickle(f'pickles/test_{var}.p')
 
-
-batch = BatchRunner(BeeForagingModel,
-                    max_steps=max_steps,
-                    iterations=replicates,
-                    fixed_parameters=fixed_params,
-                    variable_parameters=var_params,
-                    model_reporters=model_reporters,
-                    display_progress=True)
-
-batch.run_all()
-jup = batch.get_model_vars_dataframe()
-jup.to_csv(f'pickles/test_6.csv')
-jup.to_pickle(f'pickles/test_6.p')
-
-
-# data[var] = batch.get_model_vars_dataframe()
 
 
 

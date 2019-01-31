@@ -18,7 +18,7 @@ import time
 
 class BeeForagingModel(Model):
     #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width, height, obstacle_density, food_density,nr_hives=2, car_cap=5):
+    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15,nr_hives=3, car_cap=5):
         super().__init__()
         self.height = height
         self.width = width
@@ -80,7 +80,7 @@ class BeeForagingModel(Model):
             "n_births": lambda m: m.get_birth_count(),
             "n_deaths": lambda m: m.get_death_count()
         })
-        print(type(self.datacollector))
+    
         self.running = True
 
         self.total_schedule_time = 0
