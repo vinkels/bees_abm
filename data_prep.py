@@ -22,11 +22,14 @@ def data_prep():
     df_new['scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
     df_new['food_bee'] = df_final['hive_food'] / df_final['n_bees']
     df_new['bees_hive'] = df_final['n_bees'] / df_final['n_hives']
-
-
     df_new.to_csv('pickles/test_newnew.csv')
     df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step'])[['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
-    print(df_step)
+    df_step = df_step.reset_index()
+    df_sample = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'sample'])[
+        ['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
+    df_sample = df_sample.reset_index()
+    print(df_sample)
+
 
 
 if __name__ == "__main__":
