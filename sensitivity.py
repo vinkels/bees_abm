@@ -70,7 +70,7 @@ batch = BatchRunner(BeeForagingModel,
 
 batch.run_all()
 jup = batch.get_model_vars_dataframe()
-jup.to_csv(f'jeej_{tm.time()}.csv')
+jup.to_csv(f'test_{tm.time()}.csv')
 jup.to_pickle(f'test_{tm.time()}.p')
 
 

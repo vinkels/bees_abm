@@ -69,19 +69,19 @@ class BeeForagingModel(Model):
             food = Food(self, f_loc)
             self.add_agent(food, f_loc)
 
-        # self.datacollector = DataCollector({
-        #     "Bees": lambda m: m.schedule.get_breed_count(Bee),
-        #     "HiveFood": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
-        #     "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
-        #     "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
-        #     "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
-        #     "Baby bees": lambda m: m.schedule.get_bee_count("babee")
-        # })
-        # self.datacollector2 = DataCollector({
-        #     "HiveID": lambda m: m.hives[self.hive.unique_id].get_hive_id(),
-        #     "FoodLocs": lambda m: m.hives[self.hive.unique_id].get_food_memory(),
-        # })
-        # self.running = False
+        self.datacollector = DataCollector({
+            "n_Bees": lambda m: m.schedule.get_breed_count(Bee),
+            "HiveFood": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
+            "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
+            "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
+            "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
+            "Baby bees": lambda m: m.schedule.get_bee_count("babee"),
+            "death_age": lambda m: m.get_death_age(),
+            "n_births": lambda m: m.get_birth_count(),
+            "n_deaths": lambda m: m.get_death_count()
+        })
+
+        self.running = True
 
         self.total_schedule_time = 0
 
@@ -109,11 +109,10 @@ class BeeForagingModel(Model):
         # self.death_count = 0
         # self.birth_count = 0
         # self.death_age = []
-        print(self.schedule.step())
+        self.schedule.step()
 
+        self.datacollector.collect(self)
 
-        # self.datacollector.collect(self)
-        # self.datacollector2.collect(self)
 
 
     def get_birth_count(self):
