@@ -57,7 +57,7 @@ class BeeForagingModel(Model):
             #TODO TAG BEES FOR WARM-UP PERIOD
             #TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
             hive_id = hive.unique_id
-            for _ in range(0, 20):
+            for _ in range(0, 2000):
                 self.add_bee( pos=hive_location, hive=hive, type_bee="scout", hive_id=hive_id, color=hive.bee_color, age=BABYTIME)
                 
                 self.add_bee(pos=hive_location, hive=hive, type_bee="rester", hive_id=hive_id,color=hive.bee_color,  age=BABYTIME)
@@ -121,6 +121,7 @@ class BeeForagingModel(Model):
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
+
         self.datacollector.collect(self)
         
 

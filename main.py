@@ -12,9 +12,9 @@ def main():
     bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
 
     for i in range(45):
-        print(f'ITERATION {i*1000}')
+        print(f'ITERATION {i*100}')
         start_time = tm.time()
-        bee_model.run_model(1000)
+        bee_model.run_model(100)
         print(tm.time() - start_time)
 
         print(bee_model.total_schedule_time)
