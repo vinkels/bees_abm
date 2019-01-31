@@ -18,15 +18,15 @@ def data_prep():
         sample += 1
         final_dfs.append(df_temp)
     df_final = pd.concat(final_dfs)
-    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'sample', 'step']]
+    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'sample', 'step', 'death_age']]
     df_new['scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
-    
-    df_new['bees_hives'] = df_final['hive_food'] / df_final['n_bees']
-    df_new.to_csv('pickles/test_new.csv')
-    # df_final['death_age'] = 
-    # df_final['food_bee'] = 
-    # df_step = df_final.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step'])[['HiveFood', 'scout bees']].describe()
-    # print(df_step)
+    df_new['food_bee'] = df_final['hive_food'] / df_final['n_bees']
+    df_new['bees_hive'] = df_final['n_bees'] / df_final['n_hives']
+
+
+    df_new.to_csv('pickles/test_newnew.csv')
+    df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step'])[['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
+    print(df_step)
 
 
 if __name__ == "__main__":
