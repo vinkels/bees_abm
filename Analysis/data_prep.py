@@ -5,5 +5,8 @@ class Analysis():
 
 
 
-def data_prep(self):
+    def data_prep(self):
+        df = pd.read_pickle(f'pickles/{self.flnm}')
+        
+
     

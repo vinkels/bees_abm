@@ -19,6 +19,7 @@ class Hive(Agent):
         self.color = color
         self.bee_color = bee_color
         self.reproduction_rate = 0.1
+        self.bring_back_the_foooddzzz = 0
 
     def receive_info(self, info):
         self.food_locs.append(info)

@@ -258,6 +258,7 @@ class Bee(Agent):
             self.loaded = False
             hive.receive_info(self.food_loc)
             hive.unload_food()
+            hive.bring_back_the_foooddzzz += 1
 
         # become rester to gain energy
         self.type_bee = "rester"

@@ -106,9 +106,10 @@ class BeeForagingModel(Model):
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
 
-        self.death_count = 0
-        self.birth_count = 0
-        self.death_age = []
+        # self.death_count = 0
+        # self.birth_count = 0
+        # self.death_age = []
+        print(self.schedule.step())
 
 
         # self.datacollector.collect(self)
@@ -116,14 +117,20 @@ class BeeForagingModel(Model):
 
 
     def get_birth_count(self):
-        return self.birth_count
+        count = self.birth_count
+        self.birth_count = 0
+        return count
 
     def get_death_count(self):
-        return self.death_count
+        count = self.death_count
+        self.death_count = 0
+        return count
 
     def get_death_age(self):
         if len(self.death_age) > 0:
-            return sum(self.death_age)/len(self.death_age)
+            mean_age = sum(self.death_age)/len(self.death_age)
+            self.death_age = []
+            return mean_age
         else:
             return 0
 
@@ -137,7 +144,7 @@ class BeeForagingModel(Model):
 
     def remove_agent(self, agent):
         if type(agent) == Bee:
-            self.death_count+=1
+            self.death_count += 1
             self.death_age.append(agent.age)
 
         self.grid.remove_agent(agent)
@@ -145,7 +152,8 @@ class BeeForagingModel(Model):
 
     def add_bee(self, pos, hive, type_bee, hive_id, color, age=0):
             bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color,age=age)
-            self.birth_count += 1
+            if type_bee == 'babee':
+                self.birth_count += 1
             self.grid.place_agent(bee, pos)
             self.schedule.add(bee)
 
