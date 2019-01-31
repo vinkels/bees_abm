@@ -23,4 +23,6 @@ def main():
 
     print({k: len(v) for k, v in bee_model.schedule.agents_by_breed.items()})
 
+    print(bee_model.timings_scout)
+
 main()

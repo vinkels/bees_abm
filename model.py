@@ -97,6 +97,13 @@ class BeeForagingModel(Model):
 
         self.planning_time = 0
 
+        self.timings_scout = {
+            'move home': 0,
+            'look for food': 0,
+            'move to food neighbour': 0,
+            'random move': 0
+        }
+
     def get_hive(self, hive_id):
         return self.hives[hive_id]
 
