@@ -41,8 +41,9 @@ class Babee(BeeStrategy):
         bee.relax_at_hive(hive)
 
         # age is arbitrary
-        if bee.age > 100:
-            bee.age = BABYTIME
+        # print("Bee age: ", bee.age, "BABYTIME: ", BABYTIME)
+        if bee.age > BABYTIME:
+            # raise Exception("Binnen")
             bee.type_bee = "rester"
 
 
@@ -284,7 +285,7 @@ class Bee(Agent):
         Eat while at hive and gain energy
         '''
 
-        if hive.food > hive.bite:
+        if hive.food > hive.energy_level_critical:
             self.energy += hive.bite
             hive.food -= hive.bite
 
