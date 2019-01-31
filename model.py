@@ -69,7 +69,7 @@ class BeeForagingModel(Model):
             food = Food(self, f_loc)
             self.add_agent(food, f_loc)
 
-        self.datacollector = DataCollector({
+        self.datacollector = DataCollector(model_reporters={
             "n_Bees": lambda m: m.schedule.get_breed_count(Bee),
             "HiveFood": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
             "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
