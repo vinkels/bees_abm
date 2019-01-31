@@ -17,6 +17,9 @@ def path_finder(cur_loc, target_loc, grid, grid_width, grid_height):
     path = astar(grid, cur_loc, target_loc)
     # e = time.time()
 
+    # if e - s > 1:
+    #     print(f"{grid.tolist()}, {cur_loc}, {target_loc}")
+
     # print(path, e - s)
 
     if not path:

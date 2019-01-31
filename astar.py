@@ -7,12 +7,11 @@ Code from https://gist.githubusercontent.com/Nicholas-Swift/003e1932ef2804bebef2
 class Node():
     """A node class for A* Pathfinding"""
 
-    def __init__(self, parent=None, position=None):
-        self.parent = parent
+    def __init__(self, route, position=None):
+        self.route = route + [position]
         self.position = position
 
         self.g = 0
-        self.h = 0
         self.f = 0
 
     def __eq__(self, other):
@@ -23,17 +22,15 @@ def astar(maze, start, end):
     """Returns a list of tuples as a path from the given start to the given end in the given maze"""
 
     # Create start and end node
-    start_node = Node(None, start)
-    start_node.g = start_node.h = start_node.f = 0
-    end_node = Node(None, end)
-    end_node.g = end_node.h = end_node.f = 0
+    start_node = Node([], start)
+
+    # Init height and width
+    width = len(maze)
+    height = len(maze[0])
 
     # Initialize both open and closed list
-    open_list = []
-    closed_list = []
-
-    # Add the start node
-    open_list.append(start_node)
+    open_list = [start_node]
+    closed_set = set()
 
     # Loop until you find the end
     while len(open_list) > 0:
@@ -42,56 +39,43 @@ def astar(maze, start, end):
         current_node = open_list[0]
         current_index = 0
         for index, item in enumerate(open_list):
+
+            # Found the goal
+            if item.position == end:
+                return item.route
+
             if item.f < current_node.f:
                 current_node = item
                 current_index = index
 
         # Pop current off open list, add to closed list
         open_list.pop(current_index)
-        closed_list.append(current_node)
+        closed_set.add(current_node.position)
 
-        # Found the goal
-        if current_node == end_node:
-            path = []
-            current = current_node
-            while current is not None:
-                path.append(current.position)
-                current = current.parent
-            return path[::-1] # Return reversed path
+        curr_x, curr_y = current_node.position
 
         # Generate children
         children = []
         for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]: # Adjacent squares
 
             # Get node position
-            node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+            node_position = (curr_x + new_position[0], curr_y + new_position[1])
 
-            # Make sure within range
-            if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (len(maze[len(maze)-1]) -1) or node_position[1] < 0:
+            # Child position is on the closed list
+            if node_position in closed_set:
                 continue
 
-            # Make sure walkable terrain
-            if maze[node_position[0]][node_position[1]] != 0:
-                continue
-
-            # Create new node
-            new_node = Node(current_node, node_position)
-
-            # Append
-            children.append(new_node)
+            # Make sure within range and walkable
+            if 0 <= node_position[0] < width and 0 <= node_position[1] < height and maze[node_position[0]][node_position[1]] == 0:
+                # Create new node
+                children.append(Node(current_node.route, node_position))
 
         # Loop through children
         for child in children:
-
-            # Child is on the closed list
-            for closed_child in closed_list:
-                if child == closed_child:
-                    continue
-
             # Create the f, g, and h values
             child.g = current_node.g + 1
-            child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
-            child.f = child.g + child.h
+            child_h = ((child.position[0] - end[0]) ** 2) + ((child.position[1] - end[1]) ** 2)
+            child.f = child.g + child_h
 
             # Child is already in the open list
             for open_node in open_list:
