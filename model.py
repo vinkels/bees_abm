@@ -83,37 +83,36 @@ class BeeForagingModel(Model):
         # })
         # self.running = False
 
-        # self.total_data_time = 0
-        # self.total_schedule_time = 0
+        self.total_schedule_time = 0
 
-        # self.time_by_strategy = {
-        #     "scout": 0,
-        #     "foraging": 0,
-        #     "rester": 0,
-        #     "babee": 0
-        # }
+        self.time_by_strategy = {
+            "scout": 0,
+            "foraging": 0,
+            "rester": 0,
+            "babee": 0
+        }
 
-        # self.planning_time = 0
+        self.planning_time = 0
 
     def get_hive(self, hive_id):
         return self.hives[hive_id]
 
     def step(self):
-        # schedule_start = time.time()
-        # self.death_count = 0
-        # self.birth_count = 0
-        # self.death_age = []
+
+        schedule_start = time.time()
+
         self.schedule.step()
 
-        # schedule_end = time.time()
+        schedule_end = time.time()
+        self.total_schedule_time += schedule_end - schedule_start
 
-        # start = time.time()
+        self.death_count = 0
+        self.birth_count = 0
+        self.death_age = []
+
+
         # self.datacollector.collect(self)
         # self.datacollector2.collect(self)
-        # end = time.time()
-
-        # self.total_data_time += end - start
-        # self.total_schedule_time += schedule_end - schedule_start
 
 
     def get_birth_count(self):
