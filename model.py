@@ -86,7 +86,7 @@ class BeeForagingModel(Model):
             "load_count": lambda m: m.load_count
         })
         
-        self.running = True
+        
 
         self.total_schedule_time = 0
 
@@ -99,6 +99,7 @@ class BeeForagingModel(Model):
 
         self.planning_time = 0
         self.datacollector.collect(self)
+        self.running = True
         
 
         self.timings_scout = {
@@ -114,13 +115,13 @@ class BeeForagingModel(Model):
     def step(self):
 
         schedule_start = time.time()
-
+        self.datacollector.collect(self)
         self.schedule.step()
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
 
-        self.datacollector.collect(self)
+        
 
 
 
