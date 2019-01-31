@@ -39,15 +39,8 @@ distinct_samples = 1
 
 # Set the outputs
 
-model_reporters = {"n_bees": lambda m: m.schedule.get_breed_count(Bee),
-                   "food": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
-                   "scout_bee": lambda m: m.schedule.get_bee_count("scout"),
-                   "forage_bee": lambda m: m.schedule.get_bee_count("foraging"),
-                   "rest_bee": lambda m: m.schedule.get_bee_count("rester"),
-                   "baby_bee": lambda m: m.schedule.get_bee_count("babee"),
-                   "death_age": lambda m: m.get_death_age(),
-                   "n_births": lambda m: m.get_birth_count(),
-                   "n_deaths": lambda m: m.get_death_count()
+model_reporters = {
+                   "step_data": lambda m: m.datacollector.get_model_vars_dataframe()
                    }
 
 data = {}
@@ -70,8 +63,8 @@ batch = BatchRunner(BeeForagingModel,
 
 batch.run_all()
 jup = batch.get_model_vars_dataframe()
-jup.to_csv(f'test_{tm.time()}.csv')
-jup.to_pickle(f'test_{tm.time()}.p')
+jup.to_csv(f'pickles/test_6.csv')
+jup.to_pickle(f'pickles/test_6.p')
 
 
 # data[var] = batch.get_model_vars_dataframe()

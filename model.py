@@ -80,7 +80,7 @@ class BeeForagingModel(Model):
             "n_births": lambda m: m.get_birth_count(),
             "n_deaths": lambda m: m.get_death_count()
         })
-
+        print(type(self.datacollector))
         self.running = True
 
         self.total_schedule_time = 0
