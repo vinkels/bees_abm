@@ -17,10 +17,8 @@ from itertools import combinations
 import time as tm
 import os
 
-#TODO: number of hives, food availability, 
+
 # We define our variables and bounds
-
-
 params = {
         'nr_vars': 3,
         'bounds':[[1, 3 ,5],[5,10,20],[10,20,30]],
@@ -37,7 +35,7 @@ var_params = {
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-replicates = 1
+replicates = 5
 max_steps = 100
 distinct_samples = 10
 
@@ -51,7 +49,7 @@ model_reporters = {
 data = {}
 
 for i, var in enumerate(params['names']): 
-    # samples = np.linspace(*params['bounds'][i], num=distinct_samples, dtype=int)
+    
     samples = sorted(var_params[var]*distinct_samples)
     batch = BatchRunner(BeeForagingModel,
                         max_steps=max_steps,
