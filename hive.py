@@ -7,7 +7,7 @@ from bee import Bee
 class Hive(Agent):
     def __init__(self, model, pos, color,bee_color):
         super().__init__(model.next_id(), model)
-
+        self.load_count = 0
         self.pos = pos
         self.food_locs = []
         self.food = 0
@@ -53,6 +53,7 @@ class Hive(Agent):
     def unload_food(self, food=1):
         #TODO depends on bee carrying capacity
         self.food += self.model.car_cap
+        self.model.load_count += 1
 
     def get_food_stat(self):
         return self.food

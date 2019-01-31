@@ -4,3 +4,4 @@ numpy==1.15.4
 Mesa.egg==info
 SALib==1.2
 mesa==0.8.5
+pathos==0.2.3
