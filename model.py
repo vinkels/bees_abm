@@ -120,7 +120,6 @@ class BeeForagingModel(Model):
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
-        self.schedule.step()
 
         
 

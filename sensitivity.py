@@ -34,7 +34,7 @@ var_params = {
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
 replicates = 5
-max_steps = 10
+max_steps = 20
 distinct_samples = 5
 
 model_reporters = {
