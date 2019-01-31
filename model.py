@@ -105,10 +105,6 @@ class BeeForagingModel(Model):
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
-
-        # self.death_count = 0
-        # self.birth_count = 0
-        # self.death_age = []
         self.schedule.step()
 
         self.datacollector.collect(self)

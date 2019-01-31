@@ -93,9 +93,9 @@ class RandomActivationBeeWorld(RandomActivation):
             if agent.type_bee == bee_type
         ])
     
-    def get_avg_bees(self):
-        return sum([
-            1
-            for agent in self.agents_by_breed[Bee].values()
-        ])
+    # def get_avg_bees(self):
+    #     return sum([
+    #         1
+    #         for agent in self.agents_by_breed[Bee].values()
+    #     ])
     
