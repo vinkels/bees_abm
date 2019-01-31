@@ -50,6 +50,9 @@ class MultiGridWithObstacles(MultiGrid):
             'remove': 0
         }
 
+        self.radius_1_food_cache = {}
+        self.cache_hits = 0
+
         self.moore_neighbors = set([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)])
         assert len(self.moore_neighbors) == 8
 
@@ -206,6 +209,11 @@ class MultiGridWithObstacles(MultiGrid):
 
         """
         if radius == 1:
+
+            # Food never changes, so we cache it.
+            if breed == Food and pos in self.radius_1_food_cache:
+                return self.radius_1_food_cache[pos]
+
             x, y = pos
 
             cell_list = [] 
@@ -217,7 +225,7 @@ class MultiGridWithObstacles(MultiGrid):
             cell_list = [pos]
 
         if breed == Food:
-            return (
+            foods = (
                 self.agents[z] 
                 for z in (
                     self.grids[Food][x][y]
@@ -225,6 +233,12 @@ class MultiGridWithObstacles(MultiGrid):
                     if self.grids[Food][x][y]
                 )
             )
+            if radius == 1:
+                self.radius_1_food_cache[pos] = list(foods)
+                return self.radius_1_food_cache[pos]
+
+            return foods
+
         else:
             return (
                 self.agents[z] 
