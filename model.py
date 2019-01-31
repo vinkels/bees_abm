@@ -77,7 +77,7 @@ class BeeForagingModel(Model):
             "n_bees": lambda m: m.schedule.get_breed_count(Bee),
             "hive_food": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
             "scout_bees": lambda m: m.schedule.get_bee_count("scout"),
-            "dorage_bees": lambda m: m.schedule.get_bee_count("foraging"),
+            "forage_bees": lambda m: m.schedule.get_bee_count("foraging"),
             "rest_bees": lambda m: m.schedule.get_bee_count("rester"),
             "baby_bees": lambda m: m.schedule.get_bee_count("babee"),
             "death_age": lambda m: m.get_death_age(),
@@ -119,7 +119,6 @@ class BeeForagingModel(Model):
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
-        self.schedule.step()
 
         self.datacollector.collect(self)
 
