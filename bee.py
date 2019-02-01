@@ -285,9 +285,12 @@ class Bee(Agent):
         Eat while at hive and gain energy
         '''
 
-        if hive.food > hive.energy_level_critical:
+        # if hive.food > hive.energy_level_critical:
+        if hive.food > hive.bite:
             self.energy += hive.bite
             hive.food -= hive.bite
+            print(hive.bite)
+
 
         # if no food is available, go search
         # TODO ENERGY DECAY OVER TIME

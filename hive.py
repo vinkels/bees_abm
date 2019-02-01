@@ -31,11 +31,12 @@ class Hive(Agent):
         self.n_bees = self.model.schedule.count_hive_bees(self.pos)
 
         # determine optimal and critical amount of food
-        self.energy_level_optimal = self.n_bees *20
-        self.energy_level_critical = self.n_bees * 15
+        self.energy_level_optimal = self.n_bees * 5
+        self.energy_level_critical = self.n_bees
 
         # chance of babies
-        if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
+        # if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
+        if rd.random() < self.reproduction_rate:
             self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id, color = self.bee_color,age=BABYTIME)
             self.n_bees += 1
             
@@ -69,7 +70,8 @@ class Hive(Agent):
             # if more than necessary amount of food, increase consumption and reproduction
             #TODO dependency energy in hive
             if self.food >= self.energy_level_optimal:
-                self.bite =  min(1, self.bite + self.bite/100)
+                self.bite += self.bite/10
+                # self.bite =  min(1, self.bite + self.bite/100)
                 self.reproduction_rate += self.reproduction_rate/100
 
             else:

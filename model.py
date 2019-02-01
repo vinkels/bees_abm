@@ -63,8 +63,8 @@ class BeeForagingModel(Model):
                 self.add_bee(pos=hive_location, hive=hive, type_bee="rester", hive_id=hive_id,color=hive.bee_color,  age=BABYTIME)
             
             # # init babies
-            for i in range(0, 3):
-                self.add_bee(pos=hive_location, hive=hive, type_bee="babee", hive_id=hive_id,color=hive.bee_color,  age=0)
+            # for i in range(0, 3):
+            #     self.add_bee(pos=hive_location, hive=hive, type_bee="babee", hive_id=hive_id,color=hive.bee_color,  age=0)
             #     bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
             #     self.add_agent(bee_baby, hive_location)
 
