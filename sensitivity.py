@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 import time as tm
 import os
+import datetime
 
 
 # We define our variables and bounds
@@ -50,7 +51,7 @@ model_reporters = {
 #                    }
 
 data = {}
-
+new_path = datetime.datetime.now().strftime('%Y%m%d%H%M')
 for i, var in enumerate(params['names']): 
     # names = list(params)
     # names = names.remove(var)
@@ -67,9 +68,17 @@ for i, var in enumerate(params['names']):
 
     batch.run_all()
     data = batch.get_model_vars_dataframe()
-        
-    data.to_csv(f'pickles/test_{var}_new.csv')
-    data.to_pickle(f'pickles/test_{var}_new.p')
+    from datetime import datetime
+
+# define a timestamp format you like
+    
+    open(new_path, 'w').write(data)
+    data.to_csv(f'pickles/{var}_{new_path}.csv')
+    data.to_pickle(f'pickles/{var}_{new_path}.p')
+
+
+
+
 
 
 
