@@ -7,11 +7,10 @@ import math
 from config import BABYTIME, LIFESPAN
 
 from food import Food
-from hive import Hive
 import util
 
 # TODO remove
-import time as tm
+import time
 
 import numpy as np
 
@@ -42,7 +41,9 @@ class Babee(BeeStrategy):
         bee.relax_at_hive(hive)
 
         # age is arbitrary
+        # print("Bee age: ", bee.age, "BABYTIME: ", BABYTIME)
         if bee.age > BABYTIME:
+            # raise Exception("Binnen")
             bee.type_bee = "rester"
 
 
@@ -92,6 +93,7 @@ class Scout(BeeStrategy):
 
         if bee.loaded is False:
             if bee.energy < 0.5 * bee.max_energy and bee.pos != bee.hive_loc:
+                s = time.time()
                 bee.move(bee.hive_loc)
 
                 # check if destination is reached
@@ -99,15 +101,22 @@ class Scout(BeeStrategy):
                     hive = bee.model.get_hive(bee.hive_id)
                     assert hive
                     bee.arrive_at_hive(hive)
+                e = time.time()
+                bee.model.timings_scout['move home'] += e - s
             else:
+                s = time.time()
                 food_neighbours = [
                     nb
-                    for nb in bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=False, radius=1)
-                    if type(nb) == Food and nb.can_be_eaten()
+                    for nb in bee.model.grid.get_neighbors_by_breed(Food, bee.pos, moore=True, include_center=False, radius=1)
+                    if nb.can_be_eaten()
                 ]
+                e = time.time()
+                bee.model.timings_scout['look for food'] += e - s
 
                 # If you see food that is uneaten, move there.
                 if food_neighbours:
+                    s = time.time()
+
                     food = food_neighbours[rd.randrange(0, len(food_neighbours))]
 
                     bee.model.grid.move_agent(bee, food.pos)
@@ -118,9 +127,17 @@ class Scout(BeeStrategy):
                     bee.loaded = True
                     bee.food_loc = bee.pos
 
+                    e = time.time()
+                    bee.model.timings_scout['move to food neighbour'] += e - s
+
                 # otherwise, move randomly
                 else:
+                    s = time.time()
+
                     bee.random_move()
+
+                    e = time.time()
+                    bee.model.timings_scout['random move'] += e - s
 
         else:
             raise Exception("Scouts should be unloaded.")
@@ -140,11 +157,10 @@ class Foraging(BeeStrategy):
 
             # check if arrived, then take food
             if bee.food_loc == bee.pos:
-                neighbors = bee.model.grid.get_neighbors(bee.pos, moore=True, include_center=True, radius=0)
                 food_neighbors = [
                     nb
-                    for nb in neighbors
-                    if type(nb) == Food and nb.can_be_eaten()
+                    for nb in bee.model.grid.get_neighbors_by_breed(Food, bee.pos, moore=True, include_center=True, radius=0)
+                    if nb.can_be_eaten()
                 ]
 
                 bee.plan_course = []
@@ -198,7 +214,8 @@ class Bee(Agent):
 
         self.plan_course = []
 
-        self.mental_map = Grid(height=self.model.height, width=self.model.width)
+        # self.mental_map = Grid(height=self.model.height, width=self.model.width)
+        self.mental_map = np.zeros((self.model.height, self.model.width))
 
     def random_move(self):
         '''
@@ -223,8 +240,9 @@ class Bee(Agent):
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
 
         for obstacle in obstacles:
-            self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
-            self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
+            # self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
+            # self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
+            self.mental_map[obstacle[0]][obstacle[1]] = 1
 
         return list(neighbourhood)
 
@@ -235,18 +253,17 @@ class Bee(Agent):
         neighborhood = self.get_accessible_neighbourhood()
 
         if not self.plan_course or not self.plan_course[0] in neighborhood:
-            plan_start = tm.time()
+            plan_start = time.time()
             self.plan_course = util.path_finder(cur_loc=self.pos,
-                                               target_loc=loc,
-                                               grid=self.mental_map,
-                                               grid_width=self.model.width,
-                                               grid_height=self.model.height)
-            plan_end = tm.time()
+                                            target_loc=loc,
+                                            grid=self.mental_map,
+                                            grid_width=self.model.width,
+                                            grid_height=self.model.height)
+            plan_end = time.time()
             self.model.planning_time += plan_end - plan_start
 
-        nxt_loc = self.plan_course[0]
+        nxt_loc = self.plan_course.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
-        self.plan_course.pop(0)
 
     def arrive_at_hive(self, hive):
         '''
@@ -258,6 +275,7 @@ class Bee(Agent):
             self.loaded = False
             hive.receive_info(self.food_loc)
             hive.unload_food()
+            hive.bring_back_the_foooddzzz += 1
 
         # become rester to gain energy
         self.type_bee = "rester"
@@ -267,7 +285,7 @@ class Bee(Agent):
         Eat while at hive and gain energy
         '''
 
-        if hive.food > hive.bite:
+        if hive.food > hive.energy_level_critical:
             self.energy += hive.bite
             hive.food -= hive.bite
 
@@ -296,8 +314,8 @@ class Bee(Agent):
             return
 
         bee_type = self.type_bee
-        strat_start = tm.time()
+        strat_start = time.time()
         strategy = bee_strategies[self.type_bee]
         strategy(self).step()
-        strat_end = tm.time()
+        strat_end = time.time()
         self.model.time_by_strategy[bee_type] += strat_end - strat_start

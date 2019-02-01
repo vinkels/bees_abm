@@ -18,7 +18,7 @@ import time
 
 class BeeForagingModel(Model):
     #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width, height, obstacle_density, food_density,nr_hives=2, car_cap=5):
+    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, car_cap=5, VIZUALISATION=False):
         super().__init__()
         self.height = height
         self.width = width
@@ -27,14 +27,18 @@ class BeeForagingModel(Model):
         self.death_count  = 0
         self.birth_count = 0
         self.death_age = []
+        self.obstacle_density = obstacle_density
+        self.food_density = food_density
+        self.nr_hives = nr_hives
+        self.load_count = 0
 
 
         self.user_error = None
-        if obstacle_density + food_density > FOOD_OBSTACLE_RATIO:
+        if self.obstacle_density + self.food_density > FOOD_OBSTACLE_RATIO:
             raise Exception("Food and obstacles do not fit in the grid.")
 
-        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, obstacle_density, food_density, self.nr_hives)
-        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations))
+        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, self.obstacle_density, self.food_density, self.nr_hives)
+        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations), VIZUALISATION=VIZUALISATION)
         self.schedule = RandomActivationBeeWorld(self)
 
         self.hives = {}
@@ -59,7 +63,8 @@ class BeeForagingModel(Model):
                 self.add_bee(pos=hive_location, hive=hive, type_bee="rester", hive_id=hive_id,color=hive.bee_color,  age=BABYTIME)
             
             # # init babies
-            # for i in range(0, 3):
+            for i in range(0, 3):
+                self.add_bee(pos=hive_location, hive=hive, type_bee="babee", hive_id=hive_id,color=hive.bee_color,  age=0)
             #     bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
             #     self.add_agent(bee_baby, hive_location)
 
@@ -69,19 +74,20 @@ class BeeForagingModel(Model):
             food = Food(self, f_loc)
             self.add_agent(food, f_loc)
 
-        # self.datacollector = DataCollector({
-        #     "Bees": lambda m: m.schedule.get_breed_count(Bee),
-        #     "HiveFood": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
-        #     "Scout bees": lambda m: m.schedule.get_bee_count("scout"),
-        #     "Foraging bees": lambda m: m.schedule.get_bee_count("foraging"),
-        #     "Rester bees": lambda m: m.schedule.get_bee_count("rester"),
-        #     "Baby bees": lambda m: m.schedule.get_bee_count("babee")
-        # })
-        # self.datacollector2 = DataCollector({
-        #     "HiveID": lambda m: m.hives[self.hive.unique_id].get_hive_id(),
-        #     "FoodLocs": lambda m: m.hives[self.hive.unique_id].get_food_memory(),
-        # })
-        # self.running = False
+        self.datacollector = DataCollector({
+            "n_bees": lambda m: m.schedule.get_breed_count(Bee),
+            "hive_food": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
+            "scout_bees": lambda m: m.schedule.get_bee_count("scout"),
+            "forage_bees": lambda m: m.schedule.get_bee_count("foraging"),
+            "rest_bees": lambda m: m.schedule.get_bee_count("rester"),
+            "baby_bees": lambda m: m.schedule.get_bee_count("babee"),
+            "death_age": lambda m: m.get_death_age(),
+            "n_births": lambda m: m.get_birth_count(),
+            "n_deaths": lambda m: m.get_death_count(),
+            "load_count": lambda m: m.load_count
+        })
+        
+        
 
         self.total_schedule_time = 0
 
@@ -93,35 +99,48 @@ class BeeForagingModel(Model):
         }
 
         self.planning_time = 0
+        
+        self.running = True
+        
+
+        self.timings_scout = {
+            'move home': 0,
+            'look for food': 0,
+            'move to food neighbour': 0,
+            'random move': 0
+        }
+        self.datacollector.collect(self)
 
     def get_hive(self, hive_id):
         return self.hives[hive_id]
 
     def step(self):
-        schedule_start = time.time()
 
+        schedule_start = time.time()
+        
         self.schedule.step()
 
         schedule_end = time.time()
         self.total_schedule_time += schedule_end - schedule_start
 
-        self.death_count = 0
-        self.birth_count = 0
-        self.death_age = []
-
-        # self.datacollector.collect(self)
-        # self.datacollector2.collect(self)
-
+        self.datacollector.collect(self)
+        
 
     def get_birth_count(self):
-        return self.birth_count
+        count = self.birth_count
+        self.birth_count = 0
+        return count
 
     def get_death_count(self):
-        return self.death_count
+        count = self.death_count
+        self.death_count = 0
+        return count
 
     def get_death_age(self):
         if len(self.death_age) > 0:
-            return sum(self.death_age)/len(self.death_age)
+            mean_age = sum(self.death_age)/len(self.death_age)
+            self.death_age = []
+            return mean_age
         else:
             return 0
 
@@ -135,7 +154,7 @@ class BeeForagingModel(Model):
 
     def remove_agent(self, agent):
         if type(agent) == Bee:
-            self.death_count+=1
+            self.death_count += 1
             self.death_age.append(agent.age)
 
         self.grid.remove_agent(agent)
@@ -143,9 +162,11 @@ class BeeForagingModel(Model):
 
     def add_bee(self, pos, hive, type_bee, hive_id, color, age=0):
             bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color,age=age)
-            self.birth_count += 1
-            self.grid.place_agent(bee, pos)
-            self.schedule.add(bee)
+
+            if type_bee == 'babee':
+                self.birth_count += 1
+            
+            self.add_agent(bee, pos)
 
     def init_grid(self, height, width, obstacle_density, food_density,nr_hives):
         possible_locations = [

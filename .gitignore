@@ -107,6 +107,6 @@ venv.bak/
 .vscode
 
 # csvfiles
-.csv
+*.csv
 # pickle files
-/pickles
+*.p

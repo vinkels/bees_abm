@@ -7,8 +7,13 @@ from config import OBSTACLE
 
 import time
 
+from hive import Hive
+from bee import Bee
+from food import Food
+
+
 class MultiGridWithObstacles(MultiGrid):
-    def __init__(self, width, height, torus, obstacle_positions):
+    def __init__(self, width, height, torus, obstacle_positions, VIZUALISATION=False):
         """ Create a new grid.
 
         Args:
@@ -16,7 +21,25 @@ class MultiGridWithObstacles(MultiGrid):
             torus: Boolean whether the grid wraps or not.
             obstacle_positions: A set of all locations that are not accessible.
         """
-        super().__init__(width, height, torus)
+        self.height = height
+        self.width = width
+        self.torus = torus
+
+        self.VIZUALISATION = VIZUALISATION
+
+        if self.VIZUALISATION:
+            self.grids = {
+                Bee: [[set() for _ in range(self.height)] for _ in range(self.width)],
+                Hive: [[set() for _ in range(self.height)] for _ in range(self.width)],
+                Food: [[None for _ in range(self.height)] for _ in range(self.width)]
+            }
+        else:
+            self.grids = {
+                # Bee: [[set() for _ in range(self.height)] for _ in range(self.width)],
+                # Hive: [[set() for _ in range(self.height)] for _ in range(self.width)],
+                Food: [[None for _ in range(self.height)] for _ in range(self.width)]
+            }
+
         self.obstacle_positions = obstacle_positions
         # print(self.obstacle_positions)
         self.agents = {}
@@ -26,6 +49,15 @@ class MultiGridWithObstacles(MultiGrid):
             'place': 0,
             'remove': 0
         }
+
+        self.radius_1_food_cache = {}
+
+        self.accessible_cache = {}
+
+        self.cache_hits = 0
+
+        self.moore_neighbors = set([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)])
+        assert len(self.moore_neighbors) == 8
 
     def move_agent(self, agent, pos):
         """
@@ -40,8 +72,10 @@ class MultiGridWithObstacles(MultiGrid):
         """
         start = time.time()
 
-        self._remove_agent(agent.pos, agent)
-        self._place_agent(pos, agent)
+        if type(agent) == Food or self.VIZUALISATION:
+            self._remove_agent(agent.pos, agent)
+            self._place_agent(pos, agent)
+        
         agent.pos = pos
 
         end = time.time()
@@ -77,16 +111,29 @@ class MultiGridWithObstacles(MultiGrid):
         Place the agent at the correct location.
         No empties, because they cost performance.
         """
-        x, y = pos
-        self.grid[x][y].add(agent.unique_id)
+        agent_type = type(agent)
 
+        # Only food gets tracked if there is no vizualisation
+        if agent_type == Food:
+            x, y = pos
+            self.grids[agent_type][x][y] = agent.unique_id
+        elif self.VIZUALISATION:
+            x, y = pos
+            self.grids[agent_type][x][y].add(agent.unique_id)
+            
     def _remove_agent(self, pos, agent):
         """ 
         Remove the agent from the given location. 
         No empties, because they cost performance.
         """
-        x, y = pos
-        self.grid[x][y].remove(agent.unique_id)
+        agent_type = type(agent)
+
+        if agent_type == Food:
+            x, y = pos
+            self.grids[agent_type][x][y] = None
+        elif self.VIZUALISATION:
+            x, y = pos
+            self.grids[agent_type][x][y].remove(agent.unique_id)
 
     def get_contents_with_obstacles_helper(self, x, y):
         """
@@ -95,7 +142,10 @@ class MultiGridWithObstacles(MultiGrid):
         if (x, y) in self.obstacle_positions:
             return [OBSTACLE]
         else:
-            return [self.agents[z] for z in self[x][y]]
+            assert self.VIZUALISATION
+            hive_bee_ids = itertools.chain.from_iterable([self.grids[breed][x][y] for breed in [Bee, Hive]])
+            foods = [self.agents[self.grids[Food][x][y]]] if self.grids[Food][x][y] else []
+            return [self.agents[z] for z in hive_bee_ids] + foods
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
@@ -109,7 +159,7 @@ class MultiGridWithObstacles(MultiGrid):
         """
         return itertools.chain.from_iterable(
             self.get_contents_with_obstacles_helper(x, y) 
-            for x, y in cell_list if not self.is_cell_empty((x, y))
+            for x, y in cell_list
         )
 
     def is_cell_empty(self, pos):
@@ -123,24 +173,85 @@ class MultiGridWithObstacles(MultiGrid):
         """
         Returns only the accessible spots in the neighbourhood.
         """
+        if pos in self.accessible_cache:
+            return self.accessible_cache[pos]
+
         x, y = pos
 
         accessible = []
         obstacles = []
 
         # Moore's neighbourhood
-        for a in [1, 0, -1]:
-            for b in [1, 0, -1]:
+        for a, b in self.moore_neighbors:
+            cand = (x+a, y+b)
 
-                # Don't check you own position
-                if a != 0 or b != 0:
-                    cand = (x+a, y+b)
+            # Don't go out of bounds here.
+            if 0 <= cand[0] < self.width and 0 <= cand[1] < self.height:
+                if cand not in self.obstacle_positions:
+                    accessible.append(cand)
+                else:
+                    obstacles.append(cand)
 
-                    # Don't go out of bounds here.
-                    if 0 <= cand[0] < self.width and 0 <= cand[1] < self.height:
-                        if cand not in self.obstacle_positions:
-                            accessible.append(cand)
-                        else:
-                            obstacles.append(cand)
+        self.accessible_cache[pos] = accessible, obstacles
 
         return accessible, obstacles
+
+    def get_neighbors_by_breed(self, breed, pos, moore, include_center=False, radius=1):
+        """ Return a list of neighbors to a certain point.
+
+        Args:
+            pos: Coordinate tuple for the neighborhood to get.
+            moore: If True, return Moore neighborhood
+                    (including diagonals)
+                   If False, return Von Neumann neighborhood
+                     (exclude diagonals)
+            include_center: If True, return the (x, y) cell as well.
+                            Otherwise,
+                            return surrounding cells only.
+            radius: radius, in cells, of neighborhood to get.
+
+        Returns:
+            A list of non-None objects in the given neighborhood;
+            at most 9 if Moore, 5 if Von-Neumann
+            (8 and 4 if not including the center).
+
+        """
+        if radius == 1:
+
+            # Food never changes, so we cache it.
+            if breed == Food and pos in self.radius_1_food_cache:
+                return self.radius_1_food_cache[pos]
+
+            x, y = pos
+
+            cell_list = [] 
+            for a, b in self.moore_neighbors:
+                cand = (x+a, y+b)
+                if 0 <= cand[0] < self.width and 0 <= cand[1] < self.height and cand not in self.obstacle_positions:
+                    cell_list.append(cand)
+        else:
+            cell_list = [pos]
+
+        if breed == Food:
+            foods = (
+                self.agents[z] 
+                for z in (
+                    self.grids[Food][x][y]
+                    for x, y in cell_list
+                    if self.grids[Food][x][y]
+                )
+            )
+            if radius == 1:
+                self.radius_1_food_cache[pos] = list(foods)
+                return self.radius_1_food_cache[pos]
+
+            return foods
+
+        else:
+            return (
+                self.agents[z] 
+                for z in itertools.chain.from_iterable(
+                    self.grids[breed][x][y]
+                    for x, y in cell_list
+                )
+            )

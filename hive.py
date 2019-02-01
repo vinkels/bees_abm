@@ -2,10 +2,12 @@ from mesa import Agent
 import random as rd
 from config import BABYTIME
 
+from bee import Bee
+
 class Hive(Agent):
     def __init__(self, model, pos, color,bee_color):
         super().__init__(model.next_id(), model)
-
+        self.load_count = 0
         self.pos = pos
         self.food_locs = []
         self.food = 0
@@ -14,11 +16,11 @@ class Hive(Agent):
         self.energy_level_critical = 10
         self.energy_level_optimal = 0
         self.energy_level_minimum = 25
-        self.bees_hive = []
         self.bite = 1
         self.color = color
         self.bee_color = bee_color
         self.reproduction_rate = 0.1
+        self.bring_back_the_foooddzzz = 0
 
     def receive_info(self, info):
         self.food_locs.append(info)
@@ -26,12 +28,11 @@ class Hive(Agent):
     def step(self):
 
         # determine number of bees in hive
-        self.bees_hive = self.model.grid.get_neighbors(self.pos, moore=True, include_center = True, radius = 0)
-        self.n_bees = len(self.bees_hive)
+        self.n_bees = self.model.schedule.count_hive_bees(self.pos)
 
         # determine optimal and critical amount of food
-        self.energy_level_optimal = self.n_bees * 20
-        self.energy_level_critical = self.n_bees
+        self.energy_level_optimal = self.n_bees *20
+        self.energy_level_critical = self.n_bees * 15
 
         # chance of babies
         if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
@@ -42,7 +43,7 @@ class Hive(Agent):
         # forget randomnly amount of food locations when too many to remember
         to_discard  = rd.randint(1, 10)
         if len(self.food_locs) > 10:
-                self.food_locs = self.food_locs[0:to_discard]
+                self.food_locs = self.food_locs[to_discard:]
 
         # adjust parameters of hive based on food in hive
         self.balance_hive()
@@ -50,6 +51,7 @@ class Hive(Agent):
     def unload_food(self, food=1):
         #TODO depends on bee carrying capacity
         self.food += self.model.car_cap
+        self.model.load_count += 1
 
     def get_food_stat(self):
         return self.food
@@ -71,5 +73,5 @@ class Hive(Agent):
                 self.reproduction_rate += self.reproduction_rate/100
 
             else:
-                self.bite = 0.2
+                self.bite = 1
                 self.reproduction_rate = 0.1
