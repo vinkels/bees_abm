@@ -37,7 +37,7 @@ class Hive(Agent):
         # chance of babies
         # if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
         if rd.random() < self.reproduction_rate:
-            self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id, color = self.bee_color,age=BABYTIME)
+            self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id, color = self.bee_color,age=0)
             self.n_bees += 1
             
 
