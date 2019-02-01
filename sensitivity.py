@@ -33,9 +33,9 @@ var_params = {
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-replicates = 1
-max_steps = 45000
-distinct_samples = 1
+replicates = 10
+max_steps = 2000
+distinct_samples = 3
 
 model_reporters = {
     'step_data': lambda m: m.datacollector.get_model_vars_dataframe(),
@@ -56,6 +56,7 @@ for i, var in enumerate(params['names']):
     # names = names.remove(var)
     
     samples = sorted(var_params[var]*distinct_samples)
+
     batch = BatchRunnerMP(BeeForagingModel,
                         max_steps=max_steps,
                         nr_processes=os.cpu_count(),
