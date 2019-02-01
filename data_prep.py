@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 def data_prep():
     final_dfs = []
     df = pd.read_pickle('pickles/test_nr_hives.p')
+
     cur_samp = 0
     sample = 0
     for i, row in df.iterrows():
@@ -23,12 +24,21 @@ def data_prep():
     df_new['food_bee'] = df_final['hive_food'] / df_final['n_bees']
     df_new['bees_hive'] = df_final['n_bees'] / df_final['n_hives']
     df_new.to_csv('pickles/test_newnew.csv')
-    df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step'])[['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
-    df_step = df_step.reset_index()
-    df_sample = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'sample'])[
-        ['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
-    df_sample = df_sample.reset_index()
-    print(df_sample)
+    df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
+                                                                                    'food_bee': ['mean', 'std'], 
+                                                                                    'scout_forage': ['mean', 'std'], 
+                                                                                    'bees_hive': ['mean', 'std'], 
+                                                                                    'death_age': ['mean', 'std']
+                                                                                    })
+    
+    # [['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean().std()
+    print(df_step)
+    # df_step = df_step.reset_index()
+    # df_sample = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'sample'])[
+    #     ['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
+    # df_sample = df_sample.reset_index()
+    # print(df_sample)
+    
 
 
 
