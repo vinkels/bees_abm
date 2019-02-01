@@ -288,8 +288,8 @@ class Bee(Agent):
         # if hive.food > hive.energy_level_critical:
         if hive.food > hive.bite:
             if self.type_bee == "babee":
-                self.energy += 0.2
-                hive.food -= 0.2
+                self.energy += 0.5
+                hive.food -= 0.5
             else:
                 self.energy += hive.bite
                 hive.food -= hive.bite
