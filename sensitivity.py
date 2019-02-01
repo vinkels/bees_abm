@@ -1,20 +1,5 @@
-from mesa import Model
-from mesa import Agent
-from mesa.datacollection import DataCollector
-from SALib.sample import saltelli
-from food import Food
-from bee import Bee
-from hive import Hive
-from schedule import RandomActivationBeeWorld
 from model import BeeForagingModel
-from mesa.batchrunner import BatchRunner
 from mesa.batchrunner import BatchRunnerMP
-from SALib.analyze import sobol
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from itertools import combinations
-import time as tm
 import os
 from datetime import datetime
 

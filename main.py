@@ -1,7 +1,3 @@
-from mesa import Model
-from mesa import Agent
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
 import model as md
 import time as tm
 

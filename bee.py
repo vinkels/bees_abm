@@ -1,8 +1,5 @@
-from mesa import Model
 from mesa import Agent
-from mesa.space import MultiGrid
 import random as rd
-import math
 
 from config import BABYTIME, LIFESPAN
 
@@ -14,7 +11,6 @@ import time
 
 import numpy as np
 
-from pathfinding.core.grid import Grid
 
 class BeeStrategy:
     """
