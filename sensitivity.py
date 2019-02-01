@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 import time as tm
 import os
-import datetime
+from datetime import datetime
 
 
 # We define our variables and bounds
@@ -34,10 +34,12 @@ var_params = {
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-replicates = 10
-max_steps = 5000
+
+replicates = 1
+max_steps = 2000
 distinct_samples = 3
 
+# Define output parameters
 model_reporters = {
     'step_data': lambda m: m.datacollector.get_model_vars_dataframe(),
     'obstacle_density': lambda m: m.obstacle_density,
@@ -45,34 +47,25 @@ model_reporters = {
     'nr_hives': lambda m: m.nr_hives
 }
 
-# Set the outputs
-# model_reporters = {
-#                    "step_data": lambda m: m.datacollector.get_model_vars_dataframe()
-#                    }
-
 data = {}
-new_path = datetime.datetime.now().strftime('%Y%m%d%H%M')
+
+#Define time format
+
+new_path = datetime.now().strftime('%Y%m%d%H%M')
+
 for i, var in enumerate(params['names']): 
-    # names = list(params)
-    # names = names.remove(var)
-    
-    samples = sorted(var_params[var]*distinct_samples)
 
     batch = BatchRunnerMP(BeeForagingModel,
                         max_steps=max_steps,
                         nr_processes=os.cpu_count(),
                         iterations=replicates,
-                        variable_parameters={var:samples},
+                        variable_parameters=var_params[var],
                         model_reporters=model_reporters,
                         display_progress=True)
 
     batch.run_all()
-    data = batch.get_model_vars_dataframe()
-    from datetime import datetime
-
-# define a timestamp format you like
+    data = batch.get_model_vars_dataframe() 
     
-    open(new_path, 'w').write(data)
     data.to_csv(f'pickles/{var}_{new_path}.csv')
     data.to_pickle(f'pickles/{var}_{new_path}.p')
 
