@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 import time as tm
 import os
-import datetime
+from datetime import datetime
 
 
 # We define our variables and bounds
@@ -34,7 +34,7 @@ var_params = {
 
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-replicates = 10
+replicates = 1
 max_steps = 2000
 distinct_samples = 3
 
@@ -51,7 +51,7 @@ model_reporters = {
 #                    }
 
 data = {}
-new_path = datetime.datetime.now().strftime('%Y%m%d%H%M')
+new_path = datetime.now().strftime('%Y%m%d%H%M')
 for i, var in enumerate(params['names']): 
     # names = list(params)
     # names = names.remove(var)
@@ -67,12 +67,10 @@ for i, var in enumerate(params['names']):
                         display_progress=True)
 
     batch.run_all()
-    data = batch.get_model_vars_dataframe()
-    from datetime import datetime
+    data = batch.get_model_vars_dataframe() 
 
 # define a timestamp format you like
     
-    open(new_path, 'w').write(data)
     data.to_csv(f'pickles/{var}_{new_path}.csv')
     data.to_pickle(f'pickles/{var}_{new_path}.p')
 
