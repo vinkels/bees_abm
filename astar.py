@@ -40,11 +40,6 @@ def astar(maze, start, end):
         current_node = open_list[0]
         current_index = 0
         for index, item in enumerate(open_list):
-
-            # Found the goal
-            if item.position == end:
-                return item.route
-
             if item.f < current_node.f:
                 current_node = item
                 current_index = index
@@ -59,6 +54,9 @@ def astar(maze, start, end):
 
             # Get node position
             node_position = (curr_x + new_position[0], curr_y + new_position[1])
+
+            if node_position == end:
+                return current_node.route + [end]
 
             # Child position is on the closed list
             if node_position in closed_set:
