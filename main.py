@@ -10,6 +10,7 @@ def main():
 #     bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
 
     # Start at 16.0721 for 100000 iterations
+    # After immediate children eval 15.8216 for 100000 iterations
 
     import numpy as np
     grid = np.zeros((50, 50))

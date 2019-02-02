@@ -18,15 +18,15 @@ class Node():
         return self.position == other.position
 
 
+WIDTH = 50
+HEIGHT = 50
+
+
 def astar(maze, start, end):
     """Returns a list of tuples as a path from the given start to the given end in the given maze"""
 
     # Create start and end node
     start_node = Node([], start)
-
-    # Init height and width
-    width = len(maze)
-    height = len(maze[0])
 
     # Initialize both open and closed list
     open_list = [start_node]
@@ -54,8 +54,6 @@ def astar(maze, start, end):
 
         curr_x, curr_y = current_node.position
 
-        # Generate children
-        children = []
         for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]: # Adjacent squares
 
             # Get node position
@@ -66,24 +64,22 @@ def astar(maze, start, end):
                 continue
 
             # Make sure within range and walkable
-            if 0 <= node_position[0] < width and 0 <= node_position[1] < height and maze[node_position[0]][node_position[1]] == 0:
+            if 0 <= node_position[0] < 50 and 0 <= node_position[1] < 50 and maze[node_position[0]][node_position[1]] == 0:
                 # Create new node
-                children.append(Node(current_node.route, node_position))
+                child = Node(current_node.route, node_position)
 
-        # Loop through children
-        for child in children:
-            # Create the f, g, and h values
-            child.g = current_node.g + 1
-            child_h = ((child.position[0] - end[0]) ** 2) + ((child.position[1] - end[1]) ** 2)
-            child.f = child.g + child_h
+                # Create the f, g, and h values
+                child.g = current_node.g + 1
+                child_h = ((child.position[0] - end[0]) ** 2) + ((child.position[1] - end[1]) ** 2)
+                child.f = child.g + child_h
 
-            # Child is already in the open list
-            for open_node in open_list:
-                if child == open_node and child.g > open_node.g:
-                    continue
+                # Child is already in the open list
+                for open_node in open_list:
+                    if child == open_node and child.g > open_node.g:
+                        continue
 
-            # Add the child to the open list
-            open_list.append(child)
+                # Add the child to the open list
+                open_list.append(child)
 
 # def main():
 
