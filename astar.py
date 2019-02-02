@@ -28,6 +28,7 @@ def astar(maze, start, end):
 
     # Create start and end node
     start_node = Node([], start)
+    end_0, end_1 = end
 
     # Initialize both open and closed list
     open_list = [start_node]
@@ -40,18 +41,21 @@ def astar(maze, start, end):
         i += 1
 
         # Get the current node
-        current_node = open_list[0]
+        current_f = open_list[0].f
         current_index = 0
         for index, item in enumerate(open_list):
-            if item.f < current_node.f:
-                current_node = item
+            if item.f < current_f:
+                current_f = item.f
                 current_index = index
 
         # Pop current off open list, add to closed list
-        open_list.pop(current_index)
+        current_node = open_list.pop(current_index)
         closed_set.add(current_node.position)
 
         curr_x, curr_y = current_node.position
+
+        # g value is used for prioritization
+        g = current_node.g + 1
 
         for new_position in MOORE_NEIGHBOURS: # Adjacent squares
 
@@ -65,12 +69,13 @@ def astar(maze, start, end):
             if node_position in closed_set:
                 continue
 
+            n0, n1 = node_position
+
             # Make sure within range and walkable
-            if 0 <= node_position[0] < 50 and 0 <= node_position[1] < 50 and maze[node_position[0]][node_position[1]] == 0:
+            if 0 <= n0 < 50 and 0 <= n1 < 50 and maze[n0][n1] == 0:
 
                 # Create the f, g, and h values
-                g = current_node.g + 1
-                h = ((node_position[0] - end[0]) ** 2) + ((node_position[1] - end[1]) ** 2)
+                h = ((n0 - end_0) ** 2) + ((n1 - end_1) ** 2)
                 f = g + h
 
                 flag = False
