@@ -33,8 +33,11 @@ def astar(maze, start, end):
     open_list = [start_node]
     closed_set = set()
 
+    i = 0
+
     # Loop until you find the end
     while len(open_list) > 0:
+        i += 1
 
         # Get the current node
         current_node = open_list[0]
@@ -70,13 +73,16 @@ def astar(maze, start, end):
                 h = ((node_position[0] - end[0]) ** 2) + ((node_position[1] - end[1]) ** 2)
                 f = g + h
 
+                flag = False
                 # Child is already in the open list
                 for open_node in open_list:
                     if node_position == open_node.position and g > open_node.g:
+                        flag = True
                         continue
 
-                # Add the child to the open list
-                open_list.append(Node(current_node.route, node_position, f, g))
+                if not flag:
+                    # Add the child to the open list
+                    open_list.append(Node(current_node.route, node_position, f, g))
 
 # def main():
 

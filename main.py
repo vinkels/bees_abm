@@ -15,6 +15,7 @@ def main():
     # With earlier astar exit 15.1243 for 100000 iterations 5,5
     # Cython compiled 10.8601 for 100000 iterations 5,5
     # Cython compiled 3.2140 for 1000 iterations 50,50
+    # Cython compiled 27.7039 for 100 iterations 50,50 with proper wall 
 
     import numpy as np
     grid = np.zeros((50, 50))
@@ -22,13 +23,13 @@ def main():
     end = (50, 50)
 
     grid[48][48] = 1
-    for i in range(1, 47):
+    for i in range(1, 48):
         grid[48][i] = 1
         grid[i][48] = 1
 
     tt = 0
 
-    for _ in range(1000):
+    for _ in range(100):
         s = time.time()
         path_finder(start, end, grid, 50, 50)
         e = time.time()
