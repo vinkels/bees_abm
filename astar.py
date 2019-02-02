@@ -20,6 +20,7 @@ class Node():
 
 WIDTH = 50
 HEIGHT = 50
+MOORE_NEIGHBOURS = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
 
 def astar(maze, start, end):
@@ -54,7 +55,7 @@ def astar(maze, start, end):
 
         curr_x, curr_y = current_node.position
 
-        for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]: # Adjacent squares
+        for new_position in MOORE_NEIGHBOURS: # Adjacent squares
 
             # Get node position
             node_position = (curr_x + new_position[0], curr_y + new_position[1])

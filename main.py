@@ -11,6 +11,7 @@ def main():
 
     # Start at 16.0721 for 100000 iterations
     # After immediate children eval 15.8216 for 100000 iterations
+    # After Moore static 15.7563 
 
     import numpy as np
     grid = np.zeros((50, 50))
