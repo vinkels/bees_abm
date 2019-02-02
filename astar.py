@@ -7,12 +7,12 @@ Code from https://gist.githubusercontent.com/Nicholas-Swift/003e1932ef2804bebef2
 class Node():
     """A node class for A* Pathfinding"""
 
-    def __init__(self, route, position=None):
+    def __init__(self, route, position=None, f=0, g=0):
         self.route = route + [position]
         self.position = position
 
-        self.g = 0
-        self.f = 0
+        self.f = f
+        self.g = g
 
     def __eq__(self, other):
         return self.position == other.position
@@ -64,21 +64,19 @@ def astar(maze, start, end):
 
             # Make sure within range and walkable
             if 0 <= node_position[0] < 50 and 0 <= node_position[1] < 50 and maze[node_position[0]][node_position[1]] == 0:
-                # Create new node
-                child = Node(current_node.route, node_position)
 
                 # Create the f, g, and h values
-                child.g = current_node.g + 1
-                child_h = ((child.position[0] - end[0]) ** 2) + ((child.position[1] - end[1]) ** 2)
-                child.f = child.g + child_h
+                g = current_node.g + 1
+                h = ((node_position[0] - end[0]) ** 2) + ((node_position[1] - end[1]) ** 2)
+                f = g + h
 
                 # Child is already in the open list
                 for open_node in open_list:
-                    if child == open_node and child.g > open_node.g:
+                    if node_position == open_node.position and g > open_node.g:
                         continue
 
                 # Add the child to the open list
-                open_list.append(child)
+                open_list.append(Node(current_node.route, node_position, f, g))
 
 # def main():
 

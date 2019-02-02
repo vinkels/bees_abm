@@ -7,18 +7,19 @@ from util import path_finder
 
 
 def main():
-#     bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
+    # bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
 
-    # Start at 16.0721 for 100000 iterations
-    # After immediate children eval 15.8216 for 100000 iterations
-    # After Moore static 15.7563 for 100000 iterations
-    # With earlier astar exit 15.1243 for 100000 iterations
-    # Cython compiled 10.8601 for 100000 iterations
+    # Start at 16.0721 for 100000 iterations 5,5
+    # After immediate children eval 15.8216 for 100000 iterations 5,5
+    # After Moore static 15.7563 for 100000 iterations 5,5
+    # With earlier astar exit 15.1243 for 100000 iterations 5,5
+    # Cython compiled 10.8601 for 100000 iterations 5,5
+    # Cython compiled 3.2140 for 1000 iterations 50,50
 
     import numpy as np
     grid = np.zeros((50, 50))
     start = (0, 0)
-    end = (5, 5)
+    end = (50, 50)
 
     grid[48][48] = 1
     for i in range(1, 47):
@@ -27,7 +28,7 @@ def main():
 
     tt = 0
 
-    for _ in range(100000):
+    for _ in range(1000):
         s = time.time()
         path_finder(start, end, grid, 50, 50)
         e = time.time()
