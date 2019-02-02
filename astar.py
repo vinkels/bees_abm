@@ -33,6 +33,7 @@ def astar(maze, start, end):
     # Initialize both open and closed list
     open_list = [start_node]
     closed_set = set()
+    seen = set()
 
     i = 0
 
@@ -78,14 +79,8 @@ def astar(maze, start, end):
                 h = ((n0 - end_0) ** 2) + ((n1 - end_1) ** 2)
                 f = g + h
 
-                flag = False
-                # Child is already in the open list
-                for open_node in open_list:
-                    if node_position == open_node.position and g > open_node.g:
-                        flag = True
-                        continue
-
-                if not flag:
+                if node_position not in seen:
+                    seen.add(node_position)
                     # Add the child to the open list
                     open_list.append(Node(current_node.route, node_position, f, g))
 

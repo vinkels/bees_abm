@@ -14,11 +14,12 @@ def main():
     # After Moore static 15.7563 for 100000 iterations 5,5
     # With earlier astar exit 15.1243 for 100000 iterations 5,5
     # Cython compiled 10.8601 for 100000 iterations 5,5
-    
+
     # Cython compiled 3.2140 for 1000 iterations 50,50
 
     # Cython compiled 27.7039 for 100 iterations 50,50 with proper wall 
     # Cython compiled 25.8546 for 100 iterations 50,50 with proper wall 
+    # Cython compiled 2.3216 for 100 iterations 50,50 with proper wall with better memory
 
     import numpy as np
     grid = np.zeros((50, 50))
