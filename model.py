@@ -15,7 +15,7 @@ from schedule import RandomActivationBeeWorld
 import time
 
 class BeeForagingModel(Model):
-    #TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
+    # TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
     def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, car_cap=5, VIZUALISATION=False):
         super().__init__()
         self.height = height
@@ -52,22 +52,16 @@ class BeeForagingModel(Model):
             self.add_agent(hive, hive_location)
             
             # Init Bees
-            #TODO TAG BEES FOR WARM-UP PERIOD
-            #TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
+            # TODO TAG BEES FOR WARM-UP PERIOD
+            # TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
             hive_id = hive.unique_id
             for _ in range(0, 20):
                 self.add_bee( pos=hive_location, hive=hive, type_bee="scout", hive_id=hive_id, color=hive.bee_color, age=BABYTIME)
                 
                 self.add_bee(pos=hive_location, hive=hive, type_bee="rester", hive_id=hive_id,color=hive.bee_color,  age=BABYTIME)
-            
-            # # init babies
-            # for i in range(0, 3):
-            #     self.add_bee(pos=hive_location, hive=hive, type_bee="babee", hive_id=hive_id,color=hive.bee_color,  age=0)
-            #     bee_baby = Bee(self, hive_location, self.hive, "babee", hive_id=hive_id)
-            #     self.add_agent(bee_baby, hive_location)
 
-        #TODO ADD MORE ROBUST RANDOMNESS TO FOOD UTILITY
-        #DONE?
+        # TODO ADD MORE ROBUST RANDOMNESS TO FOOD UTILITY
+        # DONE?
         for f_loc in food_locations:
             food = Food(self, f_loc)
             self.add_agent(food, f_loc)
@@ -85,30 +79,8 @@ class BeeForagingModel(Model):
             "load_count": lambda m: m.load_count
         })
         
-        
-
-        self.total_schedule_time = 0
-
-        self.time_by_strategy = {
-            "scout": 0,
-            "foraging": 0,
-            "rester": 0,
-            "babee": 0
-        }
-
-        self.planning_time = 0
-        
         self.running = True
         
-        self.timings_scout = {
-            'move home': 0,
-            'look for food': 0,
-            'move to food neighbour': 0,
-            'random_move': 0,
-            'random_neighbourhood': 0,
-            'random_index': 0,
-            'random_target': 0
-        }
         self.datacollector.collect(self)
         self.grid.warmup()
 
@@ -116,14 +88,7 @@ class BeeForagingModel(Model):
         return self.hives[hive_id]
 
     def step(self):
-
-        schedule_start = time.time()
-        
         self.schedule.step()
-
-        schedule_end = time.time()
-        self.total_schedule_time += schedule_end - schedule_start
-
         self.datacollector.collect(self)
         
 
