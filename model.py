@@ -12,7 +12,6 @@ from obstacle_grid import MultiGridWithObstacles
 from schedule import RandomActivationBeeWorld
 
 
-
 class BeeForagingModel(Model):
     # TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
     def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, VIZUALISATION=False):
@@ -20,7 +19,7 @@ class BeeForagingModel(Model):
         self.height = height
         self.width = width
         self.nr_hives = nr_hives
-        self.death_count  = 0
+        self.death_count = 0
         self.birth_count = 0
         self.death_age = []
         self.obstacle_density = obstacle_density
@@ -28,13 +27,22 @@ class BeeForagingModel(Model):
         self.nr_hives = nr_hives
         self.load_count = 0
 
-
         self.user_error = None
         if self.obstacle_density + self.food_density > FOOD_OBSTACLE_RATIO:
             raise Exception("Food and obstacles do not fit in the grid.")
 
-        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height, width, self.obstacle_density, self.food_density, self.nr_hives)
-        self.grid = MultiGridWithObstacles(self.width, self.height, torus=False, obstacle_positions=set(self.obstacle_locations), VIZUALISATION=VIZUALISATION)
+        hive_locations, food_locations, self.obstacle_locations = self.init_grid(height,
+                                                                                 width,
+                                                                                 self.obstacle_density,
+                                                                                 self.food_density,
+                                                                                 self.nr_hives)
+
+        self.grid = MultiGridWithObstacles(self.width,
+                                           self.height,
+                                           torus=False,
+                                           obstacle_positions=set(self.obstacle_locations),
+                                           VIZUALISATION=VIZUALISATION)
+
         self.schedule = RandomActivationBeeWorld(self)
 
         self.hives = {}
@@ -42,7 +50,7 @@ class BeeForagingModel(Model):
         for hive_location in hive_locations:
 
             # Init Hives
-            r = lambda: rd.randint(0,255)
+            r = lambda: rd.randint(0, 255)
             color = '#{:02x}{:02x}{:02x}'.format(r(), r(), r())
             hive = Hive(self, hive_location, color=color, bee_color=color)
             self.hive = hive
@@ -54,9 +62,19 @@ class BeeForagingModel(Model):
             # TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
             hive_id = hive.unique_id
             for _ in range(0, 20):
-                self.add_bee( pos=hive_location, hive=hive, type_bee="scout", hive_id=hive_id, color=hive.bee_color, age=BABYTIME)
+                self.add_bee(pos=hive_location,
+                             hive=hive,
+                             type_bee="scout",
+                             hive_id=hive_id,
+                             color=hive.bee_color,
+                             age=BABYTIME)
                 
-                self.add_bee(pos=hive_location, hive=hive, type_bee="rester", hive_id=hive_id,color=hive.bee_color,  age=BABYTIME)
+                self.add_bee(pos=hive_location,
+                             hive=hive,
+                             type_bee="rester",
+                             hive_id=hive_id,
+                             color=hive.bee_color,
+                             age=BABYTIME)
 
         # TODO ADD MORE ROBUST RANDOMNESS TO FOOD UTILITY
         # DONE?
@@ -66,7 +84,7 @@ class BeeForagingModel(Model):
 
         self.datacollector = DataCollector({
             "n_bees": lambda m: m.schedule.get_breed_count(Bee),
-            "hive_food": lambda m: sum([hive.get_food_stat() for hive in m.hives.values()]),
+            "hive_food": lambda m: sum([h.get_food_stat() for h in m.hives.values()]),
             "scout_bees": lambda m: m.schedule.get_bee_count("scout"),
             "forage_bees": lambda m: m.schedule.get_bee_count("foraging"),
             "rest_bees": lambda m: m.schedule.get_bee_count("rester"),
@@ -88,7 +106,6 @@ class BeeForagingModel(Model):
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
-        
 
     def get_birth_count(self):
         count = self.birth_count
@@ -125,14 +142,15 @@ class BeeForagingModel(Model):
         self.schedule.remove(agent)
 
     def add_bee(self, pos, hive, type_bee, hive_id, color, age=0):
-            bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color,age=age)
+            bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color, age=age)
 
             if type_bee == 'babee':
                 self.birth_count += 1
             
             self.add_agent(bee, pos)
 
-    def init_grid(self, height, width, obstacle_density, food_density,nr_hives):
+    @staticmethod
+    def init_grid(height, width, obstacle_density, food_density, nr_hives):
         possible_locations = [
             (x, y)
             for y in range(height)
@@ -147,7 +165,6 @@ class BeeForagingModel(Model):
 
         food_end_index = amount_food + 1
         obstacle_end_index = food_end_index + amount_obstacle
-        
 
         hive_locations = possible_locations[0:nr_hives]
         

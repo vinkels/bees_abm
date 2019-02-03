@@ -18,7 +18,7 @@ def scout_step(bee):
         else:
             food_neighbours = [
                 nb
-                for nb in bee.model.grid.get_neighbors_by_breed(Food, bee.pos, moore=True, include_center=False, radius=1)
+                for nb in bee.model.grid.get_food_neighbors(bee.pos, 1)
                 if nb.can_be_eaten()
             ]
 

@@ -6,7 +6,7 @@ from config import CARRYING_CAPACITY
 
 
 class Hive(Agent):
-    def __init__(self, model, pos, color,bee_color):
+    def __init__(self, model, pos, color, bee_color):
         super().__init__(model.next_id(), model)
         self.pos = pos
         self.food_locs = []
@@ -36,19 +36,18 @@ class Hive(Agent):
         # chance of babies
         # if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
         if rd.random() < self.reproduction_rate:
-            self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id, color = self.bee_color,age=0)
+            self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id, color=self.bee_color, age=0)
             self.n_bees += 1
-            
 
-        # forget randomnly amount of food locations when too many to remember
-        to_discard  = rd.randint(1, 10)
+        # forget a random amount of food locations when too many to remember
+        to_discard = rd.randint(1, 10)
         if len(self.food_locs) > 10:
                 self.food_locs = self.food_locs[to_discard:]
 
         # adjust parameters of hive based on food in hive
         self.balance_hive()
 
-    def unload_food(self, food=1):
+    def unload_food(self):
         self.food += CARRYING_CAPACITY
         self.model.load_count += 1
 
@@ -60,7 +59,7 @@ class Hive(Agent):
         if self.food > 0:
 
             # if more than necessary amount of food, increase consumption and reproduction
-            #TODO dependency energy in hive
+            # TODO dependency energy in hive
             if self.food >= self.energy_level_optimal:
                 self.bite += self.bite/10
                 # self.bite =  min(1, self.bite + self.bite/100)

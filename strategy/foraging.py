@@ -13,7 +13,7 @@ def foraging_step(bee):
         if bee.food_loc == bee.pos:
             food_neighbors = [
                 nb
-                for nb in bee.model.grid.get_neighbors_by_breed(Food, bee.pos, moore=True, include_center=True, radius=0)
+                for nb in bee.model.grid.get_food_neighbors(bee.pos, 0)
                 if nb.can_be_eaten()
             ]
 

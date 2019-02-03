@@ -3,8 +3,6 @@ import time
 
 from config import GRID_WIDTH, GRID_HEIGHT
 
-from util import path_finder
-
 
 def main():
     bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
@@ -48,5 +46,6 @@ def main():
         start_time = time.time()
         bee_model.run_model(1000)
         print(time.time() - start_time)
+
 
 main()

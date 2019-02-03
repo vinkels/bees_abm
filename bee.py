@@ -1,8 +1,7 @@
 from mesa import Agent
 
-from config import BABYTIME, LIFESPAN
+from config import LIFESPAN
 
-from food import Food
 import util
 
 # TODO remove
@@ -13,7 +12,7 @@ from strategy import BEE_STRATEGIES
 
 
 class Bee(Agent):
-    def __init__(self, model, pos, hive, type_bee, hive_id,color,age=0, energy_pars=(20, 5)):
+    def __init__(self, model, pos, hive, type_bee, hive_id, color, age=0, energy_pars=(20, 5)):
         super().__init__(model.next_id(), model)
 
         self.loaded = False
@@ -38,10 +37,10 @@ class Bee(Agent):
         self.neighbourhood_memory = set()
 
     def get_accessible_neighbourhood(self):
-        '''
+        """
         Determine with cells in neighbourhood are not with obstacles
-        '''
-        neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
+        """
+        neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos)
 
         # If a bee enters a space for the first time, it needs to save obstacles on that position.
         if self.pos not in self.neighbourhood_memory:
@@ -53,25 +52,23 @@ class Bee(Agent):
         return neighbourhood
 
     def move(self, loc):
-        '''
+        """
         Move to specified location.
-        '''
+        """
         neighborhood = self.get_accessible_neighbourhood()
 
         if not self.plan_course or not self.plan_course[0] in neighborhood:
             self.plan_course = util.path_finder(cur_loc=self.pos,
-                                            target_loc=loc,
-                                            grid=self.mental_map,
-                                            grid_width=self.model.width,
-                                            grid_height=self.model.height)
+                                                target_loc=loc,
+                                                grid=self.mental_map)
 
         nxt_loc = self.plan_course.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
 
     def arrive_at_hive(self, hive):
-        '''
+        """
         A scouting bee arrives back at the hive
-        '''
+        """
 
         # unload food
         if self.loaded:
@@ -83,23 +80,23 @@ class Bee(Agent):
         self.type_bee = "rester"
 
     def relax_at_hive(self, hive):
-        '''
+        """
         Eat while at hive and gain energy
-        '''
-        if self.type_bee == "babee":
+        """
+        if hive.food < hive.bite:
+            if self.type_bee != "babee":
+                self.type_bee = "scout"
+        elif self.type_bee == "babee":
             self.energy += 0.5
             hive.food -= 0.5   
-        elif hive.food > hive.bite:
+        else:
             self.energy += hive.bite
             hive.food -= hive.bite
-        else:
-            self.type_bee = "scout"
-
 
     def step(self):
-        '''
+        """
         Move the bee, look around for a food source and take food source
-        '''
+        """
         # TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
         self.age += 1
 

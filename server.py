@@ -32,7 +32,6 @@ def hive_portrayal(agent):
         portrayal["Filled"] = "true"
 
         portrayal["Color"] = agent.color
-    
 
     elif type(agent) is Food:
         col_intensity = agent.util
@@ -70,13 +69,19 @@ def hive_portrayal(agent):
 
     return portrayal
 
+
 width = GRID_WIDTH
 height = GRID_HEIGHT
 
 
 canvas_element = CanvasGrid(hive_portrayal, width, height, 500, 500)
-chart_element = ChartModule([{"Label": "n_bees", "Color": "#AA0000"}, {"Label": "hive_food", "Color": "#000000"}, {"Label": "scout_bees", "Color": "#70a5f9"},
-    {"Label": "forage_bees", "Color": "#f4b042"}, {"Label": "rest_bees", "Color": "#17ef71"}, {"Label": "baby_bees", "Color": "#ff93d0"}], 500, 500)
+chart_element = ChartModule([{"Label": "n_bees", "Color": "#AA0000"},
+                             {"Label": "hive_food", "Color": "#000000"},
+                             {"Label": "scout_bees", "Color": "#70a5f9"},
+                             {"Label": "forage_bees", "Color": "#f4b042"},
+                             {"Label": "rest_bees", "Color": "#17ef71"},
+                             {"Label": "baby_bees", "Color": "#ff93d0"}],
+                            500, 500)
 
 server = ModularServer(
     BeeForagingModel,
