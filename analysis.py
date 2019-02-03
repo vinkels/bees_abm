@@ -1,7 +1,3 @@
-from SALib.analyze import sobol
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def plot_param_var_conf(ax, df, var, param, i):
@@ -15,7 +11,6 @@ def plot_param_var_conf(ax, df, var, param, i):
         var: variables to be taken from the dataframe
         param: which output variable to plot
     """
-    pass
     # x = df.groupby(var).mean().reset_index()[var]
     # y = df.groupby(var).mean()[param]
 
@@ -36,7 +31,6 @@ def plot_all_vars(df, param):
         df: dataframe that holds all data
         param: the parameter to be plotted
     """
-    pass
 
     # f, axs = plt.subplots(3, figsize=(7, 10))
     
@@ -79,7 +73,6 @@ def plot_index(s, params, i, title=''):
     # plt.yticks(range(l), params)
     # plt.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o')
     # plt.axvline(0, c='k')
-    pass
 
 def plot_sensitivity_order():
     pass

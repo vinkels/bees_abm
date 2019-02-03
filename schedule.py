@@ -1,4 +1,3 @@
-from collections import defaultdict
 
 from mesa.time import RandomActivation
 

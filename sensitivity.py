@@ -17,6 +17,7 @@ params = {
 replicates = 10
 max_steps = 2000
 
+# Define output parameters
 model_reporters = {
     'step_data': lambda m: m.datacollector.get_model_vars_dataframe(),
     'obstacle_density': lambda m: m.obstacle_density,
@@ -24,6 +25,10 @@ model_reporters = {
     'nr_hives': lambda m: m.nr_hives
 }
 
+
+data = {}
+
+#Define time format
 new_path = datetime.now().strftime('%Y%m%d%H%M')
 for var in params: 
 
@@ -39,4 +44,3 @@ for var in params:
     data = batch.get_model_vars_dataframe() 
     data.to_csv(f'pickles/{var}_{new_path}.csv')
     data.to_pickle(f'pickles/{var}_{new_path}.p')
-    

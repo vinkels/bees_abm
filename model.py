@@ -1,5 +1,4 @@
 from mesa import Model
-from mesa import Agent
 from mesa.datacollection import DataCollector
 
 import random as rd
@@ -12,7 +11,6 @@ from obstacle_grid import MultiGridWithObstacles
 
 from schedule import RandomActivationBeeWorld
 
-from util import path_finder
 
 import time
 
