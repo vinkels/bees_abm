@@ -130,13 +130,29 @@ class Scout(BeeStrategy):
                 else:
                     s = time.time()
 
-                    bee.random_move()
+                    self.random_move()
 
                     e = time.time()
                     bee.model.timings_scout['random move'] += e - s
 
         else:
             raise Exception("Scouts should be unloaded.")
+
+    def random_move(self):
+        '''
+        This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
+        '''
+        bee = self.bee
+
+        # get neighboorhood
+        neighbourhood = bee.get_accessible_neighbourhood()
+
+        # select random cell in neighbourhood
+        select_coords = rd.randint(0, len(neighbourhood) - 1)
+        target = neighbourhood[select_coords]
+
+        # move to cell
+        bee.model.grid.move_agent(bee, target)
 
 
 class Foraging(BeeStrategy):
@@ -212,21 +228,6 @@ class Bee(Agent):
 
         # self.mental_map = Grid(height=self.model.height, width=self.model.width)
         self.mental_map = np.zeros((self.model.height, self.model.width))
-
-    def random_move(self):
-        '''
-        This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
-        '''
-
-        # get neighboorhood
-        neighbourhood = self.get_accessible_neighbourhood()
-
-        # select random cell in neighbourhood
-        select_coords = rd.randint(0, len(neighbourhood) - 1)
-        target = neighbourhood[select_coords]
-
-        # move to cell
-        self.model.grid.move_agent(self, target)
 
     def get_accessible_neighbourhood(self):
         '''
