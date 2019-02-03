@@ -36,7 +36,6 @@ class Bee(Agent):
         self.pos = pos
         self.type_bee = type_bee
         self.age = age
-        self.car_cap = self.model.car_cap
         self.color = color
 
         # random threshold of energy required per bee to go foraging

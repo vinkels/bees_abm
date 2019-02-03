@@ -16,11 +16,10 @@ import time
 
 class BeeForagingModel(Model):
     # TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, car_cap=5, VIZUALISATION=False):
+    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, VIZUALISATION=False):
         super().__init__()
         self.height = height
         self.width = width
-        self.car_cap = car_cap
         self.nr_hives = nr_hives
         self.death_count  = 0
         self.birth_count = 0

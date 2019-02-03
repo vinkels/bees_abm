@@ -1,8 +1,10 @@
 from mesa import Agent
 import random as rd
 
-
 import numpy as np
+
+from config import CARRYING_CAPACITY
+
 
 class Food(Agent):
     def __init__(self, model, pos, util_pars=(5, 2.5), max_step=30):
@@ -17,8 +19,6 @@ class Food(Agent):
         self.util = rd.randint(1, self.max_util)
         self.steps = 0
 
-        self.bite = self.model.car_cap
-
     def step(self):
         #TODO CHANGE STEPCOUNT  AND ADD THIS VARIABLE IN CONFIG
         if self.steps % self.max_step == 0:
@@ -29,7 +29,7 @@ class Food(Agent):
 
 
     def get_eaten(self):
-        self.util -= self.bite
+        self.util -= CARRYING_CAPACITY
 
     def can_be_eaten(self):
-        return self.util >= self.bite
+        return self.util >= CARRYING_CAPACITY
