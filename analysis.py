@@ -1,6 +1,6 @@
 from SALib.sample import saltelli
-# from wolf_sheep.model import WolfSheep
-# from wolf_sheep.agents import Wolf, Sheep
+from ofat import OFAT
+import seaborn as sns
 from model import BeeForagingModel
 from mesa.batchrunner import BatchRunnerMP
 from SALib.analyze import sobol
@@ -12,22 +12,20 @@ import os
 from tqdm import tqdm
 from datetime import datetime
 
-def prepare_data():
+def create_data():
 
     # We define our variables and bounds
-    # params = {
-    #         'obstacle_density': [0, 15, 30],
-    #         'food_density': [5, 15, 25],
-    #         'nr_hives': [1, 3, 5],
-    #         'num_vars': 3,
-    #         'bounds':[[0,15,30],[5,15,25],[1,3,5]]
-    #         }
+    problem = {
+        'num_vars': 3,
+        'names': ['nr_hives','obstacle_density', 'food_density'],
+        'bounds': [[1,6],[0,31],[5,26]]
+    }
 
     new_path = datetime.now().strftime('%Y%m%d%H%M')
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
     replicates = 10
-    max_steps = 1000
+    max_steps = 100
     distinct_samples= 10
 
     # Define output parameters
@@ -40,44 +38,42 @@ def prepare_data():
 
     data = {}
 
-    # Same datastructure but different design to match requirements in retrieving sampling
-    problem = {
-    'num_vars': 3,
-    'names': ['nr_hives','obstacle_density', 'food_density'],
-    'bounds': [[1,6],[0,31],[5,26]]
-    # 'dists': ['unif', 'unif','unif']
-    }
-    params_values = saltelli.sample(problem,N=distinct_samples, calc_second_order=True)
+    # Sample from data with every interactions, computationally expensive but gives all combinations
+    params_values = saltelli.sample(problem,N=distinct_samples)
+
     #transform to int value and overwrite array if copy needed set flag to True
     params_values = params_values.astype(int, copy=False)
-    # print(np.where(params_values == 5))
+    
+    # test range of combinations
     # print(params_values[:][:,0], len(params_values))
     
 
-    # params_values_ = saltelli.sample(params,N=distinct_samples, calc_second_order=False)
-    # test = {val:[] for val in problem['names']}
-    # print(test)
-    # test = np.allclose(params_values, params_values_)
-    # print(test)
     batch = BatchRunnerMP(BeeForagingModel,
                         nr_processes=os.cpu_count(),
                         max_steps=max_steps,
                         variable_parameters={val:[] for val in problem['names']},
                         model_reporters=model_reporters)
     counter = 0
+    
+
+    #TODO need to match these keys with the batch runner iterations otherwise very big data dump
+    # keys = ['nr_hives','obstacle_density', 'food_density']
+
     # progress bar
-    pbar = tqdm(total=replicates)
-    for i in range(replicates):
+    pbar = tqdm(total=len(params_values))
+    for _  in range(replicates):
         for values in params_values:
+
             var_parameters = {}
+
             #collect all data samples from salteli sampling
             for n, v, in zip(problem['names'],values):
                 var_parameters[n] = v
             batch.run_iteration(var_parameters, tuple(values),counter)
+    #         data = batch.get_model_vars_dataframe() 
+    #         data.to_csv(f'pickles/{counter}_{new_path}.csv')
+    #         data.to_pickle(f'pickles/{counter}_{new_path}.p')
             counter +=1
-            # data = batch.get_model_vars_dataframe() 
-            # data.to_csv(f'pickles/{counter}_{new_path}.csv')
-            # data.to_pickle(f'pickles/{counter}_{new_path}.p')
             pbar.update(counter)
     pbar.close()
     data = batch.get_model_vars_dataframe()
@@ -85,53 +81,14 @@ def prepare_data():
     data.to_pickle(f'pickles/analysis_{new_path}.p')
     return data
 
+
+def clean_data(data):
+    pass
 def analyse(data):
     pass
     # Si_sheep = sobol.analyze(problem, data['Sheep'].as_matrix(), print_to_console=True)
     # Si_wolves = sobol.analyze(problem, data['Wolves'].as_matrix(), print_to_console=True)
     
-def plot_param_var_conf(ax, df, var, param, i):
-    """
-    Helper function for plot_all_vars. Plots the individual parameter vs
-    variables passed.
-
-    Args:
-        ax: the axis to plot to
-        df: dataframe that holds the data to be plotted
-        var: variables to be taken from the dataframe
-        param: which output variable to plot
-    """
-    pass
-    # x = df.groupby(var).mean().reset_index()[var]
-    # y = df.groupby(var).mean()[param]
-
-    # replicates = df.groupby(var)[param].count()
-    # err = (1.96 * df.groupby(var)[param].std()) / np.sqrt(replicates)
-
-    # ax.plot(x, y, c='k')
-    # ax.fill_between(x, y - err, y + err)
-
-    # ax.set_xlabel(var)
-    # ax.set_ylabel(param)
-
-def plot_all_vars(df, param):
-    """
-    Plots the parameters passed vs each of the output variables.
-
-    Args:
-        df: dataframe that holds all data
-        param: the parameter to be plotted
-    """
-    pass
-    # f, axs = plt.subplots(3, figsize=(7, 10))
-    
-    # for i, var in enumerate(problem['names']):
-    #     plot_param_var_conf(axs[i], data[var], var, param, i)
-
-# for param in ('Sheep', 'Wolves'):
-#     plot_all_vars(data, param)
-#     plt.show()
-
 def plot_index(s, params, i, title=''):
     """
     Creates a plot for Sobol sensitivity analysis that shows the contributions
@@ -180,6 +137,6 @@ def plot_sensitivity_order():
     #     plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
     #     plt.show()
 if __name__ == "__main__":
-    dt = prepare_data()
+    dt = create_data()
     
-    print(dt.shape)
+    # print(dt.shape)
