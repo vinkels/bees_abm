@@ -9,7 +9,7 @@ import util
 # TODO remove
 import time
 
-import numpy as np
+import numpy
 
 from strategy.babee import Babee
 from strategy.rester import Rester
@@ -40,13 +40,13 @@ class Bee(Agent):
 
         # random threshold of energy required per bee to go foraging
 
-        self.max_energy = np.random.normal(energy_pars[0], energy_pars[1])
+        self.max_energy = numpy.random.normal(energy_pars[0], energy_pars[1])
         self.energy = self.max_energy
 
         self.plan_course = []
 
         # self.mental_map = Grid(height=self.model.height, width=self.model.width)
-        self.mental_map = np.zeros((self.model.height, self.model.width))
+        self.mental_map = numpy.zeros((self.model.height, self.model.width))
 
         self.neighbourhood_memory = set()
 

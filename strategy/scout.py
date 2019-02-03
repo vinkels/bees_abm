@@ -44,22 +44,14 @@ class Scout(BeeStrategy):
 
                 # otherwise, move randomly
                 else:
-                    self.random_move()
+                    # get neighboorhood
+                    neighbourhood = bee.get_accessible_neighbourhood()
+
+                    # select random cell in neighbourhood
+                    target = random.choice(neighbourhood)
+
+                    # move to cell
+                    bee.model.grid.move_agent(bee, target)
 
         else:
             raise Exception("Scouts should be unloaded.")
-
-    def random_move(self):
-        '''
-        This method should get the neighbouring cells (Moore's neighbourhood), select one, and move the agent to this cell.
-        '''
-        bee = self.bee
-
-        # get neighboorhood
-        neighbourhood = bee.get_accessible_neighbourhood()
-
-        # select random cell in neighbourhood
-        target = random.choice(neighbourhood)
-
-        # move to cell
-        bee.model.grid.move_agent(bee, target)
