@@ -5,8 +5,6 @@ import itertools
 
 from config import OBSTACLE
 
-import time
-
 from hive import Hive
 from bee import Bee
 from food import Food
@@ -35,8 +33,6 @@ class MultiGridWithObstacles(MultiGrid):
             }
         else:
             self.grids = {
-                # Bee: [[set() for _ in range(self.height)] for _ in range(self.width)],
-                # Hive: [[set() for _ in range(self.height)] for _ in range(self.width)],
                 Food: [[None for _ in range(self.height)] for _ in range(self.width)]
             }
 
@@ -44,20 +40,18 @@ class MultiGridWithObstacles(MultiGrid):
         # print(self.obstacle_positions)
         self.agents = {}
 
-        self.timings = {
-            'move': 0,
-            'place': 0,
-            'remove': 0
-        }
-
         self.radius_1_food_cache = {}
 
         self.accessible_cache = {}
 
-        self.cache_hits = 0
+        # Set of moore neighbours from (0, 0)
+        self.moore_neighbors = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
 
-        self.moore_neighbors = set([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)])
-        assert len(self.moore_neighbors) == 8
+    def warmup(self):
+        for i in range(self.width):
+            for j in range(self.height):
+                self.get_accessible_neighborhood((i, j))
+                self.get_food_neighbors((i, j), 1)
 
     def move_agent(self, agent, pos):
         """
@@ -70,41 +64,28 @@ class MultiGridWithObstacles(MultiGrid):
 
         Overwritten to be less safe, but faster by not checking torus
         """
-        start = time.time()
-
         if type(agent) == Food or self.VIZUALISATION:
             self._remove_agent(agent.pos, agent)
             self._place_agent(pos, agent)
         
         agent.pos = pos
 
-        end = time.time()
-        self.timings['move'] += end - start
-
     def place_agent(self, agent, pos):
         """ Position an agent on the grid, and set its pos variable. """
-        start = time.time()
         self._place_agent(pos, agent)
 
         self.agents[agent.unique_id] = agent
 
         agent.pos = pos
-        
-        end = time.time()
-        self.timings['place'] += end - start
 
     def remove_agent(self, agent):
         """ Remove the agent from the grid and set its pos variable to None. """
-        start = time.time()
         pos = agent.pos
 
         del self.agents[agent.unique_id]
 
         self._remove_agent(pos, agent)
         agent.pos = None
-
-        end = time.time()
-        self.timings['remove'] += end - start
 
     def _place_agent(self, pos, agent):
         """ 
@@ -169,7 +150,7 @@ class MultiGridWithObstacles(MultiGrid):
         x, y = pos
         return pos not in self.obstacle_positions and self.grid[x][y] == self.default_val()
 
-    def get_accessible_neighborhood(self, pos, moore, include_center=False, radius=1):
+    def get_accessible_neighborhood(self, pos):
         """
         Returns only the accessible spots in the neighbourhood.
         """
@@ -196,7 +177,7 @@ class MultiGridWithObstacles(MultiGrid):
 
         return accessible, obstacles
 
-    def get_neighbors_by_breed(self, breed, pos, moore, include_center=False, radius=1):
+    def get_food_neighbors(self, pos, radius=1):
         """ Return a list of neighbors to a certain point.
 
         Args:
@@ -219,7 +200,7 @@ class MultiGridWithObstacles(MultiGrid):
         if radius == 1:
 
             # Food never changes, so we cache it.
-            if breed == Food and pos in self.radius_1_food_cache:
+            if pos in self.radius_1_food_cache:
                 return self.radius_1_food_cache[pos]
 
             x, y = pos
@@ -232,26 +213,17 @@ class MultiGridWithObstacles(MultiGrid):
         else:
             cell_list = [pos]
 
-        if breed == Food:
-            foods = (
-                self.agents[z] 
-                for z in (
-                    self.grids[Food][x][y]
-                    for x, y in cell_list
-                    if self.grids[Food][x][y]
-                )
+        foods = (
+            self.agents[z] 
+            for z in (
+                self.grids[Food][x][y]
+                for x, y in cell_list
+                if self.grids[Food][x][y]
             )
-            if radius == 1:
-                self.radius_1_food_cache[pos] = list(foods)
-                return self.radius_1_food_cache[pos]
+        )
+        
+        if radius == 1:
+            self.radius_1_food_cache[pos] = list(foods)
+            return self.radius_1_food_cache[pos]
 
-            return foods
-
-        else:
-            return (
-                self.agents[z] 
-                for z in itertools.chain.from_iterable(
-                    self.grids[breed][x][y]
-                    for x, y in cell_list
-                )
-            )
+        return foods
