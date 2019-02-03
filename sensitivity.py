@@ -29,7 +29,7 @@ model_reporters = {
 data = {}
 
 #Define time format
-new_path = datetime.now().strftime('%Y%m%d%H%M')
+time_stamp = datetime.now().strftime('%Y%m%d%H%M')
 for var in params: 
 
     batch = BatchRunnerMP(BeeForagingModel,
@@ -42,5 +42,5 @@ for var in params:
 
     batch.run_all()
     data = batch.get_model_vars_dataframe() 
-    data.to_csv(f'pickles/{var}_{new_path}.csv')
-    data.to_pickle(f'pickles/{var}_{new_path}.p')
+    data.to_csv(f'pickles/{time_stamp}_{var}.csv')
+    data.to_pickle(f'pickles/{time_stamp}_{var}.p')
