@@ -100,14 +100,16 @@ class BeeForagingModel(Model):
         
         self.running = True
         
-
         self.timings_scout = {
             'move home': 0,
             'look for food': 0,
             'move to food neighbour': 0,
-            'random move': 0
+            'random_move': 0,
+            'random_neighbourhood': 0,
+            'random_index': 0
         }
         self.datacollector.collect(self)
+        self.grid.warmup()
 
     def get_hive(self, hive_id):
         return self.hives[hive_id]

@@ -54,10 +54,14 @@ class MultiGridWithObstacles(MultiGrid):
 
         self.accessible_cache = {}
 
-        self.cache_hits = 0
-
         self.moore_neighbors = set([(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)])
         assert len(self.moore_neighbors) == 8
+
+    def warmup(self):
+        for i in range(self.width):
+            for j in range(self.height):
+                self.get_accessible_neighborhood((i, j))
+                self.get_neighbors_by_breed(Food, (i, j))
 
     def move_agent(self, agent, pos):
         """
@@ -169,7 +173,7 @@ class MultiGridWithObstacles(MultiGrid):
         x, y = pos
         return pos not in self.obstacle_positions and self.grid[x][y] == self.default_val()
 
-    def get_accessible_neighborhood(self, pos, moore, include_center=False, radius=1):
+    def get_accessible_neighborhood(self, pos, moore=True, include_center=False, radius=1):
         """
         Returns only the accessible spots in the neighbourhood.
         """
@@ -196,7 +200,7 @@ class MultiGridWithObstacles(MultiGrid):
 
         return accessible, obstacles
 
-    def get_neighbors_by_breed(self, breed, pos, moore, include_center=False, radius=1):
+    def get_neighbors_by_breed(self, breed, pos, moore=True, include_center=False, radius=1):
         """ Return a list of neighbors to a certain point.
 
         Args:

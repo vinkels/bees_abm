@@ -128,12 +128,7 @@ class Scout(BeeStrategy):
 
                 # otherwise, move randomly
                 else:
-                    s = time.time()
-
                     self.random_move()
-
-                    e = time.time()
-                    bee.model.timings_scout['random move'] += e - s
 
         else:
             raise Exception("Scouts should be unloaded.")
@@ -145,14 +140,23 @@ class Scout(BeeStrategy):
         bee = self.bee
 
         # get neighboorhood
+        s = time.time()
         neighbourhood = bee.get_accessible_neighbourhood()
+        e = time.time()
+        bee.model.timings_scout['random_neighbourhood'] += e - s
 
         # select random cell in neighbourhood
+        s = time.time()
         select_coords = rd.randint(0, len(neighbourhood) - 1)
         target = neighbourhood[select_coords]
+        e = time.time()
+        bee.model.timings_scout['random_index'] += e - s
 
         # move to cell
+        s = time.time()
         bee.model.grid.move_agent(bee, target)
+        e = time.time()
+        bee.model.timings_scout['random_move'] += e - s
 
 
 class Foraging(BeeStrategy):
@@ -241,7 +245,7 @@ class Bee(Agent):
             # self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
             self.mental_map[obstacle[0]][obstacle[1]] = 1
 
-        return list(neighbourhood)
+        return neighbourhood
 
     def move(self, loc):
         '''
