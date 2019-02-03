@@ -4,10 +4,11 @@ import seaborn as sns
 
 def data_prep():
     final_dfs = []
-    df = pd.read_pickle('pickles/test_nr_hives.p')
+    df = pd.read_pickle('pickles/nr_hives_201902011148.p')
 
     cur_samp = 0
     sample = 0
+    
     for i, row in df.iterrows():
         df_temp = df.at[i, 'step_data']
         df_temp['obstacle_dens'] = row['obstacle_density']
@@ -23,27 +24,34 @@ def data_prep():
     df_new['food_bee'] = df_final['hive_food'] / df_final['n_bees']
     df_new['bees_hive'] = df_final['n_bees'] / df_final['n_hives']
     df_new.to_csv('pickles/test_newnew.csv')
-    df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
-                                                                                    'food_bee': ['mean', 'std'], 
-                                                                                    'scout_forage': ['mean', 'std'], 
-                                                                                    'bees_hive': ['mean', 'std'], 
-                                                                                    'death_age': ['mean', 'std']
-                                                                                    })
-    
+    # df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
+    #                                                                                 'food_bee': ['mean', 'std'], 
+    #                                                                                 'scout_forage': ['mean', 'std'], 
+    #                                                                                 'bees_hive': ['mean', 'std'], 
+    #                                                                                 'death_age': ['mean', 'std']
+    #                                                                                 })
+    df_step = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).mean().reset_index()
     # [['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean().std()
-    print(df_step)
+    # print(df_step)
     # df_step = df_step.reset_index()
     # df_sample = df_new.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'sample'])[
     #     ['food_bee', 'scout_forage', 'bees_hive', 'death_age']].mean()
     # df_sample = df_sample.reset_index()
     # print(df_sample)
+    print(df_step)
+    return df_step
     
 
-def make_pwetty_plots():
-
+def make_pwetty_plots(df_new):
+    # plt.plot(df_new['scout_forage'], df_new['food_bee'], 'bo')
+    # plt.savefig('jup.png')
+    # df_new['n_hives'] = df_new["n_hives"].astype('category')
+    sns_plot = sns.lineplot(x="step", y="food_bee", hue="n_hives",data=df_new)
+    plt.savefig('plots/plot2.png')
 
 if __name__ == "__main__":
-    data_prep()
+    df_new = data_prep()
+    make_pwetty_plots(df_new)
 
 
         
