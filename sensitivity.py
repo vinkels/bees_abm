@@ -15,7 +15,7 @@ params = {
 # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
 replicates = 10
-max_steps = 2000
+max_steps = 1000
 
 # Define output parameters
 model_reporters = {

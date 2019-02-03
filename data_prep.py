@@ -42,6 +42,7 @@ def data_prep():
             ['food_bee', 'scout_forage', 'bees_hive']].mean()
         df_sample = df_sample.reset_index()
         sample_dct[name] = df_sample
+        
         return step_dct, sample_dct
         
 
