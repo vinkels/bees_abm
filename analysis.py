@@ -1,4 +1,78 @@
+from SALib.sample import saltelli
+# from wolf_sheep.model import WolfSheep
+# from wolf_sheep.agents import Wolf, Sheep
+from model import BeeForagingModel
+from mesa.batchrunner import BatchRunnerMP
+from SALib.analyze import sobol
+import pandas as pd
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+from itertools import combinations
+from tqdm import tqdm
 
+def prepare_data():
+
+    # We define our variables and bounds
+    params = {
+            'obstacle_density': [0, 15, 30],
+            'food_density': [5, 15, 25],
+            'nr_hives': [1, 3, 5],
+            'num_vars': 3,
+            'bounds':[[0,15,30],[5,15,25],[1,3,5]]
+            }
+
+
+    # Set the repetitions, the amount of steps, and the amount of distinct values per variable
+
+    replicates = 10
+    max_steps = 1000
+    distinct_samples= 10
+
+    # Define output parameters
+    model_reporters = {
+        'step_data': lambda m: m.datacollector.get_model_vars_dataframe(),
+        'obstacle_density': lambda m: m.obstacle_density,
+        'food_density': lambda m: m.food_density,
+        'nr_hives': lambda m: m.nr_hives
+    }
+
+    data = {}
+    
+    params_values = saltelli.sample(params,N=distinct_samples, calc_second_order=False)
+    #transform to int value and overwrite array if copy needed set flag to True
+    params_values = params_values.astype(int, copy=False)
+    # Same datastructure but different design to match requirements in retrieving sampling
+    problem = {
+    'num_vars': 3,
+    'names': ['obstacle_density', 'food_density', 'nr_hives'],
+    'bounds': [[0,15,30],[5,15,25],[1,3,5]]
+    }
+    # params_values_ = saltelli.sample(problem,N=distinct_samples, calc_second_order=False)
+    # test = {val:[] for val in problem['names']}
+    # print(test)
+    # test = np.allclose(params_values, params_values_)
+    # print(test)
+    batch = BatchRunnerMP(BeeForagingModel,
+                        nr_processes=os.cpu_count(),
+                        max_steps=max_steps,
+                        variable_parameters={val:[] for val in problem['names']},
+                        model_reporters=model_reporters)
+    counter = 0
+    #progress bar
+    pbar = tqdm(total=replicates)
+    for i in range(replicates):
+        for values in params_values:
+            var_parameters = {}
+            #collect all data samples from salteli sampling
+            for n, v, in zip(problem['names'],values):
+                var_parameters[n] = v
+            batch.run_iteration(var_parameters, tuple(values),counter)
+            counter +=1
+            pbar.update(1)
+    pbar.close()
+    data = batch.get_model_vars_dataframe()
+    return data
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
@@ -11,6 +85,7 @@ def plot_param_var_conf(ax, df, var, param, i):
         var: variables to be taken from the dataframe
         param: which output variable to plot
     """
+    pass
     # x = df.groupby(var).mean().reset_index()[var]
     # y = df.groupby(var).mean()[param]
 
@@ -31,7 +106,7 @@ def plot_all_vars(df, param):
         df: dataframe that holds all data
         param: the parameter to be plotted
     """
-
+    pass
     # f, axs = plt.subplots(3, figsize=(7, 10))
     
     # for i, var in enumerate(problem['names']):
@@ -53,7 +128,7 @@ def plot_index(s, params, i, title=''):
         i (str): string that indicates what order the sensitivity is.
         title (str): title for the plot
     """
-
+    pass
     # if i == '2':
     #     p = len(params)
     #     params = list(combinations(params, 2))
@@ -90,3 +165,6 @@ def plot_sensitivity_order():
     #     # Total order
     #     plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
     #     plt.show()
+if __name__ == "__main__":
+    dt = prepare_data()
+    print(dt)

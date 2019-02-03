@@ -5,3 +5,4 @@ SALib==1.2
 mesa==0.8.5
 pathos==0.2.3
 cython==0.29.3
+tqdm==4.29.0
