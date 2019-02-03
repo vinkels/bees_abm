@@ -55,12 +55,6 @@ class Hive(Agent):
     def get_food_stat(self):
         return self.food
 
-    def get_hive_id(self):
-        return self.unique_id
-
-    def get_food_memory(self):
-        return self.food_locs
-
     def balance_hive(self):
         # if food is available
         if self.food > 0:

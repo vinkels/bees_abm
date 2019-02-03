@@ -1,5 +1,4 @@
 from mesa import Agent
-import random
 
 from config import BABYTIME, LIFESPAN
 
@@ -7,7 +6,6 @@ from food import Food
 import util
 
 # TODO remove
-import time
 
 import numpy
 

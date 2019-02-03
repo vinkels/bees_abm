@@ -12,7 +12,6 @@ from obstacle_grid import MultiGridWithObstacles
 from schedule import RandomActivationBeeWorld
 
 
-import time
 
 class BeeForagingModel(Model):
     # TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
