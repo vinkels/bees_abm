@@ -7,22 +7,23 @@ from SALib.analyze import sobol
 import pandas as pd
 import numpy as np
 import os
-import matplotlib.pyplot as plt
-from itertools import combinations
+# import matplotlib.pyplot as plt
+# from itertools import combinations
 from tqdm import tqdm
+from datetime import datetime
 
 def prepare_data():
 
     # We define our variables and bounds
-    params = {
-            'obstacle_density': [0, 15, 30],
-            'food_density': [5, 15, 25],
-            'nr_hives': [1, 3, 5],
-            'num_vars': 3,
-            'bounds':[[0,15,30],[5,15,25],[1,3,5]]
-            }
+    # params = {
+    #         'obstacle_density': [0, 15, 30],
+    #         'food_density': [5, 15, 25],
+    #         'nr_hives': [1, 3, 5],
+    #         'num_vars': 3,
+    #         'bounds':[[0,15,30],[5,15,25],[1,3,5]]
+    #         }
 
-
+    new_path = datetime.now().strftime('%Y%m%d%H%M')
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
     replicates = 10
@@ -38,17 +39,22 @@ def prepare_data():
     }
 
     data = {}
-    
-    params_values = saltelli.sample(params,N=distinct_samples, calc_second_order=False)
-    #transform to int value and overwrite array if copy needed set flag to True
-    params_values = params_values.astype(int, copy=False)
+
     # Same datastructure but different design to match requirements in retrieving sampling
     problem = {
     'num_vars': 3,
-    'names': ['obstacle_density', 'food_density', 'nr_hives'],
-    'bounds': [[0,15,30],[5,15,25],[1,3,5]]
+    'names': ['nr_hives','obstacle_density', 'food_density'],
+    'bounds': [[1,6],[0,31],[5,26]]
+    # 'dists': ['unif', 'unif','unif']
     }
-    # params_values_ = saltelli.sample(problem,N=distinct_samples, calc_second_order=False)
+    params_values = saltelli.sample(problem,N=distinct_samples, calc_second_order=True)
+    #transform to int value and overwrite array if copy needed set flag to True
+    params_values = params_values.astype(int, copy=False)
+    # print(np.where(params_values == 5))
+    # print(params_values[:][:,0], len(params_values))
+    
+
+    # params_values_ = saltelli.sample(params,N=distinct_samples, calc_second_order=False)
     # test = {val:[] for val in problem['names']}
     # print(test)
     # test = np.allclose(params_values, params_values_)
@@ -59,7 +65,7 @@ def prepare_data():
                         variable_parameters={val:[] for val in problem['names']},
                         model_reporters=model_reporters)
     counter = 0
-    #progress bar
+    # progress bar
     pbar = tqdm(total=replicates)
     for i in range(replicates):
         for values in params_values:
@@ -69,11 +75,21 @@ def prepare_data():
                 var_parameters[n] = v
             batch.run_iteration(var_parameters, tuple(values),counter)
             counter +=1
-            pbar.update(1)
+            # data = batch.get_model_vars_dataframe() 
+            # data.to_csv(f'pickles/{counter}_{new_path}.csv')
+            # data.to_pickle(f'pickles/{counter}_{new_path}.p')
+            pbar.update(counter)
     pbar.close()
     data = batch.get_model_vars_dataframe()
+    data.to_csv(f'pickles/analysis_{new_path}.csv')
+    data.to_pickle(f'pickles/analysis_{new_path}.p')
     return data
 
+def analyse(data):
+    pass
+    # Si_sheep = sobol.analyze(problem, data['Sheep'].as_matrix(), print_to_console=True)
+    # Si_wolves = sobol.analyze(problem, data['Wolves'].as_matrix(), print_to_console=True)
+    
 def plot_param_var_conf(ax, df, var, param, i):
     """
     Helper function for plot_all_vars. Plots the individual parameter vs
@@ -151,8 +167,6 @@ def plot_index(s, params, i, title=''):
 
 def plot_sensitivity_order():
     pass
-    # Si_sheep = sobol.analyze(problem, data['Sheep'].as_matrix(), print_to_console=True)
-    # Si_wolves = sobol.analyze(problem, data['Wolves'].as_matrix(), print_to_console=True)
     # for Si in (Si_sheep, Si_wolves):
     #     # First order
     #     plot_index(Si, problem['names'], '1', 'First order sensitivity')
@@ -167,4 +181,5 @@ def plot_sensitivity_order():
     #     plt.show()
 if __name__ == "__main__":
     dt = prepare_data()
-    print(dt)
+    
+    print(dt.shape)
