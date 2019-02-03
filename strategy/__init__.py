@@ -1,10 +1,11 @@
-class BeeStrategy:
-    """
-    Base Class to create a bee strategy
-    """
+from strategy.babee import babee_step
+from strategy.rester import rester_step
+from strategy.foraging import foraging_step
+from strategy.scout import scout_step
 
-    def __init__(self, bee):
-        self.bee = bee
-
-    def step(self):
-        raise NotImplementedError
+BEE_STRATEGIES = {
+    'babee': babee_step,
+    'rester': rester_step,
+    'foraging': foraging_step,
+    'scout': scout_step
+}

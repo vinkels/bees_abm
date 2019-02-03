@@ -1,33 +1,29 @@
-from strategy import BeeStrategy
 import random
 
-class Rester(BeeStrategy):
+
+def rester_step(bee):
     '''
     This type of bee stays at the hive, until a location for food is known and then he becomes a foraging bee
     '''
+    # Resting bees can only be at the hive.
+    assert bee.pos == bee.hive_loc
 
-    def step(self):
-        bee = self.bee
+    hive = bee.model.get_hive(bee.hive_id)
 
-        # Resting bees can only be at the hive.
-        assert bee.pos == bee.hive_loc
+    # check if bee has enough energy for foraging
+    if bee.energy >= bee.max_energy:
 
-        hive = bee.model.get_hive(bee.hive_id)
+        # check if food locations are known
+        if hive.food_locs:
 
-        # check if bee has enough energy for foraging
-        if bee.energy >= bee.max_energy:
+            # become forager at random food location
+            bee.type_bee = "foraging"
+            bee.food_loc = random.choice(hive.food_locs)
 
-            # check if food locations are known
-            if hive.food_locs:
-
-                # become forager at random food location
-                bee.type_bee = "foraging"
-                bee.food_loc = random.choice(hive.food_locs)
-
-            # otherwise, stay at hive and gain energy
-            else:
-                # become scout if no food has been found
-                bee.type_bee = "scout"
-
+        # otherwise, stay at hive and gain energy
         else:
-            bee.relax_at_hive(hive)
+            # become scout if no food has been found
+            bee.type_bee = "scout"
+
+    else:
+        bee.relax_at_hive(hive)

@@ -11,18 +11,7 @@ import time
 
 import numpy
 
-from strategy.babee import Babee
-from strategy.rester import Rester
-from strategy.foraging import Foraging
-from strategy.scout import Scout
-
-
-BEE_STRATEGIES = {
-    'babee': Babee,
-    'rester': Rester,
-    'foraging': Foraging,
-    'scout': Scout
-}
+from strategy import BEE_STRATEGIES
 
 
 class Bee(Agent):
@@ -136,6 +125,4 @@ class Bee(Agent):
             self.model.remove_agent(self)
             return
 
-        bee_type = self.type_bee
-        strategy = BEE_STRATEGIES[self.type_bee]
-        strategy(self).step()
+        BEE_STRATEGIES[self.type_bee](self)
