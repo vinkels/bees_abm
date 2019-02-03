@@ -106,7 +106,8 @@ class BeeForagingModel(Model):
             'move to food neighbour': 0,
             'random_move': 0,
             'random_neighbourhood': 0,
-            'random_index': 0
+            'random_index': 0,
+            'random_target': 0
         }
         self.datacollector.collect(self)
         self.grid.warmup()

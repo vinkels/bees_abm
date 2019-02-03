@@ -1,5 +1,5 @@
 from mesa import Agent
-import random as rd
+import random
 
 from config import BABYTIME, LIFESPAN
 
@@ -64,8 +64,7 @@ class Rester(BeeStrategy):
 
                 # become forager at random food location
                 bee.type_bee = "foraging"
-                chosen_loc = rd.randint(0, len(hive.food_locs) - 1)
-                bee.food_loc = hive.food_locs[chosen_loc]
+                bee.food_loc = random.choice(hive.food_locs)
 
             # otherwise, stay at hive and gain energy
             else:
@@ -113,7 +112,7 @@ class Scout(BeeStrategy):
                 if food_neighbours:
                     s = time.time()
 
-                    food = food_neighbours[rd.randrange(0, len(food_neighbours))]
+                    food = random.choice(food_neighbours)
 
                     bee.model.grid.move_agent(bee, food.pos)
                     food.get_eaten()
@@ -147,10 +146,9 @@ class Scout(BeeStrategy):
 
         # select random cell in neighbourhood
         s = time.time()
-        select_coords = rd.randint(0, len(neighbourhood) - 1)
-        target = neighbourhood[select_coords]
+        target = random.choice(neighbourhood)
         e = time.time()
-        bee.model.timings_scout['random_index'] += e - s
+        bee.model.timings_scout['random_target'] += e - s
 
         # move to cell
         s = time.time()
