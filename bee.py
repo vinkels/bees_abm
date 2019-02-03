@@ -49,17 +49,20 @@ class Bee(Agent):
         # self.mental_map = Grid(height=self.model.height, width=self.model.width)
         self.mental_map = np.zeros((self.model.height, self.model.width))
 
+        self.neighbourhood_memory = set()
+
     def get_accessible_neighbourhood(self):
         '''
         Determine with cells in neighbourhood are not with obstacles
         '''
-
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos, moore=True)
 
-        for obstacle in obstacles:
-            # self.mental_map.node(obstacle[0], obstacle[1]).walkable = False
-            # self.mental_map.node(obstacle[0], obstacle[1]).weight = 0
-            self.mental_map[obstacle[0]][obstacle[1]] = 1
+        # If a bee enters a space for the first time, it needs to save obstacles on that position.
+        if self.pos not in self.neighbourhood_memory:
+            for obstacle in obstacles:
+                self.mental_map[obstacle[0]][obstacle[1]] = 1
+
+            self.neighbourhood_memory.add(self.pos)
 
         return neighbourhood
 
