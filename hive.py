@@ -8,7 +8,6 @@ from config import CARRYING_CAPACITY
 class Hive(Agent):
     def __init__(self, model, pos, color,bee_color):
         super().__init__(model.next_id(), model)
-        self.load_count = 0
         self.pos = pos
         self.food_locs = []
         self.food = 0
@@ -21,7 +20,6 @@ class Hive(Agent):
         self.color = color
         self.bee_color = bee_color
         self.reproduction_rate = 0.1
-        self.bring_back_the_foooddzzz = 0
 
     def receive_info(self, info):
         self.food_locs.append(info)
@@ -51,7 +49,6 @@ class Hive(Agent):
         self.balance_hive()
 
     def unload_food(self, food=1):
-        #TODO depends on bee carrying capacity
         self.food += CARRYING_CAPACITY
         self.model.load_count += 1
 

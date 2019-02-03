@@ -53,7 +53,6 @@ class RandomActivationBeeWorld(RandomActivation):
             self.step_breed(agent_class)
 
         self.steps += 1
-        self.time += 1
 
     def step_breed(self, breed):
         '''

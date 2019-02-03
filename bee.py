@@ -80,7 +80,6 @@ class Bee(Agent):
             self.loaded = False
             hive.receive_info(self.food_loc)
             hive.unload_food()
-            hive.bring_back_the_foooddzzz += 1
 
         # become rester to gain energy
         self.type_bee = "rester"
@@ -89,23 +88,13 @@ class Bee(Agent):
         '''
         Eat while at hive and gain energy
         '''
-
-        # if hive.food > hive.energy_level_critical:
-        if hive.food > hive.bite:
-            if self.type_bee == "babee":
-                self.energy += 0.5
-                hive.food -= 0.5
-            else:
-                self.energy += hive.bite
-                hive.food -= hive.bite
-
-
-
-        # if no food is available, go search
-        # TODO ENERGY DECAY OVER TIME
-
-        # BABEES are not allowed to change to scouters, only by age
-        elif self.type_bee != "babee":
+        if self.type_bee == "babee":
+            self.energy += 0.5
+            hive.food -= 0.5   
+        elif hive.food > hive.bite:
+            self.energy += hive.bite
+            hive.food -= hive.bite
+        else:
             self.type_bee = "scout"
 
 
