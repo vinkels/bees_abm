@@ -1,5 +1,4 @@
 from SALib.sample import saltelli
-from ofat import OFAT
 import seaborn as sns
 from model import BeeForagingModel
 from mesa.batchrunner import BatchRunnerMP
@@ -7,23 +6,21 @@ from SALib.analyze import sobol
 import pandas as pd
 import numpy as np
 import os
-# import matplotlib.pyplot as plt
-# from itertools import combinations
+import matplotlib.pyplot as plt
+from itertools import combinations
 from tqdm import tqdm
 from datetime import datetime
 
-def create_data():
+def create_data(problem, new_path):
+    '''
+    problem : dict with specified input variables and range instead of discrete values otherwise saltelli will not work
 
-    # We define our variables and bounds
-    problem = {
-        'num_vars': 3,
-        'names': ['nr_hives','obstacle_density', 'food_density'],
-        'bounds': [[1,6],[0,31],[5,26]]
-    }
+    Run each batch iterations with all the samples obtained from saltelli and save at the end of the run
 
-    new_path = datetime.now().strftime('%Y%m%d%H%M')
+    Saves data with time stamp as .csv and .pickle
+    '''
+
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-
     replicates = 10
     max_steps = 100
     distinct_samples= 10
@@ -52,43 +49,76 @@ def create_data():
                         nr_processes=os.cpu_count(),
                         max_steps=max_steps,
                         variable_parameters={val:[] for val in problem['names']},
-                        model_reporters=model_reporters)
+                        model_reporters=model_reporters,
+                         display_progress=True)
     counter = 0
     
-
-    #TODO need to match these keys with the batch runner iterations otherwise very big data dump
-    # keys = ['nr_hives','obstacle_density', 'food_density']
-
     # progress bar
     pbar = tqdm(total=len(params_values))
     for _  in range(replicates):
         for values in params_values:
+            var_parameters = {} 
 
-            var_parameters = {}
-
-            #collect all data samples from salteli sampling
+            # #collect all data samples from salteli sampling
             for n, v, in zip(problem['names'],values):
+                
                 var_parameters[n] = v
             batch.run_iteration(var_parameters, tuple(values),counter)
-    #         data = batch.get_model_vars_dataframe() 
-    #         data.to_csv(f'pickles/{counter}_{new_path}.csv')
-    #         data.to_pickle(f'pickles/{counter}_{new_path}.p')
             counter +=1
             pbar.update(counter)
     pbar.close()
     data = batch.get_model_vars_dataframe()
     data.to_csv(f'pickles/analysis_{new_path}.csv')
     data.to_pickle(f'pickles/analysis_{new_path}.p')
-    return data
+    
 
 
 def clean_data(data):
-    pass
-def analyse(data):
-    pass
-    # Si_sheep = sobol.analyze(problem, data['Sheep'].as_matrix(), print_to_console=True)
-    # Si_wolves = sobol.analyze(problem, data['Wolves'].as_matrix(), print_to_console=True)
+    '''
+    data: pandas datframe saved as  pickle
+    The data is one bulk of all combinations of data and just need to loop over the runs
+    Assign the input values as columns but also add means en std of output values of interests.
     
+    returns a new pandas dataframe
+    '''
+
+    final_dfs = []
+    for i, row in data.iterrows():
+        df_temp = data.at[i, 'step_data']
+        df_temp['obstacle_dens'] = row['obstacle_density']
+        df_temp['food_dens'] = row['food_density']
+        df_temp['n_hives'] = row['nr_hives']
+        df_temp['sample'] = row['Run']
+        df_temp['step'] = df_temp.index
+        final_dfs.append(df_temp)
+    df_final = pd.concat(final_dfs)
+    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
+    #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
+    df_test = df_new.copy(deep=True)
+    df_test.loc[:,'scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
+    # df_new.is_copy = False Deprecated do not use
+    df_test.loc[:,'food_bee'] = df_final['hive_food'] / df_final['n_bees']
+    df_test.loc[:,'bees_hive'] = df_final['n_bees'] / df_final['n_hives']
+    df_step = df_test.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
+                                                                                        'food_bee': ['mean', 'std'], 
+                                                                                        'scout_forage': ['mean', 'std'], 
+                                                                                        'bees_hive': ['mean', 'std']
+                                                                                        })
+    df_step = df_step.reset_index()                                                                                        
+    df_step.columns = ['_'.join(col) if col[1] else col[0] for col in df_step.columns]
+    
+    return df_step
+
+
+
+def analyse(data, problem):
+    
+    Si_scout_forage = sobol.analyze(problem, data['scout_forage_mean'].values, print_to_console=False,n_processors=os.cpu_count(),parallel=True)
+    Si_food_bee = sobol.analyze(problem, data['food_bee_mean'].values, print_to_console=False,n_processors=os.cpu_count(), parallel=True)
+    Si_bee_hive = sobol.analyze(problem, data['bees_hive_mean'].values, print_to_console=False,n_processors=os.cpu_count(), parallel=True)
+    print("Done")
+    return Si_scout_forage, Si_food_bee, Si_bee_hive
+
 def plot_index(s, params, i, title=''):
     """
     Creates a plot for Sobol sensitivity analysis that shows the contributions
@@ -101,42 +131,63 @@ def plot_index(s, params, i, title=''):
         i (str): string that indicates what order the sensitivity is.
         title (str): title for the plot
     """
-    pass
-    # if i == '2':
-    #     p = len(params)
-    #     params = list(combinations(params, 2))
-    #     indices = s['S' + i].reshape((p ** 2))
-    #     indices = indices[~np.isnan(indices)]
-    #     errors = s['S' + i + '_conf'].reshape((p ** 2))
-    #     errors = errors[~np.isnan(errors)]
-    # else:
-    #     indices = s['S' + i]
-    #     errors = s['S' + i + '_conf']
-    #     plt.figure()
+    if i == '2':
+        p = len(params)
+        params = list(combinations(params, 2))
+        indices = s['S' + i].reshape((p ** 2))
+        indices = indices[~np.isnan(indices)]
+        errors = s['S' + i + '_conf'].reshape((p ** 2))
+        errors = errors[~np.isnan(errors)]
+    else:
+        indices = s['S' + i]
+        errors = s['S' + i + '_conf']
+        plt.figure()
 
-    # l = len(indices)
+    l = len(indices)
 
-    # plt.title(title)
-    # plt.ylim([-0.2, len(indices) - 1 + 0.2])
-    # plt.yticks(range(l), params)
-    # plt.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o')
-    # plt.axvline(0, c='k')
+    plt.title(title)
+    plt.ylim([-0.2, len(indices) - 1 + 0.2])
+    plt.yticks(range(l), params)
+    plt.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o')
+    plt.axvline(0, c='k')
 
-def plot_sensitivity_order():
-    pass
-    # for Si in (Si_sheep, Si_wolves):
-    #     # First order
-    #     plot_index(Si, problem['names'], '1', 'First order sensitivity')
-    #     plt.show()
+def plot_sensitivity_order(data,problem):
 
-    #     # Second order
-    #     plot_index(Si, problem['names'], '2', 'Second order sensitivity')
-    #     plt.show()
+    for Si in data:
+        # First order
+        plot_index(Si, problem['names'], '1', 'First order sensitivity')
+        plt.show()
 
-    #     # Total order
-    #     plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
-    #     plt.show()
+        # Second order
+        plot_index(Si, problem['names'], '2', 'Second order sensitivity')
+        plt.show()
+
+        # Total order
+        plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
+        plt.show()
 if __name__ == "__main__":
-    dt = create_data()
+    var_names  = ['nr_hives','obstacle_density', 'food_density']
     
-    # print(dt.shape)
+    # Extract all the present CPU-thread for computation
+    groups = np.arange(os.cpu_count())
+    
+    #path timestamp
+    new_path = datetime.now().strftime('%Y%m%d%H%M')
+
+    # We define our variables and bounds
+    problem = {
+        'num_vars': 3,
+        'names': ['nr_hives','obstacle_density', 'food_density'],
+        'bounds': [[1,6],[0,31],[5,26]],
+        'groups':['G'+str(groups[1]),'G'+str(groups[2]),'G'+str(groups[3])] # for multiprocessing
+    }
+    # dt = create_data(problem, new_path)
+    #TODO make this part interactive?
+    # Change this right_path by running create_data. Mind that max_steps should be bigger.
+    right_path = '201902071158'
+    data = pd.read_pickle(f'pickles/analysis_{right_path}.p')
+    cl_data = clean_data(data)
+    Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
+    to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
+    plot_sensitivity_order(to_plot,problem)
+    
