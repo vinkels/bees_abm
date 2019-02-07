@@ -92,7 +92,7 @@ def clean_data(data):
         df_temp['step'] = df_temp.index
         final_dfs.append(df_temp)
     df_final = pd.concat(final_dfs)
-    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
+    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'sample', 'step']]
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_new.copy(deep=True)
     df_test.loc[:,'scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
@@ -104,10 +104,25 @@ def clean_data(data):
                                                                                         'scout_forage': ['mean', 'std'], 
                                                                                         'bees_hive': ['mean', 'std']
                                                                                         })
+    
+    
+    
+    
+    
+    
+    
     df_step = df_step.reset_index()                                                                                        
     df_step.columns = ['_'.join(col) if col[1] else col[0] for col in df_step.columns]
+
+    df_sample = df_new.copy(deep=True)
+    df_sample.loc[:,'scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
     
-    return df_step
+    df_sample.loc[:,'food_bee'] = df_final['hive_food'] / df_final['n_bees']
+    df_sample.loc[:,'bees_hive'] = df_final['n_bees'] / df_final['n_hives']
+    df_sample = df_test.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'sample'])[
+            ['food_bee', 'scout_forage', 'bees_hive']].mean()
+    df_sample = df_sample.reset_index()
+    return df_step, df_sample
 
 
 
@@ -186,8 +201,8 @@ if __name__ == "__main__":
     # Change this right_path by running create_data. Mind that max_steps should be bigger.
     right_path = '201902071158'
     data = pd.read_pickle(f'pickles/analysis_{right_path}.p')
-    cl_data = clean_data(data)
-    Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
+    cl_data_step, cl_data_sample = clean_data(data)
+    Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data_step, problem)
     to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
     plot_sensitivity_order(to_plot,problem)
     
