@@ -10,9 +10,13 @@ from datetime import datetime
 
 class OFAT():
 
-    def __init__(self, time_stamp='201902030912'):
+    def __init__(self, time_stamp=False, warm_it=500):
         self.var_names = ['food_density', 'nr_hives', 'obstacle_density']
-        self.right_time = time_stamp
+        self.warm_it = warm_it
+        if not time_stamp:
+            self.time_stamp = datetime.now().strftime('%Y%m%d%H%M')
+        else:
+            self.time_stamp = time_stamp
 
     def run_ofat(self):
 
@@ -26,8 +30,8 @@ class OFAT():
 
         # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-        replicates = 10
-        max_steps = 1000
+        replicates = 200
+        max_steps = 3000
 
         # Define output parameters
         model_reporters = {
@@ -40,8 +44,6 @@ class OFAT():
 
         data = {}
 
-        #Define time format
-        time_stamp = datetime.now().strftime('%Y%m%d%H%M')
         for var in params:
 
             batch = BatchRunnerMP(BeeForagingModel,
@@ -54,8 +56,8 @@ class OFAT():
 
             batch.run_all()
             data = batch.get_model_vars_dataframe()
-            data.to_csv(f'pickles/{time_stamp}_{var}.csv')
-            data.to_pickle(f'pickles/{time_stamp}_{var}.p')
+            data.to_csv(f'pickles/{self.time_stamp}_{var}.csv')
+            data.to_pickle(f'pickles/{self.time_stamp}_{var}.p')
 
 
     def data_prep(self):
@@ -63,10 +65,11 @@ class OFAT():
         self.step_dct = {}
         self.sample_dct = {}
         for name in self.var_names:
-            df = pd.read_pickle(f'pickles/{self.right_time}_{name}.p')
+            df = pd.read_pickle(f'pickles/{self.time_stamp}_{name}.p')
             sample = 0
             final_dfs = []
             for i, row in df.iterrows():
+                # print(row)
                 df_temp = df.at[i, 'step_data']
                 df_temp['obstacle_density'] = row['obstacle_density']
                 df_temp['food_density'] = row['food_density']
@@ -75,6 +78,7 @@ class OFAT():
                 df_temp['step'] = df_temp.index
                 sample += 1
                 final_dfs.append(df_temp)
+                final_dfs.append(df_temp.iloc[self.warm_it-1:])
             df_final = pd.concat(final_dfs)
             df_new = df_final[['nr_hives', 'food_density', 'obstacle_density', 'sample', 'step']]
             df_new['scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
@@ -89,19 +93,22 @@ class OFAT():
             df_step = df_step.reset_index()
             df_step.columns = ['_'.join(col) if col[1] else col[0] for col in df_step.columns]
             self.step_dct[name] = df_step
-            df_step.to_pickle(f'pickles/step_{name}_{self.right_time}.p')
+            df_step.to_pickle(f'pickles/step_{name}_{self.time_stamp}.p')
 
             df_sample = df_new.groupby(['obstacle_density', 'food_density', 'nr_hives', 'sample'])[
                 ['food_bee', 'scout_forage', 'bees_hive']].mean()
+            # print(df_sample)
+                
             df_sample = df_sample.reset_index()
-            df_step.to_pickle(f'pickles/sample_{name}_{self.right_time}.p')
-            self.sample_dct[name] = df_sample        
+            df_step.to_pickle(f'pickles/sample_{name}_{self.time_stamp}.p')
+            self.sample_dct[name] = df_sample    
+        return self.sample_dct, self.step_dct
 
     def make_pwetty_plots(self, df_new):
         sns_plot = sns.lineplot(x="step", y="food_bee", hue="nr_hives",data=df_new)
         plt.savefig('plots/plot2.png')
             
-    def get_ofat(self, var_names):
+    def get_ofat(self):
 
         self.ofat_dict, self.df_plot = self.data_prep()
 
@@ -121,7 +128,7 @@ class OFAT():
             var: variables to be taken from the dataframe
             param: which output variable to plot
         """
-        print(df)
+        # print(df)
         x = df.groupby(var).mean().reset_index()[var]
         y = df.groupby(var).mean()[param]
 
@@ -155,10 +162,3 @@ if __name__ == "__main__":
    ofat_obj = OFAT()
    ofat_obj.run_ofat()
    ofat_obj.get_ofat()
-
-
-
-
-        
-
-    
