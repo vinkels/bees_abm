@@ -1,13 +1,13 @@
 import numpy
 from mesa import Agent
 
-from config import LIFESPAN
+from config import LIFESPAN, ENERGY_MEAN, ENERGY_STD_DEV
 from strategy import BEE_STRATEGIES
 from astar import astar
 
 
 class Bee(Agent):
-    def __init__(self, model, pos, hive, type_bee, hive_id, color, age=0, energy_pars=(20, 5)):
+    def __init__(self, model, pos, hive, type_bee, hive_id, color, age=0):
         super().__init__(model.next_id(), model)
 
         self.loaded = False
@@ -20,7 +20,7 @@ class Bee(Agent):
         self.color = color
 
         # random threshold of energy required per bee to go foraging
-        self.max_energy = numpy.random.normal(energy_pars[0], energy_pars[1])
+        self.max_energy = numpy.random.normal(ENERGY_MEAN, ENERGY_STD_DEV)
         self.energy = self.max_energy
 
         self.plan_course = []
