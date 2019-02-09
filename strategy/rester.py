@@ -6,7 +6,7 @@ def rester_step(bee):
     This type of bee stays at the hive, until a location for food is known and then he becomes a foraging bee
     """
     # Resting bees can only be at the hive.
-    assert bee.pos == bee.hive_location
+    assert bee.at_hive
 
     hive = bee.model.get_hive(bee.hive_id)
 

@@ -12,7 +12,7 @@ class Bee(Agent):
 
         self.loaded = False
         self.food_location = None
-        self.hive_location = hive.pos
+        self._hive_location = hive.pos
         self.hive_id = hive_id
         self.pos = pos
         self.type_bee = type_bee
@@ -32,6 +32,13 @@ class Bee(Agent):
     @property
     def is_tired(self):
         return self.energy < 0.5 * self.max_energy
+
+    @property
+    def at_hive(self):
+        return self.pos == self._hive_location
+
+    def move_to_hive(self):
+        self.move(self._hive_location)
 
     def get_accessible_neighbourhood(self):
         """
@@ -67,7 +74,7 @@ class Bee(Agent):
         Arrive at the hive, and become a rester to gain energy.
         If carrying any food, unload this food at the hive.
         """
-        assert self.pos == self.hive_location
+        assert self.at_hive
 
         if self.loaded:
             self.loaded = False

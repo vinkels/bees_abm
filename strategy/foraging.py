@@ -29,8 +29,8 @@ def foraging_step(bee):
 
     # if loaded, return to hive
     else:
-        bee.move(bee.hive_location)
+        bee.move_to_hive()
 
         # check if destination is reached
-        if bee.pos == bee.hive_location:
+        if bee.at_hive:
             bee.arrive_at_hive()

@@ -8,11 +8,11 @@ def scout_step(bee):
     """
     assert not bee.loaded, "Scouts should be unloaded."
 
-    if bee.is_tired and bee.pos != bee.hive_location:
-        bee.move(bee.hive_location)
+    if bee.is_tired and not bee.at_hive:
+        bee.move_to_hive()
 
         # check if destination is reached
-        if bee.pos == bee.hive_location:
+        if bee.at_hive:
             bee.arrive_at_hive()
     else:
         food_neighbours = [
