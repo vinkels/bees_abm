@@ -9,7 +9,7 @@ class Hive(Agent):
     def __init__(self, model, pos, color, bee_color):
         super().__init__(model.next_id(), model)
         self.pos = pos
-        self.food_locs = []
+        self.food_locations = []
         self.food = 0
         self.n_bees = 0
         self.hungry = False
@@ -22,7 +22,7 @@ class Hive(Agent):
         self.reproduction_rate = 0.1
 
     def receive_food(self, info):
-        self.food_locs.append(info)
+        self.food_locations.append(info)
         self.food += CARRYING_CAPACITY
         self.model.load_count += 1
 
@@ -43,8 +43,8 @@ class Hive(Agent):
 
         # forget a random amount of food locations when too many to remember
         to_discard = rd.randint(1, 10)
-        if len(self.food_locs) > 10:
-                self.food_locs = self.food_locs[to_discard:]
+        if len(self.food_locations) > 10:
+                self.food_locations = self.food_locations[to_discard:]
 
         # adjust parameters of hive based on food in hive
         self.balance_hive()

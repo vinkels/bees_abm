@@ -11,8 +11,8 @@ class Bee(Agent):
         super().__init__(model.next_id(), model)
 
         self.loaded = False
-        self.food_loc = []
-        self.hive_loc = hive.pos
+        self.food_location = None
+        self.hive_location = hive.pos
         self.hive_id = hive_id
         self.pos = pos
         self.type_bee = type_bee
@@ -23,7 +23,7 @@ class Bee(Agent):
         self.max_energy = numpy.random.normal(ENERGY_MEAN, ENERGY_STD_DEV)
         self.energy = self.max_energy
 
-        self.plan_course = []
+        self.planned_route = []
 
         self._internal_map = numpy.zeros((self.model.height, self.model.width))
 
@@ -46,10 +46,10 @@ class Bee(Agent):
     def move(self, loc):
         neighborhood = self.get_accessible_neighbourhood()
 
-        if not self.plan_course or not self.plan_course[0] in neighborhood:
-            self.plan_course = astar(self._internal_map, self.pos, loc)
+        if not self.planned_route or not self.planned_route[0] in neighborhood:
+            self.planned_route = astar(self._internal_map, self.pos, loc)
 
-        nxt_loc = self.plan_course.pop(0)
+        nxt_loc = self.planned_route.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
 
     def arrive_at_hive(self, hive):
@@ -59,7 +59,7 @@ class Bee(Agent):
         """
         if self.loaded:
             self.loaded = False
-            hive.receive_food(self.food_loc)
+            hive.receive_food(self.food_location)
 
         self.type_bee = "rester"
 

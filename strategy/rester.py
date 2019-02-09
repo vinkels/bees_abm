@@ -6,7 +6,7 @@ def rester_step(bee):
     This type of bee stays at the hive, until a location for food is known and then he becomes a foraging bee
     '''
     # Resting bees can only be at the hive.
-    assert bee.pos == bee.hive_loc
+    assert bee.pos == bee.hive_location
 
     hive = bee.model.get_hive(bee.hive_id)
 
@@ -14,11 +14,11 @@ def rester_step(bee):
     if bee.energy >= bee.max_energy:
 
         # check if food locations are known
-        if hive.food_locs:
+        if hive.food_locations:
 
             # become forager at random food location
             bee.type_bee = "foraging"
-            bee.food_loc = random.choice(hive.food_locs)
+            bee.food_location = random.choice(hive.food_locations)
 
         # otherwise, stay at hive and gain energy
         else:

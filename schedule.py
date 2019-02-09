@@ -84,5 +84,5 @@ class RandomActivationBeeWorld(RandomActivation):
         return sum([
             1
             for agent in self.agents_by_breed[Bee].values()
-            if agent.hive_loc == pos
+            if agent.hive_location == pos
         ])

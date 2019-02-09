@@ -7,11 +7,11 @@ def scout_step(bee):
     This type of bee does a random walk, searching for food, and return to hive if he has found this.
     """
     if bee.loaded is False:
-        if bee.energy < 0.5 * bee.max_energy and bee.pos != bee.hive_loc:
-            bee.move(bee.hive_loc)
+        if bee.energy < 0.5 * bee.max_energy and bee.pos != bee.hive_location:
+            bee.move(bee.hive_location)
 
             # check if destination is reached
-            if bee.pos == bee.hive_loc:
+            if bee.pos == bee.hive_location:
                 hive = bee.model.get_hive(bee.hive_id)
                 assert hive
                 bee.arrive_at_hive(hive)
@@ -32,7 +32,7 @@ def scout_step(bee):
                 # Become a forager take food and remember location
                 bee.type_bee = 'foraging'
                 bee.loaded = True
-                bee.food_loc = bee.pos
+                bee.food_location = bee.pos
 
             # otherwise, move randomly
             else:
