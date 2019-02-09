@@ -20,7 +20,7 @@ def foraging_step(bee):
             bee.planned_route = []
             if food_neighbors:
                 food = food_neighbors[0]
-                food.get_eaten()
+                food.harvest()
                 bee.loaded = True
 
             # if there was no food at the promised location become a scout

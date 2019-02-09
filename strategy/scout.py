@@ -27,7 +27,7 @@ def scout_step(bee):
                 food = random.choice(food_neighbours)
 
                 bee.model.grid.move_agent(bee, food.pos)
-                food.get_eaten()
+                food.harvest()
 
                 # Become a forager take food and remember location
                 bee.type_bee = 'foraging'
