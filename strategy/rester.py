@@ -26,4 +26,8 @@ def rester_step(bee):
             bee.type_bee = "scout"
 
     else:
-        bee.relax_at_hive(hive)
+        if hive.food >= hive.bite:
+            bee.energy += hive.bite
+            hive.food -= hive.bite
+        else:
+            bee.type_bee = "scout"

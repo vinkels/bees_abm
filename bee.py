@@ -43,14 +43,20 @@ class Bee(Agent):
 
         return neighbourhood
 
-    def move(self, loc):
+    def move(self, target_location):
+        """
+        Make a move towards target_location.
+        If the current route is no longer viable make a new plan.
+        """
         neighborhood = self.get_accessible_neighbourhood()
 
         if not self.planned_route or not self.planned_route[0] in neighborhood:
-            self.planned_route = astar(self._internal_map, self.pos, loc)
+            self.planned_route = astar(self._internal_map,
+                                       self.pos,
+                                       target_location)
 
-        nxt_loc = self.planned_route.pop(0)
-        self.model.grid.move_agent(self, nxt_loc)
+        next_location = self.planned_route.pop(0)
+        self.model.grid.move_agent(self, next_location)
 
     def arrive_at_hive(self):
         """
@@ -65,21 +71,6 @@ class Bee(Agent):
             hive.receive_food(self.food_location)
 
         self.type_bee = "rester"
-
-    def relax_at_hive(self, hive):
-        """
-        Eat while at hive and gain energy.
-        If there is no food left, become a scout if old enough.
-        """
-        if hive.food < hive.bite:
-            if self.type_bee != "babee":
-                self.type_bee = "scout"
-        elif self.type_bee == "babee":
-            self.energy += 0.5
-            hive.food -= 0.5
-        else:
-            self.energy += hive.bite
-            hive.food -= hive.bite
 
     def step(self):
         self.age += 1
