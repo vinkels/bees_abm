@@ -2,9 +2,9 @@ from food import Food
 
 
 def foraging_step(bee):
-    '''
+    """
     This type of bee goes to a given food location, takes the food and return to the hive
-    '''
+    """
     # if not yet arrived at food location
     if bee.loaded is False:
         bee.move(bee.food_location)

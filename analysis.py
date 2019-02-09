@@ -12,13 +12,13 @@ from tqdm import tqdm
 from datetime import datetime
 
 def create_data(problem, new_path):
-    '''
+    """
     problem : dict with specified input variables and range instead of discrete values otherwise saltelli will not work
 
     Run each batch iterations with all the samples obtained from saltelli and save at the end of the run
 
     Saves data with time stamp as .csv and .pickle
-    '''
+    """
 
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
     replicates = 10
@@ -40,10 +40,10 @@ def create_data(problem, new_path):
 
     #transform to int value and overwrite array if copy needed set flag to True
     params_values = params_values.astype(int, copy=False)
-    
+
     # test range of combinations
     # print(params_values[:][:,0], len(params_values))
-    
+
 
     batch = BatchRunnerMP(BeeForagingModel,
                         nr_processes=os.cpu_count(),
@@ -52,16 +52,16 @@ def create_data(problem, new_path):
                         model_reporters=model_reporters,
                          display_progress=True)
     counter = 0
-    
+
     # progress bar
     pbar = tqdm(total=len(params_values))
     for _  in range(replicates):
         for values in params_values:
-            var_parameters = {} 
+            var_parameters = {}
 
             # #collect all data samples from salteli sampling
             for n, v, in zip(problem['names'],values):
-                
+
                 var_parameters[n] = v
             batch.run_iteration(var_parameters, tuple(values),counter)
             counter +=1
@@ -70,17 +70,17 @@ def create_data(problem, new_path):
     data = batch.get_model_vars_dataframe()
     data.to_csv(f'pickles/analysis_{new_path}.csv')
     data.to_pickle(f'pickles/analysis_{new_path}.p')
-    
+
 
 
 def clean_data(data):
-    '''
+    """
     data: pandas datframe saved as  pickle
     The data is one bulk of all combinations of data and just need to loop over the runs
     Assign the input values as columns but also add means en std of output values of interests.
-    
+
     returns a new pandas dataframe
-    '''
+    """
 
     final_dfs = []
     for i, row in data.iterrows():
@@ -100,19 +100,19 @@ def clean_data(data):
     df_test.loc[:,'food_bee'] = df_final['hive_food'] / df_final['n_bees']
     df_test.loc[:,'bees_hive'] = df_final['n_bees'] / df_final['n_hives']
     df_step = df_test.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
-                                                                                        'food_bee': ['mean', 'std'], 
-                                                                                        'scout_forage': ['mean', 'std'], 
+                                                                                        'food_bee': ['mean', 'std'],
+                                                                                        'scout_forage': ['mean', 'std'],
                                                                                         'bees_hive': ['mean', 'std']
                                                                                         })
-    df_step = df_step.reset_index()                                                                                        
+    df_step = df_step.reset_index()
     df_step.columns = ['_'.join(col) if col[1] else col[0] for col in df_step.columns]
-    
+
     return df_step
 
 
 
 def analyse(data, problem):
-    
+
     Si_scout_forage = sobol.analyze(problem, data['scout_forage_mean'].values, print_to_console=False,n_processors=os.cpu_count(),parallel=True)
     Si_food_bee = sobol.analyze(problem, data['food_bee_mean'].values, print_to_console=False,n_processors=os.cpu_count(), parallel=True)
     Si_bee_hive = sobol.analyze(problem, data['bees_hive_mean'].values, print_to_console=False,n_processors=os.cpu_count(), parallel=True)
@@ -167,10 +167,10 @@ def plot_sensitivity_order(data,problem):
         plt.show()
 if __name__ == "__main__":
     var_names  = ['nr_hives','obstacle_density', 'food_density']
-    
+
     # Extract all the present CPU-thread for computation
     groups = np.arange(os.cpu_count())
-    
+
     #path timestamp
     new_path = datetime.now().strftime('%Y%m%d%H%M')
 
@@ -190,4 +190,3 @@ if __name__ == "__main__":
     Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
     to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
     plot_sensitivity_order(to_plot,problem)
-    
