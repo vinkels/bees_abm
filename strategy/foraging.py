@@ -14,7 +14,7 @@ def foraging_step(bee):
             food_neighbors = [
                 nb
                 for nb in bee.model.grid.get_food_neighbors(bee.pos, 0)
-                if nb.can_be_eaten()
+                if nb.can_be_harvested()
             ]
 
             bee.planned_route = []

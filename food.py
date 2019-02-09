@@ -31,7 +31,7 @@ class Food(Agent):
         """
         self.util -= CARRYING_CAPACITY
 
-    def can_be_eaten(self):
+    def can_be_harvested(self):
         """
         Only food that can yield at least CARRYING_CAPACITY food can be eaten.
         """

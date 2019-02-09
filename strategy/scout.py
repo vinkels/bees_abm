@@ -19,7 +19,7 @@ def scout_step(bee):
             food_neighbours = [
                 nb
                 for nb in bee.model.grid.get_food_neighbors(bee.pos, 1)
-                if nb.can_be_eaten()
+                if nb.can_be_harvested()
             ]
 
             # If you see food that is uneaten, move there.
