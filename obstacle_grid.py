@@ -37,7 +37,7 @@ class MultiGridWithObstacles(MultiGrid):
             }
 
         self.obstacle_positions = obstacle_positions
-        # print(self.obstacle_positions)
+
         self.agents = {}
 
         self.radius_1_food_cache = {}
@@ -67,7 +67,7 @@ class MultiGridWithObstacles(MultiGrid):
         if type(agent) == Food or self.VIZUALISATION:
             self._remove_agent(agent.pos, agent)
             self._place_agent(pos, agent)
-        
+
         agent.pos = pos
 
     def place_agent(self, agent, pos):
@@ -88,7 +88,7 @@ class MultiGridWithObstacles(MultiGrid):
         agent.pos = None
 
     def _place_agent(self, pos, agent):
-        """ 
+        """
         Place the agent at the correct location.
         No empties, because they cost performance.
         """
@@ -101,10 +101,10 @@ class MultiGridWithObstacles(MultiGrid):
         elif self.VIZUALISATION:
             x, y = pos
             self.grids[agent_type][x][y].add(agent.unique_id)
-            
+
     def _remove_agent(self, pos, agent):
-        """ 
-        Remove the agent from the given location. 
+        """
+        Remove the agent from the given location.
         No empties, because they cost performance.
         """
         agent_type = type(agent)
@@ -139,7 +139,7 @@ class MultiGridWithObstacles(MultiGrid):
 
         """
         return itertools.chain.from_iterable(
-            self.get_contents_with_obstacles_helper(x, y) 
+            self.get_contents_with_obstacles_helper(x, y)
             for x, y in cell_list
         )
 
@@ -205,7 +205,7 @@ class MultiGridWithObstacles(MultiGrid):
 
             x, y = pos
 
-            cell_list = [] 
+            cell_list = []
             for a, b in self.moore_neighbors:
                 cand = (x+a, y+b)
                 if 0 <= cand[0] < self.width and 0 <= cand[1] < self.height and cand not in self.obstacle_positions:
@@ -214,14 +214,14 @@ class MultiGridWithObstacles(MultiGrid):
             cell_list = [pos]
 
         foods = (
-            self.agents[z] 
+            self.agents[z]
             for z in (
                 self.grids[Food][x][y]
                 for x, y in cell_list
                 if self.grids[Food][x][y]
             )
         )
-        
+
         if radius == 1:
             self.radius_1_food_cache[pos] = list(foods)
             return self.radius_1_food_cache[pos]

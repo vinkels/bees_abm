@@ -21,8 +21,10 @@ class Hive(Agent):
         self.bee_color = bee_color
         self.reproduction_rate = 0.1
 
-    def receive_info(self, info):
+    def receive_food(self, info):
         self.food_locs.append(info)
+        self.food += CARRYING_CAPACITY
+        self.model.load_count += 1
 
     def step(self):
 
@@ -46,10 +48,6 @@ class Hive(Agent):
 
         # adjust parameters of hive based on food in hive
         self.balance_hive()
-
-    def unload_food(self):
-        self.food += CARRYING_CAPACITY
-        self.model.load_count += 1
 
     def get_food_stat(self):
         return self.food

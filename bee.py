@@ -1,13 +1,8 @@
+import numpy
 from mesa import Agent
 
-from config import LIFESPAN
-
 import util
-
-# TODO remove
-
-import numpy
-
+from config import LIFESPAN
 from strategy import BEE_STRATEGIES
 
 
@@ -25,29 +20,26 @@ class Bee(Agent):
         self.color = color
 
         # random threshold of energy required per bee to go foraging
-
         self.max_energy = numpy.random.normal(energy_pars[0], energy_pars[1])
         self.energy = self.max_energy
 
         self.plan_course = []
 
-        # self.mental_map = Grid(height=self.model.height, width=self.model.width)
-        self.mental_map = numpy.zeros((self.model.height, self.model.width))
+        self._internal_map = numpy.zeros((self.model.height, self.model.width))
 
-        self.neighbourhood_memory = set()
+        self._visited_squares = set()
 
     def get_accessible_neighbourhood(self):
         """
-        Determine with cells in neighbourhood are not with obstacles
+        Determine which neighbours are accessible by looking at obstacles.
+        Save all obstacles in neighbourhood in memory, and return accessible neighbours.
         """
         neighbourhood, obstacles = self.model.grid.get_accessible_neighborhood(self.pos)
 
-        # If a bee enters a space for the first time, it needs to save obstacles on that position.
-        if self.pos not in self.neighbourhood_memory:
+        if self.pos not in self._visited_squares:
+            self._visited_squares.add(self.pos)
             for obstacle in obstacles:
-                self.mental_map[obstacle[0]][obstacle[1]] = 1
-
-            self.neighbourhood_memory.add(self.pos)
+                self._internal_map[obstacle[0]][obstacle[1]] = 1
 
         return neighbourhood
 
@@ -60,23 +52,20 @@ class Bee(Agent):
         if not self.plan_course or not self.plan_course[0] in neighborhood:
             self.plan_course = util.path_finder(cur_loc=self.pos,
                                                 target_loc=loc,
-                                                grid=self.mental_map)
+                                                grid=self._internal_map)
 
         nxt_loc = self.plan_course.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
 
     def arrive_at_hive(self, hive):
         """
-        A scouting bee arrives back at the hive
+        Arrive at the hive, and become a rester to gain energy.
+        If carrying any food, unload this food at the hive.
         """
-
-        # unload food
         if self.loaded:
             self.loaded = False
-            hive.receive_info(self.food_loc)
-            hive.unload_food()
+            hive.receive_food(self.food_loc)
 
-        # become rester to gain energy
         self.type_bee = "rester"
 
     def relax_at_hive(self, hive):
@@ -88,7 +77,7 @@ class Bee(Agent):
                 self.type_bee = "scout"
         elif self.type_bee == "babee":
             self.energy += 0.5
-            hive.food -= 0.5   
+            hive.food -= 0.5
         else:
             self.energy += hive.bite
             hive.food -= hive.bite
@@ -104,6 +93,7 @@ class Bee(Agent):
         # TODO This should probably be a larger age_penalty
         age_penalty = (self.age / LIFESPAN) / 10
         self.energy -= min(age_penalty, 1)
+
         # if no more energy, die
         if self.energy <= 0:
             self.model.remove_agent(self)
