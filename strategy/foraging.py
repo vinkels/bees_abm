@@ -33,6 +33,4 @@ def foraging_step(bee):
 
         # check if destination is reached
         if bee.pos == bee.hive_location:
-            hive = bee.model.get_hive(bee.hive_id)
-            assert hive
-            bee.arrive_at_hive(hive)
+            bee.arrive_at_hive()

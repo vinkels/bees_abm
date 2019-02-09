@@ -52,13 +52,16 @@ class Bee(Agent):
         nxt_loc = self.planned_route.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
 
-    def arrive_at_hive(self, hive):
+    def arrive_at_hive(self):
         """
         Arrive at the hive, and become a rester to gain energy.
         If carrying any food, unload this food at the hive.
         """
+        assert self.pos == self.hive_location
+
         if self.loaded:
             self.loaded = False
+            hive = self.model.get_hive(self.hive_id)
             hive.receive_food(self.food_location)
 
         self.type_bee = "rester"
