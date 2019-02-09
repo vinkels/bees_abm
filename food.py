@@ -3,25 +3,24 @@ import random as rd
 
 import numpy as np
 
-from config import CARRYING_CAPACITY
+from config import CARRYING_CAPACITY, FOOD_MEAN, FOOD_STD_DEV, FOOD_INCR
 
 
 class Food(Agent):
-    def __init__(self, model, pos, util_pars=(5, 2.5), max_step=30):
+    def __init__(self, model, pos):
         super().__init__(model.next_id(), model)
-        self.max_step = max_step
 
         self.pos = pos
 
         # TODO GENERATE RANDOMNESS BETWEEN 1 AND MAX_UTIL CHANGE THIS IN MODEL.PY
-        self.max_util = abs(int(round(np.random.normal(util_pars[0], util_pars[1])))) + 1
+        self.max_util = abs(int(round(np.random.normal(FOOD_MEAN, FOOD_STD_DEV)))) + 1
 
         self.util = rd.randint(1, self.max_util)
         self.steps = 0
 
     def step(self):
         # TODO CHANGE STEPCOUNT  AND ADD THIS VARIABLE IN CONFIG
-        if self.steps % self.max_step == 0:
+        if self.steps % FOOD_INCR == 0:
             if self.util < self.max_util:
                 self.util += 1
 

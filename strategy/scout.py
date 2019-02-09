@@ -34,16 +34,10 @@ def scout_step(bee):
                 bee.loaded = True
                 bee.food_location = bee.pos
 
-            # otherwise, move randomly
+            # otherwise, move to a random neighbour
             else:
-                # get neighboorhood
                 neighbourhood = bee.get_accessible_neighbourhood()
-
-                # select random cell in neighbourhood
-                target = random.choice(neighbourhood)
-
-                # move to cell
-                bee.model.grid.move_agent(bee, target)
+                bee.model.grid.move_agent(bee, random.choice(neighbourhood))
 
     else:
         raise Exception("Scouts should be unloaded.")
