@@ -1,9 +1,9 @@
 import numpy
 from mesa import Agent
 
-import util
 from config import LIFESPAN
 from strategy import BEE_STRATEGIES
+from astar import astar
 
 
 class Bee(Agent):
@@ -44,15 +44,10 @@ class Bee(Agent):
         return neighbourhood
 
     def move(self, loc):
-        """
-        Move to specified location.
-        """
         neighborhood = self.get_accessible_neighbourhood()
 
         if not self.plan_course or not self.plan_course[0] in neighborhood:
-            self.plan_course = util.path_finder(cur_loc=self.pos,
-                                                target_loc=loc,
-                                                grid=self._internal_map)
+            self.plan_course = astar(self._internal_map, self.pos, loc)
 
         nxt_loc = self.plan_course.pop(0)
         self.model.grid.move_agent(self, nxt_loc)
@@ -70,7 +65,8 @@ class Bee(Agent):
 
     def relax_at_hive(self, hive):
         """
-        Eat while at hive and gain energy
+        Eat while at hive and gain energy.
+        If there is no food left, become a scout if old enough.
         """
         if hive.food < hive.bite:
             if self.type_bee != "babee":
@@ -83,18 +79,13 @@ class Bee(Agent):
             hive.food -= hive.bite
 
     def step(self):
-        """
-        Move the bee, look around for a food source and take food source
-        """
-        # TODO TYPE OF ENERGY DECAY FOR BEE AND AGE SPAN
         self.age += 1
 
         # lose energy proportional to age
-        # TODO This should probably be a larger age_penalty
         age_penalty = (self.age / LIFESPAN) / 10
         self.energy -= min(age_penalty, 1)
 
-        # if no more energy, die
+        # if out of energy, die
         if self.energy <= 0:
             self.model.remove_agent(self)
             return
