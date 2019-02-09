@@ -8,9 +8,7 @@ def scout_step(bee):
     """
     assert not bee.loaded, "Scouts should be unloaded."
 
-    bee_is_tired = bee.energy < 0.5 * bee.max_energy
-
-    if bee_is_tired and bee.pos != bee.hive_location:
+    if bee.is_tired and bee.pos != bee.hive_location:
         bee.move(bee.hive_location)
 
         # check if destination is reached

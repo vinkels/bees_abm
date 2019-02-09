@@ -29,6 +29,10 @@ class Bee(Agent):
 
         self._visited_squares = set()
 
+    @property
+    def is_tired(self):
+        return self.energy < 0.5 * self.max_energy
+
     def get_accessible_neighbourhood(self):
         """
         Determine which neighbours are accessible by looking at obstacles.
