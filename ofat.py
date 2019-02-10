@@ -30,7 +30,7 @@ class OFAT():
 
         # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-        replicates = 400
+        replicates = 500
         max_steps = 3000
 
         # Define output parameters
@@ -109,6 +109,9 @@ class OFAT():
         plt.savefig('plots/plot2.png')
             
     def get_ofat(self):
+        """
+
+        """
 
         self.ofat_dict, self.df_plot = self.data_prep()
 
@@ -154,7 +157,7 @@ class OFAT():
         f, axs = plt.subplots(3, figsize=(7, 10))
 
         for i, var in enumerate(self.var_names):
-            self.plot_param_var_conf(axs[i], self.ofat_dict[var], var, param, i)
+            self.plot_param_var_conf(axs[i], self.ofat_dict[var], var, param)
 
 
 

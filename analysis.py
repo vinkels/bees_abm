@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 from tqdm import tqdm
 from datetime import datetime
+import sys
 
 def create_data(problem, new_path):
     """
@@ -21,9 +22,9 @@ def create_data(problem, new_path):
     """
 
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-    replicates = 200
+    replicates = 20
     max_steps = 3000
-    distinct_samples= 10
+    distinct_samples= 4
 
     # Define output parameters
     model_reporters = {
@@ -36,7 +37,12 @@ def create_data(problem, new_path):
     data = {}
 
     # Sample from data with every interactions, computationally expensive but gives all combinations
-    params_values = saltelli.sample(problem,N=distinct_samples)
+    params_values = saltelli.sample(problem,N=3)
+
+    # change nr of hives to ints -> looks ok 
+    for i, val in enumerate(params_values):
+        params_values[i][0] = int(val[0])
+    print(params_values)
 
     #transform to int value and overwrite array if copy needed set flag to True
     params_values = params_values.astype(int, copy=False)
@@ -90,8 +96,9 @@ def clean_data(data, new_path):
         df_temp['n_hives'] = row['nr_hives']
         df_temp['sample'] = row['Run']
         df_temp['step'] = df_temp.index
-        final_dfs.append(df_temp)
-    final_dfs.append(df_temp.iloc[500:])
+        # final_dfs.append(df_temp)
+        final_dfs.append(df_temp.iloc[500:])
+    df_final = pd.concat(final_dfs)
     df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_new.copy(deep=True)
@@ -112,7 +119,7 @@ def clean_data(data, new_path):
 
     df_sample = df_sample.reset_index()
     df_sample.columns = ['_'.join(col) if col[1] else col[0] for col in df_sample.columns]
-    df_sample.to_pickle(f'pickles/sobol_sample_{new_path}.p')
+    df_sample.to_pickle(f'pickles/sobol_small_sample_{new_path}.p')
 
     return df_sample
 
@@ -158,43 +165,47 @@ def plot_index(s, params, i, title=''):
     plt.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o')
     plt.axvline(0, c='k')
 
-def plot_sensitivity_order(data,problem):
+def plot_sensitivity_order(data,problem, new_path):
 
     for Si in data:
         # First order
         plot_index(Si, problem['names'], '1', 'First order sensitivity')
-        plt.show()
+        plt.savefig(f'sobol_first_{new_path}.png')
 
         # Second order
         plot_index(Si, problem['names'], '2', 'Second order sensitivity')
-        plt.show()
+        plt.savefig(f'sobol_second_{new_path}.png')
 
         # Total order
         plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
-        plt.show()
+        plt.savefig(f'sobol_total_{new_path}.png')
+
+
 if __name__ == "__main__":
     var_names  = ['nr_hives','obstacle_density', 'food_density']
 
     # Extract all the present CPU-thread for computation
     groups = np.arange(os.cpu_count())
 
-    #path timestamp
-    new_path = datetime.now().strftime('%Y%m%d%H%M')
+    # to make multiple small batches 
+    for i in range(25):
+        #path timestamp
+        new_path = datetime.now().strftime('%Y%m%d%H%M')
 
-    # We define our variables and bounds
-    problem = {
-        'num_vars': 3,
-        'names': ['nr_hives','obstacle_density', 'food_density'],
-        'bounds': [[1,6],[0,31],[5,26]],
-        'groups':['G'+str(groups[1]),'G'+str(groups[2]),'G'+str(groups[3])] # for multiprocessing
-    }
-    df = create_data(problem, new_path)
+        # We define our variables and bounds
+        problem = {
+            'num_vars': 3,
+            'names': ['nr_hives','obstacle_density', 'food_density'],
+            'bounds': [[1,6],[0,31],[5,26]],
+            'groups':['G'+str(groups[1]),'G'+str(groups[2]),'G'+str(groups[3])] # for multiprocessing
+        }
+        df = create_data(problem, new_path)
     #TODO make this part interactive?
 
-    # Change this right_path by running create_data. Mind that max_steps should be bigger.
-    # right_path = '201902071158'
-    # data = pd.read_pickle(f'pickles/sobol_sample_{new_path}.p')
-    cl_data = clean_data(df, new_path)
-    Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
-    to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
-    plot_sensitivity_order(to_plot,problem)
+    # # Change this right_path by running create_data. Mind that max_steps should be bigger.
+    # # right_path = '201902071158'
+    # # data = pd.read_pickle(f'pickles/sobol_sample_{new_path}.p')
+    # cl_data = clean_data(df, new_path)
+    # Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
+    # to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
+    # plot_sensitivity_order(to_plot, problem, new_path)
