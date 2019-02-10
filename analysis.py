@@ -21,7 +21,7 @@ def create_data(problem, new_path):
     """
 
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-    replicates = 
+    replicates = 200
     max_steps = 3000
     distinct_samples= 10
 
