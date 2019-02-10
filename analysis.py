@@ -92,8 +92,7 @@ def clean_data(data, new_path):
         df_temp['n_hives'] = row['nr_hives']
         df_temp['sample'] = row['Run']
         df_temp['step'] = df_temp.index
-        # final_dfs.append(df_temp)
-        final_dfs.append(df_temp.iloc[50:])
+        final_dfs.append(df_temp.iloc[10:])
     df_final = pd.concat(final_dfs)
 
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
