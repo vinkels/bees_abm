@@ -7,7 +7,7 @@ def scout_step(bee):
     This type of bee does a random walk, searching for food,
     and returns to its hive if he has found food or is tired.
     """
-    assert not bee.is_loaded, "Scouts should be unloaded."
+    assert not bee.is_carrying_food, "Scouts should be unloaded."
 
     if bee.is_tired and not bee.at_hive:
         bee.move_to_hive()
@@ -27,7 +27,7 @@ def scout_step(bee):
 
             # Become a forager take food and remember location
             bee.type_bee = 'foraging'
-            bee.is_loaded = True
+            bee.is_carrying_food = True
             bee.food_location = bee.pos
 
         # otherwise, move to a random neighbour

@@ -6,7 +6,7 @@ def foraging_step(bee):
     This type of bee goes to a given food location and takes the food.
     If the bee is loaded it returns to the hive.
     """
-    if bee.is_loaded:
+    if bee.is_carrying_food:
         bee.move_to_hive()
     else:
         bee.move(bee.food_location)
@@ -26,4 +26,4 @@ def foraging_step(bee):
                 bee.type_bee = "scout"
             else:
                 food_on_location[0].harvest()
-                bee.is_loaded = True
+                bee.is_carrying_food = True

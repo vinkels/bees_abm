@@ -9,24 +9,30 @@ from astar import astar
 class Bee(Agent):
     def __init__(self, model, pos, hive, type_bee, hive_id, color, age=0):
         super().__init__(model.next_id(), model)
+        self.pos = pos
+        self.age = age
+        self.type_bee = type_bee
+        self.is_carrying_food = False
 
-        self.is_loaded = False
-        self.food_location = None
+        # A bee knows where its hive is.
         self._hive_location = hive.pos
         self._hive_id = hive_id
-        self.pos = pos
-        self.type_bee = type_bee
-        self.age = age
+
+        # A bee can remember a food location
+        self.food_location = None
+
+        # Color is used for vizualisation.
         self.color = color
 
-        # random threshold of energy required per bee to go foraging
+        # random maximum of energy level required per bee to go foraging
         self.max_energy = numpy.random.normal(ENERGY_MEAN, ENERGY_STD_DEV)
         self.energy = self.max_energy
 
+        # A bee can have a route planned out.
         self.planned_route = []
 
+        # A bee remembers a map of the area, and where it has been before.
         self._internal_map = numpy.zeros((self.model.height, self.model.width))
-
         self._visited_squares = set()
 
     @property
@@ -56,7 +62,6 @@ class Bee(Agent):
         """
         self.move(self._hive_location)
 
-        # check if destination is reached
         if self.at_hive:
             self.arrive_at_hive()
 
@@ -94,24 +99,28 @@ class Bee(Agent):
         Arrive at the hive, and become a rester to gain energy.
         If carrying any food, unload this food at the hive.
         """
-        assert self.at_hive
+        assert self.at_hive, "A bee can only arrive if at hive."
 
-        if self.is_loaded:
-            self.is_loaded = False
+        if self.is_carrying_food:
+            self.is_carrying_food = False
             self.hive.receive_food(self.food_location)
 
         self.type_bee = "rester"
 
     def step(self):
+        """
+        A bee step consists of 4 steps:
+        1. Age the bee.
+        2. Lose energy proportional to age.
+        3. Remove bee if out of energy.
+        4. Execute bee strategy.
+        """
         self.age += 1
 
-        # lose energy proportional to age
         age_penalty = (self.age / LIFESPAN) / 10
         self.energy -= min(age_penalty, 1)
 
-        # if out of energy, die
         if self.energy <= 0:
             self.model.remove_agent(self)
-            return
-
-        BEE_STRATEGIES[self.type_bee](self)
+        else:
+            BEE_STRATEGIES[self.type_bee](self)
