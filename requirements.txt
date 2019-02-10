@@ -6,3 +6,13 @@ mesa==0.8.5
 pathos==0.2.3
 cython==0.29.3
 tqdm==4.29.0
+Axelrod==3.11.0
+prompt-toolkit==1.0.15
+ipython==6.2.1
+jupyter-console==5.2.0
+ipykernel==4.10.0
+mesa
+pathfinding
+ipynb
+statsmodels
+SALib
