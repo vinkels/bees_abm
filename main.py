@@ -5,6 +5,9 @@ from config import GRID_WIDTH, GRID_HEIGHT
 
 
 def main():
+    """
+    Class used in testing the bee_model internally.
+    """
     bee_model = md.BeeForagingModel(GRID_WIDTH, GRID_HEIGHT, 10, 30, 7)
 
     iteration_size = 1000

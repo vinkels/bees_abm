@@ -3,7 +3,7 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
-from config import *
+from config import GRID_HEIGHT, GRID_WIDTH
 from food import Food
 from bee import Bee
 from hive import Hive
@@ -13,8 +13,7 @@ from schedule import RandomActivationBeeWorld
 
 
 class BeeForagingModel(Model):
-    # TODO MODIFY HEIGHT AND WIDTH FROM CONFIG
-    def __init__(self, width=50, height=50, obstacle_density=15, food_density=15, nr_hives=3, VIZUALISATION=False):
+    def __init__(self, width=GRID_WIDTH, height=GRID_HEIGHT, obstacle_density=15, food_density=15, nr_hives=3, VIZUALISATION=False):
         super().__init__()
         self.height = height
         self.width = width
@@ -53,7 +52,7 @@ class BeeForagingModel(Model):
             r = lambda: rd.randint(0, 255)
             color = '#{:02x}{:02x}{:02x}'.format(r(), r(), r())
             hive = Hive(self, hive_location, color=color, bee_color=color)
-            self.hive = hive
+
             self.hives[hive.unique_id] = hive
             self.add_agent(hive, hive_location)
 
@@ -96,23 +95,38 @@ class BeeForagingModel(Model):
         self.grid.warmup()
 
     def get_hive(self, hive_id):
+        """
+        Get the Hive belonging to hive_id.
+        """
         return self.hives[hive_id]
 
     def step(self):
+        """
+        Steps the schedule and collect data.
+        """
         self.schedule.step()
         self.datacollector.collect(self)
 
     def get_birth_count(self):
+        """
+        Returns the current birth count en resets it to 0.
+        """
         count = self.birth_count
         self.birth_count = 0
         return count
 
     def get_death_count(self):
+        """
+        Returns the current death count en resets it to 0.
+        """
         count = self.death_count
         self.death_count = 0
         return count
 
     def get_death_age(self):
+        """
+        Returns the current mean death age count en resets it to 0.
+        """
         if len(self.death_age) > 0:
             mean_age = sum(self.death_age)/len(self.death_age)
             self.death_age = []
@@ -120,15 +134,24 @@ class BeeForagingModel(Model):
         else:
             return 0
 
-    def run_model(self, n_steps):
-        for i in range(n_steps):
+    def run_model(self, number_of_steps):
+        """
+        Runs the model for a certain number_of_steps.
+        """
+        for i in range(number_of_steps):
             self.step()
 
     def add_agent(self, agent, pos):
+        """
+        Add an agent to the grid and schedule.
+        """
         self.grid.place_agent(agent, pos)
         self.schedule.add(agent)
 
     def remove_agent(self, agent):
+        """
+        Remove an agent from the grid and schedule.
+        """
         if type(agent) == Bee:
             self.death_count += 1
             self.death_age.append(agent.age)
@@ -137,15 +160,21 @@ class BeeForagingModel(Model):
         self.schedule.remove(agent)
 
     def add_bee(self, hive, type_bee, color, age=0):
-            bee = Bee(self, pos=hive.pos, hive=hive, type_bee=type_bee, hive_id=hive.unique_id, color=color, age=age)
+        """
+        Add a bee to the model.
+        """
+        bee = Bee(self, pos=hive.pos, hive=hive, type_bee=type_bee, hive_id=hive.unique_id, color=color, age=age)
 
-            if type_bee == 'babee':
-                self.birth_count += 1
+        if type_bee == 'babee':
+            self.birth_count += 1
 
-            self.add_agent(bee, hive.pos)
+        self.add_agent(bee, hive.pos)
 
     @staticmethod
     def init_grid(height, width, obstacle_density, food_density, nr_hives):
+        """
+        Set the initial locations for the hives, food and obstacles.
+        """
         possible_locations = [
             (x, y)
             for y in range(height)
