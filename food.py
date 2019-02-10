@@ -12,6 +12,9 @@ class Food(Agent):
         self.pos = pos
         self.steps = 0
 
+        # Max util is a random value from a normal distribution
+        # WARNING: max_util can be lower than CARRYING_CAPACITY,
+        #          making the food unharvestable.
         self.max_util = abs(int(round(normal(FOOD_MEAN, FOOD_STD_DEV)))) + 1
         self.util = randint(1, self.max_util)
 

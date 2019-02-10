@@ -1,6 +1,6 @@
-from mesa import Agent
 import random as rd
 
+from mesa import Agent
 
 from config import CARRYING_CAPACITY
 
@@ -13,54 +13,66 @@ class Hive(Agent):
         self.food = 0
         self.n_bees = 0
         self.hungry = False
-        self.energy_level_critical = 10
+
+        # The optimal energy level is used to balance the hive.
         self.energy_level_optimal = 0
-        self.energy_level_minimum = 25
+
+        # bite is the bite size that bees will take from the food supply.
         self.bite = 1
+
+        # Colors are used in the vizualisation
         self.color = color
         self.bee_color = bee_color
+
+        # The rate at which new bees are produced
         self.reproduction_rate = 0.1
 
     def receive_food(self, info):
+        """
+        Add food to foodsupply, and save food location.
+        """
         self.food_locations.append(info)
         self.food += CARRYING_CAPACITY
         self.model.load_count += 1
 
     def step(self):
-
-        # determine number of bees in hive
+        """
+        The hive step consists of 5 steps.
+        1. Determine the current number of bees in the hive.
+        2. Determine the current optimal energy level.
+        3. Reproduce with a certain chance.
+        4. Cleanup food locations.
+        5. Balance hive if necessary.
+        """
         self.n_bees = self.model.schedule.count_hive_bees(self.pos)
 
-        # determine optimal and critical amount of food
         self.energy_level_optimal = self.n_bees * 5
-        self.energy_level_critical = self.n_bees
 
-        # chance of babies
-        # if self.food > self.energy_level_optimal and rd.random() < self.reproduction_rate:
         if rd.random() < self.reproduction_rate:
-            self.model.add_bee(self.pos, self, "babee", hive_id=self.unique_id, color=self.bee_color, age=0)
+            self.model.add_bee(self, "babee", color=self.bee_color)
             self.n_bees += 1
 
-        # forget a random amount of food locations when too many to remember
-        to_discard = rd.randint(1, 10)
         if len(self.food_locations) > 10:
-                self.food_locations = self.food_locations[to_discard:]
+            to_discard = rd.randint(1, 10)
+            self.food_locations = self.food_locations[to_discard:]
 
-        # adjust parameters of hive based on food in hive
         self.balance_hive()
 
     def get_food_stat(self):
+        """
+        Returns the current amount of food in the hive.
+        """
         return self.food
 
     def balance_hive(self):
-        # if food is available
+        """
+        If food is available, adjust parameters of hive based on food in hive
+        """
         if self.food > 0:
 
-            # if more than necessary amount of food, increase consumption and reproduction
-            # TODO dependency energy in hive
+            # if enough food, increase consumption and reproduction
             if self.food >= self.energy_level_optimal:
                 self.bite += self.bite/10
-                # self.bite =  min(1, self.bite + self.bite/100)
                 self.reproduction_rate += self.reproduction_rate/100
 
             else:
