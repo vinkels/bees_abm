@@ -38,7 +38,14 @@ class Bee(Agent):
         return self.pos == self._hive_location
 
     def move_to_hive(self):
+        """
+        Move towards the hive, and if the hive is reached arrive there.
+        """
         self.move(self._hive_location)
+
+        # check if destination is reached
+        if self.at_hive:
+            self.arrive_at_hive()
 
     def get_accessible_neighbourhood(self):
         """

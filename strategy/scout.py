@@ -4,21 +4,18 @@ from food import Food
 
 def scout_step(bee):
     """
-    This type of bee does a random walk, searching for food, and return to hive if he has found this.
+    This type of bee does a random walk, searching for food,
+    and returns to its hive if he has found food or is tired.
     """
     assert not bee.loaded, "Scouts should be unloaded."
 
     if bee.is_tired and not bee.at_hive:
         bee.move_to_hive()
-
-        # check if destination is reached
-        if bee.at_hive:
-            bee.arrive_at_hive()
     else:
         food_neighbours = [
             nb
             for nb in bee.model.grid.get_food_neighbors(bee.pos, 1)
-            if nb.can_be_harvested()
+            if nb.can_be_harvested
         ]
 
         # If you see food that is uneaten, move there.
