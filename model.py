@@ -3,7 +3,7 @@ from mesa.datacollection import DataCollector
 
 import random as rd
 
-from config import GRID_HEIGHT, GRID_WIDTH
+from config import GRID_HEIGHT, GRID_WIDTH, FOOD_OBSTACLE_RATIO, BABYTIME
 from food import Food
 from bee import Bee
 from hive import Hive
