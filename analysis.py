@@ -22,9 +22,9 @@ def create_data(problem, new_path):
     """
 
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-    replicates = 1
-    max_steps = 10
-    distinct_samples= 1
+    replicates = 10
+    max_steps = 100
+    distinct_samples= 10
 
     # Define output parameters
     model_reporters = {
@@ -39,27 +39,10 @@ def create_data(problem, new_path):
     # Sample from data with every interactions, computationally expensive but gives all combinations
     params_values = saltelli.sample(problem,N=distinct_samples)
 
-<<<<<<< HEAD
-    # change nr of hives to ints -> looks ok
-    for i, val in enumerate(params_values):
-        params_values[i][0] = int(val[0])
-    # print(params_values)
-
-    #transform to int value and overwrite array if copy needed set flag to True
-    # params_values = params_values.astype(int, copy=False)
-
-=======
-    # change nr of hives to ints -> looks ok 
-    # for i, val in enumerate(params_values):
-    #     params_values[i][0] = int(val[0])
-    # print(params_values)
 
     #transform to int value and overwrite array if copy needed set flag to True
     params_values = params_values.astype(int, copy=False)
->>>>>>> 87f67447f01a4f70ff52ae887a986bc24bf30a6d
-    # test range of combinations
-    # print(params_values[:][:,0], len(params_values))
-    print(params_values)
+
 
     batch = BatchRunnerMP(BeeForagingModel,
                         nr_processes=os.cpu_count(),
@@ -87,7 +70,6 @@ def create_data(problem, new_path):
 
     data.to_csv(f'pickles/analysis_{new_path}.csv')
     data.to_pickle(f'pickles/analysis_{new_path}.p')
-    # print('wat ben jij',type(data))
     return data
 
 
@@ -110,14 +92,10 @@ def clean_data(data, new_path):
         df_temp['n_hives'] = row['nr_hives']
         df_temp['sample'] = row['Run']
         df_temp['step'] = df_temp.index
-        final_dfs.append(df_temp)
-        # final_dfs.append(df_temp.iloc[500:])
+        # final_dfs.append(df_temp)
+        final_dfs.append(df_temp.iloc[50:])
     df_final = pd.concat(final_dfs)
 
-<<<<<<< HEAD
-    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
-=======
->>>>>>> 87f67447f01a4f70ff52ae887a986bc24bf30a6d
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_final.copy(deep=True)
     df_test.loc[:,'scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
@@ -128,10 +106,7 @@ def clean_data(data, new_path):
 
 
     df_sample = df_sample.reset_index()
-<<<<<<< HEAD
-=======
-    print(df_sample)
->>>>>>> 87f67447f01a4f70ff52ae887a986bc24bf30a6d
+
     df_sample.to_pickle(f'pickles/sobol_small_sample_{new_path}.p')
 
     return df_sample
@@ -143,7 +118,6 @@ def analyse(data, problem):
     Si_scout_forage = sobol.analyze(problem, data['scout_forage'].values, print_to_console=False,n_processors=os.cpu_count(),parallel=True)
     Si_food_bee = sobol.analyze(problem, data['food_bee'].values, print_to_console=False,n_processors=os.cpu_count(), parallel=True)
     Si_bee_hive = sobol.analyze(problem, data['bees_hive'].values, print_to_console=False,n_processors=os.cpu_count(), parallel=True)
-    print("Done")
     return Si_scout_forage, Si_food_bee, Si_bee_hive
 
 def plot_index(s, params, i, title=''):
@@ -201,12 +175,8 @@ if __name__ == "__main__":
     groups = np.arange(os.cpu_count())
 
     dfs = []
-<<<<<<< HEAD
     # to make multiple small batches
-=======
-    # to make multiple small batches 
->>>>>>> 87f67447f01a4f70ff52ae887a986bc24bf30a6d
-    for i in range(2):
+    for i in range(5):
         #path timestamp
         new_path = datetime.now().strftime('%Y%m%d%H%M')
 
@@ -220,10 +190,7 @@ if __name__ == "__main__":
         df = create_data(problem, new_path)
         dfs.append(df)
     data = pd.concat(dfs)
-    #TODO make this part interactive?
-    # print(df)
-    # Change this right_path by running create_data. Mind that max_steps should be bigger.
-    # right_path = '201902071158'
+
     # data = pd.read_pickle(f'pickles/sobol_sample_{new_path}.p')
     cl_data = clean_data(data, new_path)
     Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
