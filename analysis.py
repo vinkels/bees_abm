@@ -106,7 +106,6 @@ def clean_data(data, new_path):
 
 
     df_sample = df_sample.reset_index()
-
     df_sample.to_pickle(f'pickles/sobol_small_sample_{new_path}.p')
 
     return df_sample
