@@ -39,7 +39,6 @@ def create_data(problem, new_path):
     # Sample from data with every interactions, computationally expensive but gives all combinations
     params_values = saltelli.sample(problem,N=distinct_samples)
 
-<<<<<<< HEAD
     # change nr of hives to ints -> looks ok 
     # for i, val in enumerate(params_values):
     #     params_values[i][0] = int(val[0])
@@ -47,19 +46,9 @@ def create_data(problem, new_path):
 
     #transform to int value and overwrite array if copy needed set flag to True
     params_values = params_values.astype(int, copy=False)
-=======
-    # change nr of hives to ints -> looks ok
-    for i, val in enumerate(params_values):
-        params_values[i][0] = int(val[0])
-    # print(params_values)
-
-    #transform to int value and overwrite array if copy needed set flag to True
-    # params_values = params_values.astype(int, copy=False)
-
->>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
     # test range of combinations
     # print(params_values[:][:,0], len(params_values))
-
+    print(params_values)
 
     batch = BatchRunnerMP(BeeForagingModel,
                         nr_processes=os.cpu_count(),
@@ -87,7 +76,7 @@ def create_data(problem, new_path):
 
     data.to_csv(f'pickles/analysis_{new_path}.csv')
     data.to_pickle(f'pickles/analysis_{new_path}.p')
-    print('wat ben jij',type(data))
+    # print('wat ben jij',type(data))
     return data
 
 
@@ -102,29 +91,18 @@ def clean_data(data, new_path):
     """
 
     final_dfs = []
-    # print(type(data))
-    for i, row in data.iterrows():
-        # print(type(row['step_data']), row['step_data'])
-        df_temp = data.at[i, 'step_data']
-        print('----------------------------------')
-        print(df_temp, type(df_temp))
 
-        # print(type(df_temp), df_temp)
-        print('----------------------------------')
+    for i, row in data.iterrows():
+        df_temp = row['step_data']
         df_temp['obstacle_dens'] = row['obstacle_density']
         df_temp['food_dens'] = row['food_density']
         df_temp['n_hives'] = row['nr_hives']
         df_temp['sample'] = row['Run']
         df_temp['step'] = df_temp.index
         final_dfs.append(df_temp)
-        print('kom ik hiiiieeeeeeeer?')
         # final_dfs.append(df_temp.iloc[500:])
     df_final = pd.concat(final_dfs)
 
-<<<<<<< HEAD
-=======
-    df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
->>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_final.copy(deep=True)
     df_test.loc[:,'scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
@@ -135,10 +113,7 @@ def clean_data(data, new_path):
 
 
     df_sample = df_sample.reset_index()
-<<<<<<< HEAD
     print(df_sample)
-=======
->>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
     df_sample.to_pickle(f'pickles/sobol_small_sample_{new_path}.p')
 
     return df_sample
@@ -207,14 +182,9 @@ if __name__ == "__main__":
     # Extract all the present CPU-thread for computation
     groups = np.arange(os.cpu_count())
 
-<<<<<<< HEAD
     dfs = []
     # to make multiple small batches 
     for i in range(2):
-=======
-    # to make multiple small batches
-    for i in range(25):
->>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
         #path timestamp
         new_path = datetime.now().strftime('%Y%m%d%H%M')
 
