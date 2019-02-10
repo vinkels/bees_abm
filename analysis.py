@@ -21,8 +21,8 @@ def create_data(problem, new_path):
     """
 
     # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-    replicates = 10
-    max_steps = 100
+    replicates = 
+    max_steps = 3000
     distinct_samples= 10
 
     # Define output parameters
@@ -73,7 +73,7 @@ def create_data(problem, new_path):
 
 
 
-def clean_data(data):
+def clean_data(data, new_path):
     """
     data: pandas datframe saved as  pickle
     The data is one bulk of all combinations of data and just need to loop over the runs
@@ -91,7 +91,7 @@ def clean_data(data):
         df_temp['sample'] = row['Run']
         df_temp['step'] = df_temp.index
         final_dfs.append(df_temp)
-    df_final = pd.concat(final_dfs)
+    final_dfs.append(df_temp.iloc[500:])
     df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_new.copy(deep=True)
@@ -99,15 +99,22 @@ def clean_data(data):
     # df_new.is_copy = False Deprecated do not use
     df_test.loc[:,'food_bee'] = df_final['hive_food'] / df_final['n_bees']
     df_test.loc[:,'bees_hive'] = df_final['n_bees'] / df_final['n_hives']
-    df_step = df_test.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
-                                                                                        'food_bee': ['mean', 'std'],
-                                                                                        'scout_forage': ['mean', 'std'],
-                                                                                        'bees_hive': ['mean', 'std']
-                                                                                        })
-    df_step = df_step.reset_index()
-    df_step.columns = ['_'.join(col) if col[1] else col[0] for col in df_step.columns]
+    # df_step = df_test.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'step']).agg({
+    #                                                                                     'food_bee': ['mean', 'std'],
+    #                                                                                     'scout_forage': ['mean', 'std'],
+    #                                                                                     'bees_hive': ['mean', 'std']
+    #                                                                                     })
+    # df_step = df_step.reset_index()
+    # df_step.columns = ['_'.join(col) if col[1] else col[0] for col in df_step.columns]
+    df_sample = df_test.groupby(['obstacle_dens', 'food_dens', 'n_hives', 'sample'])[
+                ['food_bee', 'scout_forage', 'bees_hive']].mean()
+            # print(df_sample)
 
-    return df_step
+    df_sample = df_sample.reset_index()
+    df_sample.columns = ['_'.join(col) if col[1] else col[0] for col in df_sample.columns]
+    df_sample.to_pickle(f'pickles/sobol_sample_{new_path}.p')
+
+    return df_sample
 
 
 
@@ -185,8 +192,8 @@ if __name__ == "__main__":
     #TODO make this part interactive?
     # Change this right_path by running create_data. Mind that max_steps should be bigger.
     right_path = '201902071158'
-    data = pd.read_pickle(f'pickles/analysis_{right_path}.p')
-    cl_data = clean_data(data)
+    data = pd.read_pickle(f'pickles/analysis_{new_path}.p')
+    cl_data = clean_data(data, new_path)
     Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
     to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
     plot_sensitivity_order(to_plot,problem)

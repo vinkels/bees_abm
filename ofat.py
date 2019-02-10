@@ -30,7 +30,7 @@ class OFAT():
 
         # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
-        replicates = 200
+        replicates = 400
         max_steps = 3000
 
         # Define output parameters
@@ -77,7 +77,7 @@ class OFAT():
                 df_temp['sample'] = row['Run']
                 df_temp['step'] = df_temp.index
                 sample += 1
-                final_dfs.append(df_temp)
+                # final_dfs.append(df_temp)
                 final_dfs.append(df_temp.iloc[self.warm_it-1:])
             df_final = pd.concat(final_dfs)
             df_new = df_final[['nr_hives', 'food_density', 'obstacle_density', 'sample', 'step']]
