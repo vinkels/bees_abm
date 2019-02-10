@@ -1,13 +1,11 @@
-from mesa.space import MultiGrid, accept_tuple_argument
-
 import itertools
 
+from mesa.space import MultiGrid, accept_tuple_argument
 
-from config import OBSTACLE
-
-from hive import Hive
 from bee import Bee
+from config import OBSTACLE
 from food import Food
+from hive import Hive
 
 
 class MultiGridWithObstacles(MultiGrid):
@@ -18,6 +16,7 @@ class MultiGridWithObstacles(MultiGrid):
             width, height: The width and height of the grid
             torus: Boolean whether the grid wraps or not.
             obstacle_positions: A set of all locations that are not accessible.
+            VIZUALISATION: Is this grid going to be shown to a UI.
         """
         self.height = height
         self.width = width
@@ -25,6 +24,8 @@ class MultiGridWithObstacles(MultiGrid):
 
         self.VIZUALISATION = VIZUALISATION
 
+        # If we are not vizualizing, we only keep food on an actual grid,
+        # bees and hives are accessed in other ways.
         if self.VIZUALISATION:
             self.grids = {
                 Bee: [[set() for _ in range(self.height)] for _ in range(self.width)],
