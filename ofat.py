@@ -28,10 +28,16 @@ class OFAT():
             'nr_hives': [1, 3, 5]
         }
 
+<<<<<<< HEAD
         # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
         replicates = 1
         max_steps = 30
+=======
+        # Set the repetitions and the amount of steps
+        replicates = 400
+        max_steps = 3000
+>>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
 
         # Define output parameters
         model_reporters = {
@@ -117,11 +123,14 @@ class OFAT():
         sns_plot = sns.lineplot(x="step", y="food_bee",
                                 hue="nr_hives", data=df_new)
         plt.savefig('plots/plot2.png')
+<<<<<<< HEAD
 
     def get_ofat(self):
         """
 
         """
+=======
+>>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
 
         self.ofat_dict, self.df_plot = self.data_prep()
 
