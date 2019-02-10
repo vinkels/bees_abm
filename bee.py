@@ -10,10 +10,10 @@ class Bee(Agent):
     def __init__(self, model, pos, hive, type_bee, hive_id, color, age=0):
         super().__init__(model.next_id(), model)
 
-        self.loaded = False
+        self.is_loaded = False
         self.food_location = None
         self._hive_location = hive.pos
-        self.hive_id = hive_id
+        self._hive_id = hive_id
         self.pos = pos
         self.type_bee = type_bee
         self.age = age
@@ -31,11 +31,24 @@ class Bee(Agent):
 
     @property
     def is_tired(self):
+        """
+        Returns if the bee is tired and should stop scouting.
+        """
         return self.energy < 0.5 * self.max_energy
 
     @property
     def at_hive(self):
+        """
+        Returns if the bee is currently at its hive location.
+        """
         return self.pos == self._hive_location
+
+    @property
+    def hive(self):
+        """
+        Returns the hive object that this bee relates to.
+        """
+        return self.model.get_hive(self._hive_id)
 
     def move_to_hive(self):
         """
@@ -83,10 +96,9 @@ class Bee(Agent):
         """
         assert self.at_hive
 
-        if self.loaded:
-            self.loaded = False
-            hive = self.model.get_hive(self.hive_id)
-            hive.receive_food(self.food_location)
+        if self.is_loaded:
+            self.is_loaded = False
+            self.hive.receive_food(self.food_location)
 
         self.type_bee = "rester"
 

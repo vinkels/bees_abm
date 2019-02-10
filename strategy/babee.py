@@ -6,7 +6,7 @@ def babee_step(bee):
     This type of bee stays at the hive until a certain age (BABYTIME).
     If the hive can be eaten from by the baby, take a bite for energy.
     """
-    hive = bee.model.get_hive(bee.hive_id)
+    hive = bee.hive
 
     if hive.food >= BABYBITE:
         bee.energy += BABYBITE

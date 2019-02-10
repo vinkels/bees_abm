@@ -8,7 +8,7 @@ def rester_step(bee):
     # Resting bees can only be at the hive.
     assert bee.at_hive
 
-    hive = bee.model.get_hive(bee.hive_id)
+    hive = bee.hive
 
     # check if bee has enough energy for foraging
     if bee.energy >= bee.max_energy:
