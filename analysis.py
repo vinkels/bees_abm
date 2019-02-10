@@ -94,8 +94,6 @@ def clean_data(data, new_path):
         df_temp['step'] = df_temp.index
         final_dfs.append(df_temp.iloc[10:])
     df_final = pd.concat(final_dfs)
-
-    #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_final.copy(deep=True)
     df_test.loc[:,'scout_forage'] = (df_final['scout_bees'] - df_final['forage_bees']) / (df_final['scout_bees'] + df_final['forage_bees'])
     df_test.loc[:,'food_bee'] = df_final['hive_food'] / df_final['n_bees']
@@ -155,15 +153,15 @@ def plot_sensitivity_order(data,problem, new_path):
     for Si in data:
         # First order
         plot_index(Si, problem['names'], '1', 'First order sensitivity')
-        plt.savefig(f'sobol_first_{new_path}.png')
+        plt.savefig(f'plots/sobol_first_{new_path}.png')
 
         # Second order
         plot_index(Si, problem['names'], '2', 'Second order sensitivity')
-        plt.savefig(f'sobol_second_{new_path}.png')
+        plt.savefig(f'plots/sobol_second_{new_path}.png')
 
         # Total order
         plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
-        plt.savefig(f'sobol_total_{new_path}.png')
+        plt.savefig(f'plots/sobol_total_{new_path}.png')
 
 
 if __name__ == "__main__":
