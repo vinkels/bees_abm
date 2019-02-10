@@ -96,15 +96,10 @@ def clean_data(data, new_path):
         df_temp['n_hives'] = row['nr_hives']
         df_temp['sample'] = row['Run']
         df_temp['step'] = df_temp.index
-<<<<<<< HEAD
         # final_dfs.append(df_temp)
         final_dfs.append(df_temp.iloc[500:])
     df_final = pd.concat(final_dfs)
-=======
-        final_dfs.append(df_temp)
-        final_dfs.append(df_temp.iloc[500:])
-    df_final = pd.concatenate(final_dfs)
->>>>>>> fc30fc0c4174ca55c6a81c96aed4ff10e2ae696c
+    
     df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_new.copy(deep=True)
