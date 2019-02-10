@@ -56,23 +56,18 @@ class BeeForagingModel(Model):
             self.hive = hive
             self.hives[hive.unique_id] = hive
             self.add_agent(hive, hive_location)
-            
+
             # Init Bees
             # TODO TAG BEES FOR WARM-UP PERIOD
             # TODO DEFINE THE AMOUNT OF STARTING BEES BABIES AS WELL
-            hive_id = hive.unique_id
             for _ in range(0, 20):
-                self.add_bee(pos=hive_location,
-                             hive=hive,
+                self.add_bee(hive=hive,
                              type_bee="scout",
-                             hive_id=hive_id,
                              color=hive.bee_color,
                              age=BABYTIME)
-                
-                self.add_bee(pos=hive_location,
-                             hive=hive,
+
+                self.add_bee(hive=hive,
                              type_bee="rester",
-                             hive_id=hive_id,
                              color=hive.bee_color,
                              age=BABYTIME)
 
@@ -94,9 +89,9 @@ class BeeForagingModel(Model):
             "n_deaths": lambda m: m.get_death_count(),
             "load_count": lambda m: m.load_count
         })
-        
+
         self.running = True
-        
+
         self.datacollector.collect(self)
         self.grid.warmup()
 
@@ -127,7 +122,7 @@ class BeeForagingModel(Model):
 
     def run_model(self, n_steps):
         for i in range(n_steps):
-            self.step()        
+            self.step()
 
     def add_agent(self, agent, pos):
         self.grid.place_agent(agent, pos)
@@ -141,13 +136,13 @@ class BeeForagingModel(Model):
         self.grid.remove_agent(agent)
         self.schedule.remove(agent)
 
-    def add_bee(self, pos, hive, type_bee, hive_id, color, age=0):
-            bee = Bee(self, pos=pos, hive=hive, type_bee=type_bee, hive_id=hive_id, color=color, age=age)
+    def add_bee(self, hive, type_bee, color, age=0):
+            bee = Bee(self, pos=hive.pos, hive=hive, type_bee=type_bee, hive_id=hive.unique_id, color=color, age=age)
 
             if type_bee == 'babee':
                 self.birth_count += 1
-            
-            self.add_agent(bee, pos)
+
+            self.add_agent(bee, hive.pos)
 
     @staticmethod
     def init_grid(height, width, obstacle_density, food_density, nr_hives):
@@ -167,7 +162,7 @@ class BeeForagingModel(Model):
         obstacle_end_index = food_end_index + amount_obstacle
 
         hive_locations = possible_locations[0:nr_hives]
-        
+
         food_locations = possible_locations[nr_hives:food_end_index]
         obstacle_locations = set(possible_locations[food_end_index:obstacle_end_index])
 
