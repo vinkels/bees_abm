@@ -20,6 +20,10 @@ class OFAT():
             self.time_stamp = time_stamp
 
     def run_ofat(self):
+        """
+        Collects data of model for ofat analysis.
+        Writes raw data as nested pandas dataframe to pickle and csv.
+        """
 
         # We define our variables and bounds
         params = {
@@ -28,16 +32,10 @@ class OFAT():
             'nr_hives': [1, 3, 5]
         }
 
-<<<<<<< HEAD
         # Set the repetitions, the amount of steps, and the amount of distinct values per variable
 
         replicates = 1
         max_steps = 30
-=======
-        # Set the repetitions and the amount of steps
-        replicates = 400
-        max_steps = 3000
->>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
 
         # Define output parameters
         model_reporters = {
@@ -79,8 +77,7 @@ class OFAT():
             final_dfs = []
             for i, row in df.iterrows():
                 # print(row)
-                df_temp = df.at[i, 'step_data']
-                print(type(df_temp))
+                df_temp = row['step_data']
                 df_temp.loc[:, 'obstacle_density'] = row['obstacle_density']
                 df_temp.loc[:, 'food_density'] = row['food_density']
                 df_temp.loc[:, 'nr_hives'] = row['nr_hives']
@@ -117,26 +114,38 @@ class OFAT():
             df_sample = df_sample.reset_index()
             df_step.to_pickle(f'pickles/sample_{name}_{self.time_stamp}.p')
             self.sample_dct[name] = df_sample
+
         return self.sample_dct, self.step_dct
 
-    def make_pwetty_plots(self, df_new):
-        sns_plot = sns.lineplot(x="step", y="food_bee",
-                                hue="nr_hives", data=df_new)
-        plt.savefig('plots/plot2.png')
-<<<<<<< HEAD
+    def make_step_plots(self, df_step):
+        """
+        Plots average over runs with steps on x-axis per input and output variable.
+        """
+
+        for val in ['food_density', 'nr_hives', 'obstacle_density']:
+            df = df_step[val]
+            for var in ['food_bee_mean', 'scout_forage_mean', 'bees_hive_mean']:
+                plt.figure()
+                sns_plot = sns.lineplot(x="step", y=var,
+                                        hue=val, data=df)
+                                        
+                plt.savefig(f'plots/new_{val}_{var}_1.png')
 
     def get_ofat(self):
         """
-
+        Formats raw data as dict with pandas dataframes and runs ofat analysis on data
+        returns fict with average over runs and average over steps between runs.
         """
-=======
->>>>>>> 04d56bc1476dad5b382334206a61ca5ea01e4e93
 
         self.ofat_dict, self.df_plot = self.data_prep()
+        label_lst = ['food per bee', 'scout-forager ratio', 'bees per hive']
 
         for param in ('food_bee', 'scout_forage', 'bees_hive'):
             self.plot_all_vars(param)
-            plt.savefig(f'plots/test_ofat_{param}.png')
+            plt.savefig(f'plots/ofat_{self.time_stamp}_{param}.png')
+        plt.figure()
+        return self.ofat_dict, self.df_plot
+        
 
     def plot_param_var_conf(self, ax, df, var, param):
         """
@@ -149,7 +158,6 @@ class OFAT():
             var: variables to be taken from the dataframe
             param: which output variable to plot
         """
-        # print(df)
         x = df.groupby(var).mean().reset_index()[var]
         y = df.groupby(var).mean()[param]
 
@@ -172,12 +180,14 @@ class OFAT():
         """
 
         f, axs = plt.subplots(3, figsize=(7, 10))
+        label_lst = ['food per bee', 'scout-forager ratio', 'bees per hive']
 
         for i, var in enumerate(self.var_names):
             self.plot_param_var_conf(axs[i], self.ofat_dict[var], var, param)
 
 
 if __name__ == "__main__":
-   ofat_obj = OFAT()
-   ofat_obj.run_ofat()
-   ofat_obj.get_ofat()
+    ofat_obj = OFAT(time_stamp='201902101145')
+    ofat_obj.run_ofat()
+    sample_dct, run_df = ofat_obj.get_ofat()
+    ofat_obj.make_step_plots(df_plot)
