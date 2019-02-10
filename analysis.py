@@ -188,12 +188,13 @@ if __name__ == "__main__":
         'bounds': [[1,6],[0,31],[5,26]],
         'groups':['G'+str(groups[1]),'G'+str(groups[2]),'G'+str(groups[3])] # for multiprocessing
     }
-    # dt = create_data(problem, new_path)
+    df = create_data(problem, new_path)
     #TODO make this part interactive?
+
     # Change this right_path by running create_data. Mind that max_steps should be bigger.
-    right_path = '201902071158'
-    data = pd.read_pickle(f'pickles/analysis_{new_path}.p')
-    cl_data = clean_data(data, new_path)
+    # right_path = '201902071158'
+    # data = pd.read_pickle(f'pickles/sobol_sample_{new_path}.p')
+    cl_data = clean_data(df, new_path)
     Si_scout_forage, Si_food_bee, Si_bee_hive = analyse(cl_data, problem)
     to_plot = [Si_scout_forage, Si_food_bee, Si_bee_hive]
     plot_sensitivity_order(to_plot,problem)
