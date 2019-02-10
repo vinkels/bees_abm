@@ -4,11 +4,15 @@ From tutorial: https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e66
 Code from
 https://gist.githubusercontent.com/
 Nicholas-Swift/003e1932ef2804bebef2710527008f44/raw/8fd79d81dcd5b52d01918b29689e0727154f886c/astar.py
+
+The code was adapted and tuned to be more performant for our exact use case.
 """
 
 
 class Node:
-    """A node class for A* Pathfinding"""
+    """
+    A node class for A* Pathfinding
+    """
 
     def __init__(self, route, position=None, f=0, g=0):
         self.route = route + [position]
@@ -27,7 +31,9 @@ MOORE_NEIGHBOURS = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1)
 
 
 def astar(maze, start, end):
-    """Returns a list of tuples as a path from the given start to the given end in the given maze"""
+    """
+    Returns a list of tuples as a path from the given start to the given end in the given maze
+    """
 
     # Create start and end node
     start_node = Node([], start)
