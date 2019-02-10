@@ -49,6 +49,9 @@ class MultiGridWithObstacles(MultiGrid):
         self.moore_neighbors = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
 
     def warmup(self):
+        """
+        Warmup the caches in the grid, so all steps will be faster and more consistent.
+        """
         for i in range(self.width):
             for j in range(self.height):
                 self.get_accessible_neighborhood((i, j))
@@ -72,7 +75,9 @@ class MultiGridWithObstacles(MultiGrid):
         agent.pos = pos
 
     def place_agent(self, agent, pos):
-        """ Position an agent on the grid, and set its pos variable. """
+        """
+        Position an agent on the grid, and set its pos variable.
+        """
         self._place_agent(pos, agent)
 
         self.agents[agent.unique_id] = agent
@@ -80,7 +85,9 @@ class MultiGridWithObstacles(MultiGrid):
         agent.pos = pos
 
     def remove_agent(self, agent):
-        """ Remove the agent from the grid and set its pos variable to None. """
+        """
+        Remove the agent from the grid and set its pos variable to None.
+        """
         pos = agent.pos
 
         del self.agents[agent.unique_id]
@@ -137,7 +144,6 @@ class MultiGridWithObstacles(MultiGrid):
 
         Returns:
             A iterator of the contents of the cells identified in cell_list
-
         """
         return itertools.chain.from_iterable(
             self.get_contents_with_obstacles_helper(x, y)
@@ -153,7 +159,9 @@ class MultiGridWithObstacles(MultiGrid):
 
     def get_accessible_neighborhood(self, pos):
         """
-        Returns only the accessible spots in the neighbourhood.
+        Returns a list of accessible positions
+        in a 1 radius Moore neighbourhood, excluding the center.
+        It also returns a list of obstacles in the same neighbourhood.
         """
         if pos in self.accessible_cache:
             return self.accessible_cache[pos]
@@ -183,22 +191,17 @@ class MultiGridWithObstacles(MultiGrid):
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
-            moore: If True, return Moore neighborhood
-                    (including diagonals)
-                   If False, return Von Neumann neighborhood
-                     (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well.
-                            Otherwise,
-                            return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
             A list of non-None objects in the given neighborhood;
-            at most 9 if Moore, 5 if Von-Neumann
-            (8 and 4 if not including the center).
-
+            At most 1 if radius==0, and 8 if radius==1.
         """
-        if radius == 1:
+        if radius == 0:
+            x, y = pos
+            food_candidate = self.grids[Food][x][y]
+            return [self.agents[food_candidate]] if food_candidate else []
+        else:
 
             # Food never changes, so we cache it.
             if pos in self.radius_1_food_cache:
@@ -211,20 +214,15 @@ class MultiGridWithObstacles(MultiGrid):
                 cand = (x+a, y+b)
                 if 0 <= cand[0] < self.width and 0 <= cand[1] < self.height and cand not in self.obstacle_positions:
                     cell_list.append(cand)
-        else:
-            cell_list = [pos]
 
-        foods = (
-            self.agents[z]
-            for z in (
-                self.grids[Food][x][y]
-                for x, y in cell_list
-                if self.grids[Food][x][y]
-            )
-        )
+            foods = [
+                self.agents[z]
+                for z in (
+                    self.grids[Food][x][y]
+                    for x, y in cell_list
+                    if self.grids[Food][x][y]
+                )
+            ]
 
-        if radius == 1:
-            self.radius_1_food_cache[pos] = list(foods)
-            return self.radius_1_food_cache[pos]
-
-        return foods
+            self.radius_1_food_cache[pos] = foods
+            return foods
