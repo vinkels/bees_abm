@@ -74,6 +74,9 @@ class RandomActivationBeeWorld(RandomActivation):
         return len(self.agents_by_breed[breed_class].values())
 
     def get_bee_count(self, bee_type):
+        """
+        Get the total number of bees in the model.
+        """
         return sum([
             1
             for agent in self.agents_by_breed[Bee].values()
@@ -81,6 +84,9 @@ class RandomActivationBeeWorld(RandomActivation):
         ])
 
     def count_hive_bees(self, pos):
+        """
+        Get the total number of bees on a position.
+        """
         return sum([
             1
             for bee in self.agents_by_breed[Bee].values()

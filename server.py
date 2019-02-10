@@ -22,52 +22,52 @@ def hive_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {}
-
-    if type(agent) is Bee:
-        portrayal["Shape"] = "circle"
-        portrayal["scale"] = 0.9
-        portrayal["r"] = 0.5
-        portrayal["Layer"] = 2
-        portrayal["Filled"] = "true"
-
-        portrayal["Color"] = agent.color
+    elif type(agent) is Bee:
+        return {
+            "Shape": "circle",
+            "scale": 0.9,
+            "r": 0.5,
+            "Layer": 2,
+            "Filled": "true",
+            "Color": agent.color
+        }
 
     elif type(agent) is Food:
         col_intensity = agent.util
 
         assert col_intensity >= 0, agent.__dict__
 
-        if col_intensity > 4:
-            col_intensity = 4
-        portrayal["Shape"] = "circle"
-        portrayal["scale"] = 0.9
-        portrayal["Layer"] = 1
-        portrayal["Filled"] = "true"
-        portrayal["Color"] = color_dic[col_intensity]
-        portrayal["r"] = 0.7
+        col_intensity = 4 if col_intensity > 4 else col_intensity
+
+        return {
+            "Shape": "circle",
+            "scale": 0.9,
+            "Layer": 1,
+            "Filled": "true",
+            "Color": color_dic[col_intensity],
+            "r": 0.7
+        }
 
     elif type(agent) is Hive:
-        portrayal["Shape"] = "rect"
-        portrayal["scale"] = 0.9
-        portrayal["Layer"] = 0
-        portrayal["Filled"] = "true"
-
-        portrayal["w"] = 1
-        portrayal["h"] = 1
-      
-        portrayal["Color"] = agent.color
-
+        return {
+            "Shape": "rect",
+            "scale": 0.9,
+            "Layer": 0,
+            "Filled": "true",
+            "w": 1,
+            "h": 1,
+            "Color": agent.color
+        }
     elif agent is OBSTACLE:
-        portrayal["Shape"] = "rect"
-        portrayal["scale"] = 0.9
-        portrayal["Layer"] = 0
-        portrayal["Filled"] = "true"
-        portrayal["Color"] = "GREY"
-        portrayal["w"] = 1
-        portrayal["h"] = 1
-
-    return portrayal
+        return {
+            "Shape": "rect",
+            "scale": 0.9,
+            "Layer": 0,
+            "Filled": "true",
+            "Color": "GREY",
+            "w": 1,
+            "h": 1
+        }
 
 
 width = GRID_WIDTH
@@ -90,8 +90,16 @@ server = ModularServer(
     {
         "width": width,
         "height": height,
-        "obstacle_density": UserSettableParameter('slider', 'obstacle density', value=0, min_value=0, max_value=100),
-        "food_density": UserSettableParameter('slider', 'food density', value=1, min_value=0, max_value=100),
+        "obstacle_density": UserSettableParameter('slider',
+                                                  'obstacle density',
+                                                  value=0,
+                                                  min_value=0,
+                                                  max_value=100),
+        "food_density": UserSettableParameter('slider',
+                                              'food density',
+                                              value=1,
+                                              min_value=0,
+                                              max_value=100),
         "VIZUALISATION": True
     }
 )
