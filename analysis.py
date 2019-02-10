@@ -39,13 +39,13 @@ def create_data(problem, new_path):
     # Sample from data with every interactions, computationally expensive but gives all combinations
     params_values = saltelli.sample(problem,N=3)
 
-    # change nr of hives to ints -> looks ok 
+    # change nr of hives to ints -> looks ok
     for i, val in enumerate(params_values):
         params_values[i][0] = int(val[0])
-    print(params_values)
+    # print(params_values)
 
     #transform to int value and overwrite array if copy needed set flag to True
-    params_values = params_values.astype(int, copy=False)
+    # params_values = params_values.astype(int, copy=False)
 
     # test range of combinations
     # print(params_values[:][:,0], len(params_values))
@@ -99,7 +99,7 @@ def clean_data(data, new_path):
         # final_dfs.append(df_temp)
         final_dfs.append(df_temp.iloc[500:])
     df_final = pd.concat(final_dfs)
-    
+
     df_new = df_final[['n_hives', 'food_dens', 'obstacle_dens', 'step']]
     #TODO Fix create SettingWithcopyWarning, solution make a deepcopy of the result dataframe
     df_test = df_new.copy(deep=True)
@@ -119,7 +119,6 @@ def clean_data(data, new_path):
             # print(df_sample)
 
     df_sample = df_sample.reset_index()
-    df_sample.columns = ['_'.join(col) if col[1] else col[0] for col in df_sample.columns]
     df_sample.to_pickle(f'pickles/sobol_small_sample_{new_path}.p')
 
     return df_sample
@@ -188,7 +187,7 @@ if __name__ == "__main__":
     # Extract all the present CPU-thread for computation
     groups = np.arange(os.cpu_count())
 
-    # to make multiple small batches 
+    # to make multiple small batches
     for i in range(25):
         #path timestamp
         new_path = datetime.now().strftime('%Y%m%d%H%M')

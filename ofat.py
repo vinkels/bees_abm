@@ -28,15 +28,8 @@ class OFAT():
             'nr_hives': [1, 3, 5]
         }
 
-<<<<<<< HEAD
-
-        # Set the repetitions, the amount of steps, and the amount of distinct values per variable
-
-        replicates = 500
-=======
         # Set the repetitions and the amount of steps
         replicates = 400
->>>>>>> fc30fc0c4174ca55c6a81c96aed4ff10e2ae696c
         max_steps = 3000
 
         # Define output parameters
@@ -119,14 +112,6 @@ class OFAT():
                                 hue="nr_hives",
                                 data=df_new)
         plt.savefig('plots/plot2.png')
-<<<<<<< HEAD
-            
-    def get_ofat(self):
-        """
-
-        """
-=======
->>>>>>> fc30fc0c4174ca55c6a81c96aed4ff10e2ae696c
 
     def get_ofat(self):
         self.ofat_dict, self.df_plot = self.data_prep()
